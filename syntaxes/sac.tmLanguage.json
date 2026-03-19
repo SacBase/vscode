@@ -9,72 +9,145 @@
 	],
 	"patterns": [
 		{
-			"include": "#sac-keywords"
-		},
-		{
 			"include": "#sac-type-patterns"
 		},
 		{
-			"include": "#sac-rank-types"
+			"include": "#sac-shape-guards"
 		},
 		{
-			"include": "#sac-with-ops"
+			"include": "#sac-builtins"
+		},
+		{
+			"include": "#sac-functions"
+		},
+		{
+			"include": "#sac-module-imports"
+		},
+		{
+			"include": "#sac-types"
+		},
+		{
+			"include": "#sac-keywords"
 		},
 		{
 			"include": "#sac-pragmas"
-		},
-		{
-			"include": "#sac-primitives"
 		},
 		{
 			"include": "source.c"
 		}
 	],
 	"repository": {
-		"sac-keywords": {
+		"sac-module-imports": {
 			"patterns": [
 				{
-					"name": "keyword.control.sac",
-					"match": "\\b(if|else|while|do|for|return|use|import|module|export|provide|all|except|typedef|classtype|class|objdef|external|struct|step|width)\\b"
-				}
-			]
-		},
-		"sac-type-patterns": {
-			"patterns": [
+					"begin": "\\b(use|import)\\b",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.control.import.sac"
+						}
+					},
+					"end": ";",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.terminator.statement.sac"
+						}
+					},
+					"patterns": [
+						{
+							"name": "entity.name.module.sac",
+							"match": "[a-zA-Z_]\\w*(?:::[a-zA-Z_]\\w*)?"
+						},
+						{
+							"name": "keyword.control.import.sac",
+							"match": "\\b(all|except)\\b"
+						},
+						{
+							"name": "keyword.operator.set.sac",
+							"match": "[{}:]"
+						}
+					]
+				},
 				{
-					"name": "storage.type.pattern.sac",
-					"match": "([a-zA-Z_]\\w*)\\s*\\[\\s*([a-zA-Z_]\\w*)\\s*:\\s*([a-zA-Z_]\\w*)(?:\\s*,\\s*([a-zA-Z_]\\w*)\\s*:\\s*([a-zA-Z_]\\w*))*\\s*\\]",
+					"match": "\\b(module)\\s+([a-zA-Z_]\\w*(?:::[a-zA-Z_]\\w*)?)\\b",
 					"captures": {
 						"1": {
-							"name": "storage.type.sac"
+							"name": "keyword.control.module.sac"
 						},
 						"2": {
-							"name": "variable.parameter.rank.sac"
-						},
-						"3": {
-							"name": "variable.parameter.shape.sac"
+							"name": "entity.name.module.sac"
 						}
 					}
-				}
-			]
-		},
-		"sac-rank-types": {
-			"patterns": [
+				},
 				{
-					"name": "storage.type.rank.sac",
-					"match": "\\[(\\*|\\+|\\.+|(?:,\\.+)+)\\]"
+					"match": "\\b(provide|export)\\b",
+					"name": "keyword.control.import.sac"
 				}
 			]
 		},
-		"sac-with-ops": {
+		"sac-builtins": {
 			"patterns": [
 				{
 					"name": "keyword.operator.withloop.sac",
 					"match": "\\b(with|genarray|modarray|fold|foldfix|propagate)\\b"
 				},
 				{
+					"name": "support.function.primitive.sac",
+					"match": "\\b(_[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*_)\\b"
+				},
+				{
+					"name": "support.function.builtin.sac",
+					"match": "\\b(shape|reshape|sel|take|drop|cat|dim|size|all|min|max|print|transpose|zero|toi|tof|toc|tob|tos|toui|toul|toull|toub|tous)\\b"
+				},
+				{
 					"name": "constant.language.selection.sac",
 					"match": "\\.{1,3}"
+				}
+			]
+		},
+		"sac-types": {
+			"patterns": [
+				{
+					"match": "\\b(?:int|bool|char|float|double)\\b",
+					"name": "storage.type.sac"
+				}
+			]
+		},
+		"sac-type-patterns": {
+			"patterns": [
+				{
+					"begin": "(int|bool|char|float|double)\\s*\\[",
+					"beginCaptures": {
+						"1": {
+							"name": "storage.type.sac"
+						},
+						"0": {
+							"name": "punctuation.section.brackets.begin.sac"
+						}
+					},
+					"end": "\\]",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.brackets.end.sac"
+						}
+					},
+					"patterns": [
+						{
+							"name": "variable.parameter.rank.sac",
+							"match": "\\.|[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?"
+						},
+						{
+							"name": "punctuation.separator.rank.sac",
+							"match": "[:,]"
+						}
+					]
+				}
+			]
+		},
+		"sac-keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.sac",
+					"match": "\\b(if|else|while|do|for|return|typedef|classtype|class|objdef|external|struct|step|width)\\b"
 				}
 			]
 		},
@@ -86,11 +159,29 @@
 				}
 			]
 		},
-		"sac-primitives": {
+		"sac-functions": {
 			"patterns": [
 				{
-					"name": "support.function.primitive.sac",
-					"match": "\\b(_sel_VxA_|_sel_VxS_|_reshape_VxA_)\\b"
+					"begin": "\\b(?:int|bool|char|float|double)\\b\\s+([A-Za-z_]\\w*)",
+					"beginCaptures": {
+						"1": {
+							"name": "entity.name.function.sac"
+						}
+					},
+					"end": "\\{",
+					"patterns": []
+				},
+				{
+					"match": "\\b((?!(?:with|genarray|modarray|fold|foldfix|propagate|shape|reshape|sel|take|drop|cat|dim|size|all|min|max|print|transpose)\\b)(?!_[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*_\\b)[A-Za-z_]\\w*)\\s*(?=\\()",
+					"name": "support.function.call.sac"
+				}
+			]
+		},
+		"sac-shape-guards": {
+			"patterns": [
+				{
+					"name": "keyword.operator.guard.sac",
+					"match": "\\|"
 				}
 			]
 		}

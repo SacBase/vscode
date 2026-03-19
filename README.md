@@ -8,6 +8,8 @@ This extension is currently focused on a solid first milestone:
 - Syntax highlighting for SaC-specific constructs
 - Basic editor behavior (comments, brackets, auto-closing pairs)
 
+Note: SaC syntax highlighting is additive to your currently selected VS Code theme. The extension keeps your active theme and applies SaC-specific token color overlays (keywords, built-ins, and shape syntax) without replacing C/editor colors.
+
 The next milestone is compiler-backed diagnostics (inline errors and warnings from `sac2c`).
 
 ## Current Progress

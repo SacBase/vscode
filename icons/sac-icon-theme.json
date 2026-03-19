@@ -1,0 +1,10 @@
+{
+  "iconDefinitions": {
+    "_file_sac": {
+      "iconPath": "./logo.png"
+    }
+  },
+  "fileExtensions": {
+    "sac": "_file_sac"
+  }
+}
