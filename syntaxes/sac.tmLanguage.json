@@ -1,0 +1,98 @@
+{
+	"$schema": "./sac.tmLanguage.schema.json",
+	"name": "SaC",
+	"scopeName": "source.sac",
+	"description": [
+		"Syntax highlighting for SaC (Single Assignment C)",
+		"We reuse the C syntax highlighting for most of the code, and add some additional keywords specific to SaC.",
+		"Schema was fetched with: curl -L -o sac.tmLanguage.schema.json https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json"
+	],
+	"patterns": [
+		{
+			"include": "#sac-keywords"
+		},
+		{
+			"include": "#sac-type-patterns"
+		},
+		{
+			"include": "#sac-rank-types"
+		},
+		{
+			"include": "#sac-with-ops"
+		},
+		{
+			"include": "#sac-pragmas"
+		},
+		{
+			"include": "#sac-primitives"
+		},
+		{
+			"include": "source.c"
+		}
+	],
+	"repository": {
+		"sac-keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.sac",
+					"match": "\\b(if|else|while|do|for|return|use|import|module|export|provide|all|except|typedef|classtype|class|objdef|external|struct|step|width)\\b"
+				}
+			]
+		},
+		"sac-type-patterns": {
+			"patterns": [
+				{
+					"name": "storage.type.pattern.sac",
+					"match": "([a-zA-Z_]\\w*)\\s*\\[\\s*([a-zA-Z_]\\w*)\\s*:\\s*([a-zA-Z_]\\w*)(?:\\s*,\\s*([a-zA-Z_]\\w*)\\s*:\\s*([a-zA-Z_]\\w*))*\\s*\\]",
+					"captures": {
+						"1": {
+							"name": "storage.type.sac"
+						},
+						"2": {
+							"name": "variable.parameter.rank.sac"
+						},
+						"3": {
+							"name": "variable.parameter.shape.sac"
+						}
+					}
+				}
+			]
+		},
+		"sac-rank-types": {
+			"patterns": [
+				{
+					"name": "storage.type.rank.sac",
+					"match": "\\[(\\*|\\+|\\.+|(?:,\\.+)+)\\]"
+				}
+			]
+		},
+		"sac-with-ops": {
+			"patterns": [
+				{
+					"name": "keyword.operator.withloop.sac",
+					"match": "\\b(with|genarray|modarray|fold|foldfix|propagate)\\b"
+				},
+				{
+					"name": "constant.language.selection.sac",
+					"match": "\\.{1,3}"
+				}
+			]
+		},
+		"sac-pragmas": {
+			"patterns": [
+				{
+					"name": "keyword.control.directive.pragma.sac",
+					"match": "#\\s*pragma\\s+(linkobj|linksign|header|linkname|sacarg|effect|ctype|gpumem)\\b"
+				}
+			]
+		},
+		"sac-primitives": {
+			"patterns": [
+				{
+					"name": "support.function.primitive.sac",
+					"match": "\\b(_sel_VxA_|_sel_VxS_|_reshape_VxA_)\\b"
+				}
+			]
+		}
+	}
+}
