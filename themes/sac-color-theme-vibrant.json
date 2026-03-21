@@ -93,14 +93,28 @@
     {
       "scope": "keyword.control.import.sac",
       "settings": {
-        "foreground": "#CCFF66",
+        "foreground": "#A8FF3D",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "keyword.control.import.all.sac",
+      "settings": {
+        "foreground": "#C8FF66",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "keyword.control.import.except.sac",
+      "settings": {
+        "foreground": "#E0FF99",
         "fontStyle": "bold"
       }
     },
     {
       "scope": "entity.name.module.sac",
       "settings": {
-        "foreground": "#DDFF99"
+        "foreground": "#99F0FF"
       }
     },
     {
@@ -126,14 +140,14 @@
     {
       "scope": "support.function.builtin.sac",
       "settings": {
-        "foreground": "#BBFF00",
+        "foreground": "#FFB347",
         "fontStyle": "bold"
       }
     },
     {
       "scope": "support.function.primitive.sac",
       "settings": {
-        "foreground": "#99FF00",
+        "foreground": "#FF6FAE",
         "fontStyle": "bold"
       }
     },

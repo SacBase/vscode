@@ -59,7 +59,12 @@
     ],
     "themes": [
       {
-        "label": "SaC Warm Default",
+        "label": "SaC Default",
+        "uiTheme": "vs-dark",
+        "path": "./themes/sac-color-theme-default.json"
+      },
+      {
+        "label": "SaC Warm",
         "uiTheme": "vs-dark",
         "path": "./themes/sac-color-theme-warm.json"
       },

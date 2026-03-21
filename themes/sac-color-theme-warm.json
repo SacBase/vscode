@@ -93,14 +93,28 @@
     {
       "scope": "keyword.control.import.sac",
       "settings": {
-        "foreground": "#FFB280",
+        "foreground": "#FF9A66",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "keyword.control.import.all.sac",
+      "settings": {
+        "foreground": "#FFB985",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "keyword.control.import.except.sac",
+      "settings": {
+        "foreground": "#FFD0A6",
         "fontStyle": "bold"
       }
     },
     {
       "scope": "entity.name.module.sac",
       "settings": {
-        "foreground": "#FFCC99"
+        "foreground": "#FFC38A"
       }
     },
     {
