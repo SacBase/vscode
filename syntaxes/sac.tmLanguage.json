@@ -47,6 +47,26 @@
 				}
 			]
 		},
+		"L:meta.function.definition.parameters.c - comment - string": {
+			"patterns": [
+				{
+					"include": "#sac-types"
+				},
+				{
+					"include": "#sac-shapes-in-calls"
+				}
+			]
+		},
+		"L:meta.function.parameters.c - comment - string": {
+			"patterns": [
+				{
+					"include": "#sac-types"
+				},
+				{
+					"include": "#sac-shapes-in-calls"
+				}
+			]
+		},
 		"L:source.sac - comment - string": {
 			"patterns": [
 				{

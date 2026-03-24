@@ -5,12 +5,20 @@ import { fileURLToPath } from "url";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
   createConnection,
+  Diagnostic,
   ProposedFeatures,
   TextDocuments,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
 
-import { parseCompilerOutput, toLspDiagnostic } from "./diagnosticParser";
+import {
+  groupDiagnostics,
+  parseCompilerOutput,
+  presentDiagnostics,
+} from "./diagnostics/adapter";
+import { buildDiagnosticWithRange } from "./diagnostics/range";
+import { buildRelatedInformation } from "./diagnostics/relatedInfo";
+import { DiagnosticsPresentationMode } from "./diagnostics/types";
 import {
   CompilerResolutionSettings,
   resolveSac2cPath,
@@ -19,6 +27,10 @@ import {
 interface SacSettings extends CompilerResolutionSettings {
   diagnosticsMode: "onSave" | "onType" | "manual";
   diagnosticsDebounceMs: number;
+  diagnosticsPresentation: DiagnosticsPresentationMode;
+  diagnosticsIncludeRelatedInformation: boolean;
+  diagnosticsIncludeStackInMessage: boolean;
+  diagnosticsMaxStackFrames: number;
   executionBackend: "local" | "wsl" | "docker";
   wslDistribution: string;
   dockerImage: string;
@@ -58,6 +70,10 @@ function getDefaultSettings(): SacSettings {
   return {
     diagnosticsMode: "onSave",
     diagnosticsDebounceMs: 500,
+    diagnosticsPresentation: "smart",
+    diagnosticsIncludeRelatedInformation: true,
+    diagnosticsIncludeStackInMessage: true,
+    diagnosticsMaxStackFrames: 5,
     compilerChannel: "system",
     compilerPath: "",
     fallbackToSystem: true,
@@ -152,9 +168,19 @@ function updateSettings(configuration: unknown): void {
   const diagnosticsMode: SacSettings["diagnosticsMode"] =
     mode === "onType" || mode === "manual" || mode === "onSave" ? mode : "onSave";
 
+  const presentation = diagnostics.presentation;
+  const diagnosticsPresentation: DiagnosticsPresentationMode =
+    presentation === "expanded" || presentation === "smart" || presentation === "hybrid"
+      ? presentation
+      : "expanded";
+
   settings = {
     diagnosticsMode,
     diagnosticsDebounceMs: Math.max(Number(diagnostics.debounceMs || 500), 100),
+    diagnosticsPresentation,
+    diagnosticsIncludeRelatedInformation: diagnostics.includeRelatedInformation !== false,
+    diagnosticsIncludeStackInMessage: diagnostics.includeStackInMessage !== false,
+    diagnosticsMaxStackFrames: Math.max(Number(diagnostics.maxStackFrames || 5), 0),
     compilerChannel:
       compiler.channel === "stable" || compiler.channel === "develop" || compiler.channel === "system"
         ? compiler.channel
@@ -382,18 +408,46 @@ function diagnosticAppliesToDocument(parsedPath: string, requestedFilePath: stri
 /**
  * Collects and converts compiler output diagnostics for a single document URI.
  *
- * @param documentUri URI of the document being validated.
+ * @param document Document being validated.
  * @param stdout Compiler standard output.
  * @param stderr Compiler standard error.
  * @returns LSP diagnostics applicable to the requested document.
  */
-function gatherDiagnosticsForDocument(documentUri: string, stdout: string, stderr: string) {
-  const requestedFilePath = normalizePathForCompare(uriToFsPath(documentUri));
+function gatherDiagnosticsForDocument(document: TextDocument, stdout: string, stderr: string): Diagnostic[] {
+  const requestedFilePath = normalizePathForCompare(uriToFsPath(document.uri));
   const parsedDiagnostics = parseCompilerOutput(stdout, stderr);
+  const normalizedParsedDiagnostics = parsedDiagnostics.map((entry) => ({
+    ...entry,
+    file: normalizePathForCompare(entry.file),
+  }));
+  const groups = groupDiagnostics(normalizedParsedDiagnostics);
+  const lines = document.getText().split(/\r?\n/);
 
-  return parsedDiagnostics
-    .filter((parsed) => diagnosticAppliesToDocument(parsed.file, requestedFilePath))
-    .map((parsed) => toLspDiagnostic(parsed));
+  const rendered = presentDiagnostics(
+    normalizedParsedDiagnostics,
+    groups,
+    requestedFilePath,
+    {
+      presentation: settings.diagnosticsPresentation,
+      includeRelatedInformation: settings.diagnosticsIncludeRelatedInformation,
+      includeStackInMessage: settings.diagnosticsIncludeStackInMessage,
+      maxStackFrames: settings.diagnosticsMaxStackFrames,
+    },
+  );
+
+  return rendered
+    .filter((entry) => diagnosticAppliesToDocument(entry.anchor.file, requestedFilePath))
+    .map((entry) => {
+      const lineText = lines[entry.anchor.line] || "";
+      const diagnostic = buildDiagnosticWithRange(entry.anchor, lineText);
+      diagnostic.message = entry.message;
+
+      if (settings.diagnosticsIncludeRelatedInformation && entry.related.length > 0) {
+        diagnostic.relatedInformation = buildRelatedInformation(entry.related);
+      }
+
+      return diagnostic;
+    });
 }
 
 /**
@@ -458,7 +512,7 @@ async function validateDocument(document: TextDocument): Promise<void> {
     }
   }
 
-  const diagnostics = gatherDiagnosticsForDocument(document.uri, runResult.stdout, runResult.stderr);
+  const diagnostics = gatherDiagnosticsForDocument(document, runResult.stdout, runResult.stderr);
 
   connection.sendDiagnostics({
     uri: document.uri,

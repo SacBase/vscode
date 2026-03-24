@@ -2,8 +2,8 @@
 
 [![VS Code Engine](https://img.shields.io/badge/VS%20Code-%5E1.110.0-007ACC?logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/)
 [![TypeScript](https://img.shields.io/badge/Runtime-TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![GitHub Repo stars](https://img.shields.io/github/stars/LuckyLuuk12/sac-language-support?style=social)](https://github.com/LuckyLuuk12/sac-language-support/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/LuckyLuuk12/sac-language-support)](https://github.com/LuckyLuuk12/sac-language-support/issues)
+[![GitHub Repo stars](https://img.shields.io/github/stars/SacBase/vscode?style=social)](https://github.com/SacBase/vscode/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/SacBase/vscode)](https://github.com/SacBase/vscode/issues)
 
 <table>
 	<tr>
@@ -78,6 +78,10 @@ Main settings:
 
 - `sac.languageServer.enable`
 - `sac.diagnostics.mode` (`onSave`, `onType`, `manual`)
+- `sac.diagnostics.presentation` (`expanded`, `smart`, `hybrid`)
+- `sac.diagnostics.includeRelatedInformation`
+- `sac.diagnostics.includeStackInMessage`
+- `sac.diagnostics.maxStackFrames`
 - `sac.compiler.channel` (`stable`, `develop`, `system`)
 - `sac.compiler.path`
 - `sac.compiler.executionBackend` (`local`, `wsl`, `docker`)
@@ -96,6 +100,10 @@ Default structured messaging args are:
 ```
 
 If your `sac2c` version uses a different syntax, override `sac.compiler.messaging.args`.
+
+Diagnostics pipeline details are documented in `docs/diagnostics-pipeline.md`.
+
+Editor-agnostic diagnostics architecture and JSON/SARIF adapter notes are documented in `docs/editor-agnostic-diagnostics.md`.
 
 ## Windows Notes
 

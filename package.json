@@ -124,6 +124,32 @@
           "minimum": 100,
           "description": "Debounce used for onType diagnostics mode."
         },
+        "sac.diagnostics.presentation": {
+          "type": "string",
+          "enum": [
+            "expanded",
+            "smart",
+            "hybrid"
+          ],
+          "default": "smart",
+          "description": "Controls diagnostic rendering style: all raw entries (expanded), one actionable entry per chain (smart), or smart plus local context entries (hybrid)."
+        },
+        "sac.diagnostics.includeRelatedInformation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Attach compiler origin and stack-like context as related information in hover/Problems details."
+        },
+        "sac.diagnostics.includeStackInMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include short origin and call-stack hints directly inside diagnostic messages."
+        },
+        "sac.diagnostics.maxStackFrames": {
+          "type": "number",
+          "default": 5,
+          "minimum": 0,
+          "description": "Maximum number of context frames used in smart/hybrid diagnostics."
+        },
         "sac.compiler.channel": {
           "type": "string",
           "enum": [
