@@ -29,7 +29,10 @@
     "typescript": "^5.8.2"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Language Packs",
+    "Snippets",
+    "Themes"
   ],
   "contributes": {
     "languages": [
