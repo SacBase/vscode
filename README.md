@@ -1,39 +1,40 @@
 # SaC Language Support for VS Code
 
-VS Code language support for SaC (Single Assignment C).
+[![VS Code Engine](https://img.shields.io/badge/VS%20Code-%5E1.110.0-007ACC?logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/)
+[![TypeScript](https://img.shields.io/badge/Runtime-TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![GitHub Repo stars](https://img.shields.io/github/stars/LuckyLuuk12/sac-language-support?style=social)](https://github.com/LuckyLuuk12/sac-language-support/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/LuckyLuuk12/sac-language-support)](https://github.com/LuckyLuuk12/sac-language-support/issues)
 
-This extension is currently focused on a solid first milestone:
+<table>
+	<tr>
+		<td width="140" valign="middle">
+			<a href="https://github.com/LuckyLuuk12">
+				<img src="https://github.com/LuckyLuuk12.png?size=120" alt="Luuk Kablan" width="120" height="120" />
+			</a>
+		</td>
+		<td valign="middle">
+			<a href="https://github.com/LuckyLuuk12">
+				<img src="https://img.shields.io/badge/Maintainer-Luuk%20Kablan-0d1117?style=for-the-badge&logo=github&logoColor=white" alt="Maintainer Luuk Kablan" width="360" />
+			</a>
+			<br />
+			<a href="https://github.com/LuckyLuuk12">
+				<img src="https://img.shields.io/badge/GitHub-%40LuckyLuuk12-24292f?style=for-the-badge&logo=github" alt="GitHub LuckyLuuk12" width="360" />
+			</a>
+			<br />
+			<a href="https://github.com/SacBase/vscode">
+				<img src="https://img.shields.io/badge/SacBase%2Fvscode-Admin-238636?style=for-the-badge&logo=github" alt="SacBase vscode admin" width="360" />
+			</a>
+		</td>
+	</tr>
+</table>
+
+VS Code language support for SaC (Single Assignment C), including a minimal language server for compiler-backed diagnostics.
+
+This extension now includes:
 
 - SaC language registration (`.sac` files)
-- Syntax highlighting for SaC-specific constructs
-- Basic editor behavior (comments, brackets, auto-closing pairs)
-
-Note: SaC syntax highlighting is additive to your currently selected VS Code theme. The extension keeps your active theme and applies SaC-specific token color overlays (keywords, built-ins, and shape syntax) without replacing C/editor colors.
-
-The next milestone is compiler-backed diagnostics (inline errors and warnings from `sac2c`).
-
-## Current Progress
-
-### Implemented
-
-- Language ID: `sac`
-- File association: `.sac`
-- TextMate grammar in `syntaxes/sac.tmLanguage.json`
-- SaC-aware highlighting for:
-	- module/import/use keywords
-	- with-loop operators (`with`, `genarray`, `modarray`, `fold`, `foldfix`, `propagate`)
-	- selected pragmas (`#pragma header`, `#pragma ctype`, etc.)
-	- selected primitive patterns
-- Language configuration in `language-configuration.json`:
-	- line and block comments
-	- bracket matching
-	- auto-closing and surrounding pairs
-
-### In Progress / Planned
-
-- Inline diagnostics from `sac2c` (Problems panel + squiggles)
-- Better error parsing for file, line, column and message severity
-- Hover help and completions for common SaC constructs
+- SaC syntax highlighting and language configuration
+- Compiler-backed diagnostics via `sac2c` (Problems panel + red squiggles)
 
 ## Installation (Development)
 
@@ -55,50 +56,54 @@ npm install
 
 ## Requirements
 
-For currently implemented features (syntax + editor behavior), no external tool is required.
+For syntax highlighting only, no external tool is required.
 
-For upcoming diagnostics features, an operational `sac2c` installation on your `PATH` will be required.
+For diagnostics, `sac2c` is required via one of:
+
+- `sac.compiler.path` (explicit executable path)
+- bundled compiler in `vendor/sac2c/<channel>/<platform-target>/`
+- system `sac2c` on `PATH`
+
+Execution backends:
+
+- `local`: run `sac2c` directly on the host where the extension runs
+- `wsl`: run via `wsl.exe` (Windows host only)
+- `docker`: run via `docker run` with bind mount
+
+The extension does not auto-install or auto-start WSL/Docker.
 
 ## Extension Settings
 
-No custom extension settings are contributed yet.
+Main settings:
 
-Settings will be added together with diagnostics support, likely including:
+- `sac.languageServer.enable`
+- `sac.diagnostics.mode` (`onSave`, `onType`, `manual`)
+- `sac.compiler.channel` (`stable`, `develop`, `system`)
+- `sac.compiler.path`
+- `sac.compiler.executionBackend` (`local`, `wsl`, `docker`)
+- `sac.compiler.wsl.distribution`
+- `sac.compiler.docker.image`
+- `sac.compiler.docker.runArgs`
+- `sac.compiler.messaging.enabled`
+- `sac.compiler.messaging.args`
+- `sac.compiler.extraArgs`
+- `sac.compiler.fallbackToSystem`
 
-- path to `sac2c`
-- diagnostics trigger mode (`onSave` / `onType`)
-- extra compiler flags used for diagnostics
+Default structured messaging args are:
 
-## Known Issues
+```text
+-cti-no-color -cti-no-source -cti-no-hint -cti-no-explain -cti-message-length 0 -cti-primary-header-format "%s: " -cti-continuation-header-format "%.0s"
+```
 
-- Diagnostics are not implemented yet; syntax errors are not shown inline.
-- Grammar coverage is good for core syntax but still incomplete for the full SaC language surface.
-- No snippets, hover docs, symbol navigation, or formatting support yet.
+If your `sac2c` version uses a different syntax, override `sac.compiler.messaging.args`.
 
-## Roadmap
+## Windows Notes
 
-Short-term:
+`sac2c` is typically Linux/macOS-first. For Windows users, recommended options are:
 
-- Add `sac2c` diagnostics integration without modifying compiler sources
-- Surface errors and warnings as VS Code diagnostics
-- Improve syntax grammar coverage using real-world SaC code from Stdlib and exercises
+- Use VS Code Remote WSL and run this extension inside WSL with backend `local`
+- Use backend `wsl` and configure `sac.compiler.wsl.distribution`
+- Use backend `docker` and set `sac.compiler.docker.image`
 
-Mid-term:
+If none are available, keep syntax highlighting enabled and diagnostics disabled.
 
-- Hover/type hints
-- Basic completions for keywords/pragmas/common patterns
-- Go to definition for local symbols
-
-Long-term:
-
-- Full LSP-based SaC tooling
-- Workspace-aware module resolution and richer semantic analysis
-
-## Release Notes
-
-### 0.0.1
-
-- Initial public extension scaffold
-- SaC language registration and `.sac` file association
-- First version of SaC syntax highlighting
-- Basic language configuration (comments, brackets, pairs)

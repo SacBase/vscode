@@ -8,8 +8,25 @@
   "displayName": "SaC (Single Assignment C) Language Support",
   "description": "VS Code extension providing language support and improved developer workflow for SaC (Single Assignment C), including syntax highlighting and compiler diagnostics.",
   "version": "0.0.1",
+  "main": "./out/extension.js",
   "engines": {
     "vscode": "^1.110.0"
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.11",
+    "@types/vscode": "^1.110.0",
+    "typescript": "^5.8.2"
   },
   "categories": [
     "Programming Languages"
@@ -78,6 +95,122 @@
         "uiTheme": "vs-dark",
         "path": "./themes/sac-color-theme-vibrant.json"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "SaC",
+      "properties": {
+        "sac.languageServer.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the SaC language server."
+        },
+        "sac.diagnostics.mode": {
+          "type": "string",
+          "enum": [
+            "onSave",
+            "onType",
+            "manual"
+          ],
+          "default": "onSave",
+          "description": "When to run diagnostics through sac2c."
+        },
+        "sac.diagnostics.debounceMs": {
+          "type": "number",
+          "default": 500,
+          "minimum": 100,
+          "description": "Debounce used for onType diagnostics mode."
+        },
+        "sac.compiler.channel": {
+          "type": "string",
+          "enum": [
+            "stable",
+            "develop",
+            "system"
+          ],
+          "default": "system",
+          "description": "Which sac2c channel to prefer: bundled stable, bundled develop, or system PATH."
+        },
+        "sac.compiler.path": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to sac2c executable. If set, this overrides channel resolution."
+        },
+        "sac.compiler.executionBackend": {
+          "type": "string",
+          "enum": [
+            "local",
+            "wsl",
+            "docker"
+          ],
+          "default": "local",
+          "description": "How to execute sac2c: local process, through WSL, or in Docker."
+        },
+        "sac.compiler.wsl.distribution": {
+          "type": "string",
+          "default": "",
+          "description": "Optional WSL distribution name used when executionBackend is 'wsl'."
+        },
+        "sac.compiler.docker.image": {
+          "type": "string",
+          "default": "",
+          "description": "Docker image that contains sac2c. Required when executionBackend is 'docker'."
+        },
+        "sac.compiler.docker.runArgs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional docker run arguments when executionBackend is 'docker'."
+        },
+        "sac.compiler.extraArgs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional command-line arguments passed to sac2c when running diagnostics."
+        },
+        "sac.compiler.messaging.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable compiler messaging format arguments for deterministic diagnostics parsing."
+        },
+        "sac.compiler.messaging.args": {
+          "type": "array",
+          "default": [
+            "-cti-no-color",
+            "-cti-no-source",
+            "-cti-no-hint",
+            "-cti-no-explain",
+            "-cti-message-length",
+            "0",
+            "-cti-primary-header-format",
+            "%s: ",
+            "-cti-continuation-header-format",
+            "%.0s"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Arguments used to request stable GNU-style diagnostics output from sac2c."
+        },
+        "sac.compiler.fallbackToSystem": {
+          "type": "boolean",
+          "default": true,
+          "description": "If bundled channel binary is missing, fallback to sac2c from PATH."
+        },
+        "sac.compiler.trace": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Trace communication between VS Code and the SaC language server."
+        }
+      }
+    }
   }
 }
