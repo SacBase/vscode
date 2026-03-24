@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  echo "Usage: npm run publish:official -- [optional commit message]"
+  echo ""
+  echo "Behavior:"
+  echo "  1) Commit dirty workspace as 'chore: confirm pushed workspace'"
+  echo "  2) Push private branch to origin"
+  echo "  3) Publish one squashed commit to official remote"
+  exit 0
+fi
+
 message="${1:-chore: curated public sync}"
 private_branch="${PRIVATE_BRANCH:-master}"
 official_remote="${OFFICIAL_REMOTE:-official}"
@@ -35,14 +45,28 @@ git push origin "$private_branch"
 git fetch "$official_remote"
 git fetch origin "$private_branch"
 
-git checkout -B "$publish_branch" "$official_remote/$official_branch"
+base_ref=""
+if git show-ref --verify --quiet "refs/remotes/$official_remote/$official_branch"; then
+  base_ref="$official_remote/$official_branch"
+elif git show-ref --verify --quiet "refs/remotes/$official_remote/master"; then
+  official_branch="master"
+  base_ref="$official_remote/master"
+fi
 
-git merge --squash "origin/$private_branch"
+if [[ -n "$base_ref" ]]; then
+  git checkout -B "$publish_branch" "$base_ref"
+  git merge --squash "origin/$private_branch"
 
-if [[ -z "$(git status --porcelain)" ]]; then
-  echo "No changes to publish to $official_remote/$official_branch."
-  git checkout "$current_branch"
-  exit 0
+  if [[ -z "$(git status --porcelain)" ]]; then
+    echo "No changes to publish to $official_remote/$official_branch."
+    git checkout "$current_branch"
+    exit 0
+  fi
+else
+  echo "No existing branch found on $official_remote. Creating first squashed publish commit."
+  git checkout --orphan "$publish_branch"
+  git rm -rf . >/dev/null 2>&1 || true
+  git checkout "origin/$private_branch" -- .
 fi
 
 git commit -m "$message"
