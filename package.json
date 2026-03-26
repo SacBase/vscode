@@ -41,7 +41,6 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "publish:official": "./scripts/publish-official.sh",
     "package": "vsce package"
   },
   "dependencies": {
