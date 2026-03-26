@@ -69,7 +69,16 @@ export class LanguageClientFeature implements FeatureLifecycle {
       clientOptions,
     );
 
-    await this.client.start();
+    try {
+      await this.client.start();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      vscode.window.showErrorMessage(`Failed to start SaC language server: ${message}`);
+
+      // I clear the reference to avoid later stop calls on a failed client state.
+      this.client = undefined;
+      return;
+    }
   }
 
   public async deactivate(): Promise<void> {
@@ -77,7 +86,12 @@ export class LanguageClientFeature implements FeatureLifecycle {
       return;
     }
 
-    await this.client.stop();
+    try {
+      await this.client.stop();
+    } catch {
+      // I intentionally ignore stop errors for failed/starting states during shutdown.
+    }
+
     this.client = undefined;
   }
 }

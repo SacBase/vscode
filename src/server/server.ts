@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from "url";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
   createConnection,
@@ -31,6 +31,10 @@ interface SacSettings extends CompilerResolutionSettings {
   diagnosticsIncludeRelatedInformation: boolean;
   diagnosticsIncludeStackInMessage: boolean;
   diagnosticsMaxStackFrames: number;
+  workspaceScanEnabled: boolean;
+  workspaceScanOnInitialize: boolean;
+  workspaceScanOnConfigurationChange: boolean;
+  workspaceScanExcludeDirectories: string[];
   executionBackend: "local" | "wsl" | "docker";
   wslDistribution: string;
   dockerImage: string;
@@ -54,10 +58,26 @@ interface SacInvocation {
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
+const DEFAULT_WORKSPACE_SCAN_EXCLUDE_DIRS = [".git", "node_modules", "out", ".vscode-test"];
 
 let workspaceRoot = process.cwd();
+let workspaceRoots: string[] = [workspaceRoot];
 let settings: SacSettings = getDefaultSettings();
 const pendingTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+/**
+ * Safely runs a promise and reports errors to the LSP console instead of
+ * letting unhandled rejections bubble and terminate the server process.
+ *
+ * @param work Promise to execute.
+ * @param context Short label describing the task.
+ */
+function runSafely(work: Promise<void>, context: string): void {
+  work.catch((error) => {
+    const message = error instanceof Error ? error.stack || error.message : String(error);
+    connection.console.error(`[sac-server] ${context} failed: ${message}`);
+  });
+}
 
 /**
  * Builds the default server settings used before workspace configuration arrives.
@@ -74,6 +94,10 @@ function getDefaultSettings(): SacSettings {
     diagnosticsIncludeRelatedInformation: true,
     diagnosticsIncludeStackInMessage: true,
     diagnosticsMaxStackFrames: 5,
+    workspaceScanEnabled: true,
+    workspaceScanOnInitialize: true,
+    workspaceScanOnConfigurationChange: true,
+    workspaceScanExcludeDirectories: [...DEFAULT_WORKSPACE_SCAN_EXCLUDE_DIRS],
     compilerChannel: "system",
     compilerPath: "",
     fallbackToSystem: true,
@@ -132,6 +156,118 @@ function normalizePathForCompare(filePath: string): string {
 }
 
 /**
+ * Checks whether a filesystem path points to a SaC source file.
+ *
+ * @param filePath Candidate path.
+ * @returns True when path ends in .sac.
+ */
+function isSacFilePath(filePath: string): boolean {
+  return filePath.toLowerCase().endsWith(".sac");
+}
+
+/**
+ * Recursively collects .sac files from a workspace root.
+ *
+ * @param rootDir Root directory to scan.
+ * @returns Absolute file paths of discovered SaC files.
+ */
+function collectSacFiles(rootDir: string, excludedDirNames: Set<string>): string[] {
+  const files: string[] = [];
+
+  const visit = (dirPath: string): void => {
+    let entries: fs.Dirent[];
+    try {
+      entries = fs.readdirSync(dirPath, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        if (!excludedDirNames.has(entry.name)) {
+          visit(fullPath);
+        }
+        continue;
+      }
+
+      if (entry.isFile() && isSacFilePath(fullPath)) {
+        files.push(fullPath);
+      }
+    }
+  };
+
+  visit(rootDir);
+  return files;
+}
+
+/**
+ * Creates an ephemeral text document from disk for files not currently open.
+ *
+ * @param fsPath Absolute source file path.
+ * @returns TextDocument when file could be read, otherwise null.
+ */
+function createDocumentFromFile(fsPath: string): TextDocument | null {
+  try {
+    const content = fs.readFileSync(fsPath, "utf8");
+    return TextDocument.create(pathToFileURL(fsPath).toString(), "sac", 0, content);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Validates all discovered SaC files in configured workspace roots.
+ */
+async function validateAllWorkspaceSacFiles(): Promise<void> {
+  if (settings.diagnosticsMode === "manual" || !settings.workspaceScanEnabled) {
+    return;
+  }
+
+  const excludedDirNames = new Set(settings.workspaceScanExcludeDirectories);
+
+  const openByPath = new Map<string, TextDocument>();
+  for (const openDocument of documents.all()) {
+    if (!isFileDocument(openDocument)) {
+      continue;
+    }
+    openByPath.set(normalizePathForCompare(uriToFsPath(openDocument.uri)), openDocument);
+  }
+
+  const seenPaths = new Set<string>();
+  for (const root of workspaceRoots) {
+    for (const fsPath of collectSacFiles(root, excludedDirNames)) {
+      const normalizedPath = normalizePathForCompare(fsPath);
+      if (seenPaths.has(normalizedPath)) {
+        continue;
+      }
+      seenPaths.add(normalizedPath);
+
+      const openDocument = openByPath.get(normalizedPath);
+      if (openDocument) {
+        try {
+          await validateDocument(openDocument);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          connection.console.error(`[sac-server] validate open document failed (${fsPath}): ${message}`);
+        }
+        continue;
+      }
+
+      const ephemeral = createDocumentFromFile(fsPath);
+      if (ephemeral) {
+        try {
+          await validateDocument(ephemeral);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          connection.console.error(`[sac-server] validate file failed (${fsPath}): ${message}`);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Normalizes unknown config values into a string-array compiler argument list.
  *
  * @param value Candidate config value.
@@ -147,6 +283,24 @@ function normalizeCompilerArgs(value: unknown, fallback: string[]): string[] {
 }
 
 /**
+ * Normalizes unknown config values into a cleaned string list.
+ *
+ * @param value Candidate config value.
+ * @param fallback Fallback list used when value is invalid.
+ * @returns Sanitized string list.
+ */
+function normalizeStringList(value: unknown, fallback: string[]): string[] {
+  if (!Array.isArray(value)) {
+    return fallback;
+  }
+
+  return value
+    .filter((entry): entry is string => typeof entry === "string")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+}
+
+/**
  * Updates runtime settings from configuration payload provided by the client.
  *
  * !IMPORTANT: Invalid or missing values are coerced back to safe defaults.
@@ -159,6 +313,7 @@ function updateSettings(configuration: unknown): void {
   const root = configuration as Record<string, unknown> | undefined;
   const sac = (root?.sac as Record<string, unknown> | undefined) || {};
   const diagnostics = (sac.diagnostics as Record<string, unknown> | undefined) || {};
+  const workspaceScan = (diagnostics.workspaceScan as Record<string, unknown> | undefined) || {};
   const compiler = (sac.compiler as Record<string, unknown> | undefined) || {};
   const wsl = (compiler.wsl as Record<string, unknown> | undefined) || {};
   const docker = (compiler.docker as Record<string, unknown> | undefined) || {};
@@ -181,6 +336,13 @@ function updateSettings(configuration: unknown): void {
     diagnosticsIncludeRelatedInformation: diagnostics.includeRelatedInformation !== false,
     diagnosticsIncludeStackInMessage: diagnostics.includeStackInMessage !== false,
     diagnosticsMaxStackFrames: Math.max(Number(diagnostics.maxStackFrames || 5), 0),
+    workspaceScanEnabled: workspaceScan.enabled !== false,
+    workspaceScanOnInitialize: workspaceScan.onInitialize !== false,
+    workspaceScanOnConfigurationChange: workspaceScan.onConfigurationChange !== false,
+    workspaceScanExcludeDirectories: normalizeStringList(
+      workspaceScan.excludeDirectories,
+      [...DEFAULT_WORKSPACE_SCAN_EXCLUDE_DIRS],
+    ),
     compilerChannel:
       compiler.channel === "stable" || compiler.channel === "develop" || compiler.channel === "system"
         ? compiler.channel
@@ -219,7 +381,12 @@ function updateSettings(configuration: unknown): void {
  * @param uri Document URI.
  */
 function clearDocumentDiagnostics(uri: string): void {
-  connection.sendDiagnostics({ uri, diagnostics: [] });
+  try {
+    connection.sendDiagnostics({ uri, diagnostics: [] });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    connection.console.error(`[sac-server] clear diagnostics failed (${uri}): ${message}`);
+  }
 }
 
 /**
@@ -514,10 +681,15 @@ async function validateDocument(document: TextDocument): Promise<void> {
 
   const diagnostics = gatherDiagnosticsForDocument(document, runResult.stdout, runResult.stderr);
 
-  connection.sendDiagnostics({
-    uri: document.uri,
-    diagnostics,
-  });
+  try {
+    connection.sendDiagnostics({
+      uri: document.uri,
+      diagnostics,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    connection.console.error(`[sac-server] publish diagnostics failed (${document.uri}): ${message}`);
+  }
 }
 
 /**
@@ -533,7 +705,7 @@ function scheduleOnTypeValidation(document: TextDocument): void {
 
   const timer = setTimeout(() => {
     pendingTimers.delete(document.uri);
-    void validateDocument(document);
+    runSafely(validateDocument(document), `onType document validate (${document.uri})`);
   }, settings.diagnosticsDebounceMs);
 
   pendingTimers.set(document.uri, timer);
@@ -542,8 +714,12 @@ function scheduleOnTypeValidation(document: TextDocument): void {
 connection.onInitialize((params) => {
   if (params.workspaceFolders && params.workspaceFolders.length > 0) {
     workspaceRoot = uriToFsPath(params.workspaceFolders[0].uri);
+    workspaceRoots = params.workspaceFolders.map((folder) => uriToFsPath(folder.uri));
   } else if (params.rootUri) {
     workspaceRoot = uriToFsPath(params.rootUri);
+    workspaceRoots = [workspaceRoot];
+  } else {
+    workspaceRoots = [workspaceRoot];
   }
 
   return {
@@ -555,23 +731,39 @@ connection.onInitialize((params) => {
 });
 
 connection.onInitialized(() => {
-  connection.workspace.getConfiguration("sac").then((sacConfig) => {
+  runSafely((async () => {
+    const sacConfig = await connection.workspace.getConfiguration("sac");
     updateSettings({ sac: sacConfig as unknown });
-  });
+    if (settings.workspaceScanOnInitialize) {
+      await validateAllWorkspaceSacFiles();
+    }
+  })(), "onInitialized");
 });
 
 connection.onDidChangeConfiguration((change) => {
   updateSettings(change.settings as unknown);
 
+  if (settings.workspaceScanOnConfigurationChange) {
+    runSafely(validateAllWorkspaceSacFiles(), "configuration workspace scan");
+    return;
+  }
+
   for (const document of documents.all()) {
-    void validateDocument(document);
+    runSafely(validateDocument(document), `configuration document validate (${document.uri})`);
   }
 });
 
 documents.onDidOpen((event) => {
+  if (settings.diagnosticsMode === "manual") {
+    return;
+  }
+
   if (settings.diagnosticsMode === "onType") {
     scheduleOnTypeValidation(event.document);
+    return;
   }
+
+  runSafely(validateDocument(event.document), `open document validate (${event.document.uri})`);
 });
 
 documents.onDidChangeContent((event) => {
@@ -584,7 +776,7 @@ documents.onDidChangeContent((event) => {
 
 documents.onDidSave((event) => {
   if (settings.diagnosticsMode === "onSave") {
-    void validateDocument(event.document);
+    runSafely(validateDocument(event.document), `save document validate (${event.document.uri})`);
   }
 });
 

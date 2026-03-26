@@ -82,6 +82,10 @@ Main settings:
 - `sac.diagnostics.includeRelatedInformation`
 - `sac.diagnostics.includeStackInMessage`
 - `sac.diagnostics.maxStackFrames`
+- `sac.diagnostics.workspaceScan.enabled`
+- `sac.diagnostics.workspaceScan.onInitialize`
+- `sac.diagnostics.workspaceScan.onConfigurationChange`
+- `sac.diagnostics.workspaceScan.excludeDirectories`
 - `sac.compiler.channel` (`stable`, `develop`, `system`)
 - `sac.compiler.path`
 - `sac.compiler.executionBackend` (`local`, `wsl`, `docker`)

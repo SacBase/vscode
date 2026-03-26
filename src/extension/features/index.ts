@@ -18,14 +18,33 @@ export async function registerExtensionFeatures(
     new LanguageClientFeature(context),
   ];
 
-  for (const feature of features) {
-    await feature.activate();
+  const activated: FeatureLifecycle[] = [];
+
+  try {
+    for (const feature of features) {
+      await feature.activate();
+      activated.push(feature);
+    }
+  } catch (error) {
+    for (const feature of [...activated].reverse()) {
+      try {
+        await feature.deactivate();
+      } catch {
+        // I intentionally ignore rollback errors to keep startup failure handling deterministic.
+      }
+    }
+
+    throw error;
   }
 
   return {
     async dispose(): Promise<void> {
-      for (const feature of [...features].reverse()) {
-        await feature.deactivate();
+      for (const feature of [...activated].reverse()) {
+        try {
+          await feature.deactivate();
+        } catch {
+          // I intentionally ignore shutdown errors to avoid noisy dispose failures.
+        }
       }
     },
   };

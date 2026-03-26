@@ -150,6 +150,34 @@
           "minimum": 0,
           "description": "Maximum number of context frames used in smart/hybrid diagnostics."
         },
+        "sac.diagnostics.workspaceScan.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic workspace-wide diagnostics scanning for .sac files."
+        },
+        "sac.diagnostics.workspaceScan.onInitialize": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run workspace-wide diagnostics scan when the language server initializes."
+        },
+        "sac.diagnostics.workspaceScan.onConfigurationChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run workspace-wide diagnostics scan after configuration changes."
+        },
+        "sac.diagnostics.workspaceScan.excludeDirectories": {
+          "type": "array",
+          "default": [
+            ".git",
+            "node_modules",
+            "out",
+            ".vscode-test"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "Directory names to skip during recursive workspace diagnostics scan."
+        },
         "sac.compiler.channel": {
           "type": "string",
           "enum": [

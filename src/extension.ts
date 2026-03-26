@@ -17,7 +17,13 @@ let controller: ExtensionFeatureController | undefined;
  * @returns Promise resolved once the language client has started.
  */
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  controller = await registerExtensionFeatures(context);
+  try {
+    controller = await registerExtensionFeatures(context);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    vscode.window.showErrorMessage(`SaC extension activation failed: ${message}`);
+    controller = undefined;
+  }
 }
 
 /**
