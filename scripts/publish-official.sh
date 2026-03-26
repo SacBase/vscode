@@ -3,6 +3,7 @@ set -euo pipefail
 
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   echo "Usage: npm run publish:official -- [optional commit message]"
+  echo "Tip: wrap message in single quotes if it contains special shell chars (e.g. &, backticks)."
   echo ""
   echo "Behavior:"
   echo "  1) Commit dirty workspace as 'chore: confirm pushed workspace'"
@@ -11,7 +12,11 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   exit 0
 fi
 
-message="${1:-chore: curated public sync}"
+default_message="chore: curated public sync"
+message="$default_message"
+if [[ "$#" -gt 0 ]]; then
+  message="$*"
+fi
 private_branch="${PRIVATE_BRANCH:-master}"
 official_remote="${OFFICIAL_REMOTE:-official}"
 official_branch="${OFFICIAL_BRANCH:-main}"
@@ -34,6 +39,13 @@ if ! git remote get-url "$official_remote" >/dev/null 2>&1; then
 fi
 
 current_branch="$(git branch --show-current)"
+restore_branch=true
+cleanup() {
+  if [[ "$restore_branch" == "true" && -n "$current_branch" ]]; then
+    git checkout "$current_branch" >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
 
 if [[ -n "$(git status --porcelain)" ]]; then
   git add -A
@@ -55,11 +67,14 @@ fi
 
 if [[ -n "$base_ref" ]]; then
   git checkout -B "$publish_branch" "$base_ref"
-  git merge --squash "origin/$private_branch"
+  git merge --squash --allow-unrelated-histories "origin/$private_branch"
 
   if [[ -z "$(git status --porcelain)" ]]; then
     echo "No changes to publish to $official_remote/$official_branch."
-    git checkout "$current_branch"
+    if [[ -n "$current_branch" ]]; then
+      git checkout "$current_branch"
+    fi
+    restore_branch=false
     exit 0
   fi
 else
@@ -72,6 +87,9 @@ fi
 git commit -m "$message"
 git push "$official_remote" "HEAD:$official_branch"
 
-git checkout "$current_branch"
+if [[ -n "$current_branch" ]]; then
+  git checkout "$current_branch"
+fi
+restore_branch=false
 
 echo "Published squashed changes to $official_remote/$official_branch with message: $message"
