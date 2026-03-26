@@ -51,7 +51,7 @@ function parseTabSeparatedLine(line: string): CoreParsedDiagnostic | null {
 }
 
 function parseFallbackLine(line: string): CoreParsedDiagnostic | null {
-  const fallbackRegex = /^(.*?):(\d+)(?::(\d+))?(?::\s*(warning|error|fatal|note|info))?\s*:?\s*(.*)$/i;
+  const fallbackRegex = /^(.*?):(\d+)(?::(\d+)(?:-(\d+))?)?(?::\s*(warning|error|fatal|note|info))?\s*:?\s*(.*)$/i;
   const match = line.match(fallbackRegex);
   if (!match) {
     return null;
@@ -60,18 +60,26 @@ function parseFallbackLine(line: string): CoreParsedDiagnostic | null {
   const file = match[1].trim();
   const lineNumber = Number.parseInt(match[2], 10);
   const columnNumber = Number.parseInt(match[3] || "1", 10);
-  const severity = match[4] || "error";
-  const message = (match[5] || "").trim();
+  const endColumnNumber = Number.parseInt(match[4] || "", 10);
+  const severity = match[5] || "error";
+  const message = (match[6] || "").trim();
 
   if (!file || Number.isNaN(lineNumber)) {
     return null;
   }
 
+  const normalizedColumn = Number.isNaN(columnNumber) ? 0 : Math.max(columnNumber - 1, 0);
+  // sac2c reports one-based inclusive end columns; LSP uses zero-based exclusive end columns.
+  const normalizedEndColumn = Number.isNaN(endColumnNumber)
+    ? undefined
+    : Math.max(endColumnNumber, normalizedColumn + 1);
+
   return {
     location: {
       filePath: normalizePath(file),
       line: Math.max(lineNumber - 1, 0),
-      column: Number.isNaN(columnNumber) ? 0 : Math.max(columnNumber - 1, 0),
+      column: normalizedColumn,
+      endColumn: normalizedEndColumn,
     },
     severity: toSeverity(severity),
     message: message || "sac2c reported a diagnostic",
@@ -109,7 +117,7 @@ export function parseSacCompilerOutput(stdout: string, stderr: string): CorePars
       continue;
     }
 
-    const key = `${diagnostic.location.filePath}:${diagnostic.location.line}:${diagnostic.location.column}:${diagnostic.severity}:${diagnostic.message}`;
+    const key = `${diagnostic.location.filePath}:${diagnostic.location.line}:${diagnostic.location.column}:${diagnostic.location.endColumn ?? ""}:${diagnostic.severity}:${diagnostic.message}`;
     if (!seen.has(key)) {
       seen.add(key);
       parsed.push(diagnostic);

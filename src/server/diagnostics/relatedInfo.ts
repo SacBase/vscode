@@ -31,7 +31,9 @@ export function buildRelatedInformation(entries: ParsedDiagnostic[]): Diagnostic
         start,
         end: {
           line: start.line,
-          character: start.character + 1,
+          character: entry.endColumn !== undefined
+            ? Math.max(entry.endColumn, start.character + 1)
+            : start.character + 1,
         },
       },
     };

@@ -4,6 +4,7 @@ export interface CoreDiagnosticLocation {
   filePath: string;
   line: number;
   column: number;
+  endColumn?: number;
 }
 
 /**

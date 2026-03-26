@@ -7,6 +7,7 @@ export interface ParsedDiagnostic {
   file: string;
   line: number;
   column: number;
+  endColumn?: number;
   severity: DiagnosticSeverity;
   message: string;
 }

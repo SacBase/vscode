@@ -49,6 +49,7 @@ export function toCoreParsedDiagnostic(entry: ParsedDiagnostic): CoreParsedDiagn
       filePath: entry.file,
       line: entry.line,
       column: entry.column,
+      endColumn: entry.endColumn,
     },
     severity: toCoreSeverity(entry.severity),
     message: entry.message,
@@ -60,6 +61,7 @@ export function fromCoreParsedDiagnostic(entry: CoreParsedDiagnostic): ParsedDia
     file: entry.location.filePath,
     line: entry.location.line,
     column: entry.location.column,
+    endColumn: entry.location.endColumn,
     severity: toLspSeverity(entry.severity),
     message: entry.message,
   };

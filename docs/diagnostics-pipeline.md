@@ -34,7 +34,8 @@ Because of these limitations, the extension uses a best-effort approach that com
 
 4. Range Selection
 - File: `src/server/diagnostics/range.ts`
-- Chooses squiggle range with token/symbol heuristics.
+- First uses compiler-provided column spans when available (for example `line:start-end`).
+- Otherwise chooses squiggle range with token/symbol heuristics.
 - Falls back to statement-level ranges when compiler columns are too weak.
 
 5. Related Information
