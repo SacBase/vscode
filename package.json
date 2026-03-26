@@ -3,11 +3,36 @@
   "author": {
     "name": "Luuk Kablan",
     "email": "luuk@kablan.nl",
-    "url": "https://sac.kablan.nl"
+    "url": "https://kablan.nl"
   },
   "displayName": "SaC (Single Assignment C) Language Support",
   "description": "VS Code extension providing language support and improved developer workflow for SaC (Single Assignment C), including syntax highlighting and compiler diagnostics.",
   "version": "0.0.1",
+  "repository": {
+    "url": "https://github.com/SacBase/vscode"
+  },
+  "license": "MIT",
+  "bugs": {
+    "email": "luuk@kablan.nl",
+    "url": "https://github.com/SacBase/vscode/issues"
+  },
+  "keywords": [
+    "sac",
+    "single-assignment c",
+    "sac highlight",
+    "sac syntax"
+  ],
+  "icon": "./icons/logo.png",
+  "galleryBanner": {
+    "color": "#ffc02e",
+    "theme": "dark"
+  },
+  "categories": [
+    "Programming Languages",
+    "Language Packs",
+    "Snippets",
+    "Themes"
+  ],
   "main": "./out/extension.js",
   "engines": {
     "vscode": "^1.110.0"
@@ -29,12 +54,6 @@
     "@types/vscode": "^1.110.0",
     "typescript": "^5.8.2"
   },
-  "categories": [
-    "Programming Languages",
-    "Language Packs",
-    "Snippets",
-    "Themes"
-  ],
   "contributes": {
     "languages": [
       {

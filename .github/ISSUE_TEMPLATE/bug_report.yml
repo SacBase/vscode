@@ -1,0 +1,89 @@
+name: Bug report
+description: Report a reproducible problem in the extension
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please provide as much detail as possible.
+
+  - type: input
+    id: vscode_version
+    attributes:
+      label: VS Code version
+      placeholder: e.g. 1.100.0
+    validations:
+      required: true
+
+  - type: input
+    id: extension_version
+    attributes:
+      label: Extension version
+      placeholder: e.g. 0.0.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Compiler execution backend
+      description: Select what you use for diagnostics.
+      options:
+        - local
+        - wsl
+        - docker
+        - not using diagnostics
+    validations:
+      required: true
+
+  - type: textarea
+    id: settings
+    attributes:
+      label: Relevant settings
+      description: Paste relevant `sac.*` settings.
+      render: json
+
+  - type: textarea
+    id: repro_steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open ...
+        2. Change ...
+        3. Save file ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots / sample code
+      description: Include diagnostics output, screenshots, or a minimal `.sac` sample.

@@ -1,80 +1,61 @@
-# SaC Language Support for VS Code
+# SaC Language Support
 
-[![VS Code Engine](https://img.shields.io/badge/VS%20Code-%5E1.110.0-007ACC?logo=visualstudiocode&logoColor=white)](https://code.visualstudio.com/)
-[![TypeScript](https://img.shields.io/badge/Runtime-TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![GitHub Repo stars](https://img.shields.io/github/stars/SacBase/vscode?style=social)](https://github.com/SacBase/vscode/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/SacBase/vscode)](https://github.com/SacBase/vscode/issues)
+SaC Language Support adds first-class editing support for SaC (Single Assignment C) in Visual Studio Code.
 
-<table>
-	<tr>
-		<td width="140" valign="middle">
-			<a href="https://github.com/LuckyLuuk12">
-				<img src="https://github.com/LuckyLuuk12.png?size=120" alt="Luuk Kablan" width="120" height="120" />
-			</a>
-		</td>
-		<td valign="middle">
-			<a href="https://github.com/LuckyLuuk12">
-				<img src="https://img.shields.io/badge/Maintainer-Luuk%20Kablan-0d1117?style=for-the-badge&logo=github&logoColor=white" alt="Maintainer Luuk Kablan" width="360" />
-			</a>
-			<br />
-			<a href="https://github.com/LuckyLuuk12">
-				<img src="https://img.shields.io/badge/GitHub-%40LuckyLuuk12-24292f?style=for-the-badge&logo=github" alt="GitHub LuckyLuuk12" width="360" />
-			</a>
-			<br />
-			<a href="https://github.com/SacBase/vscode">
-				<img src="https://img.shields.io/badge/SacBase%2Fvscode-Admin-238636?style=for-the-badge&logo=github" alt="SacBase vscode admin" width="360" />
-			</a>
-		</td>
-	</tr>
-</table>
+It provides:
+- SaC language registration for `.sac` files
+- Syntax highlighting and language configuration
+- Compiler-backed diagnostics via `sac2c` (Problems panel + editor squiggles)
 
-VS Code language support for SaC (Single Assignment C), including a minimal language server for compiler-backed diagnostics.
+## Why Use This Extension?
 
-This extension now includes:
+- Faster feedback while writing SaC code
+- Clear diagnostics integrated into the editor
+- Flexible compiler execution (`local`, `wsl`, `docker`)
 
-- SaC language registration (`.sac` files)
-- SaC syntax highlighting and language configuration
-- Compiler-backed diagnostics via `sac2c` (Problems panel + red squiggles)
+## Features
 
-## Installation (Development)
+### 1. Syntax Highlighting
 
-This repository is currently set up as a development extension project.
+SaC keywords, operators, comments, and language constructs are highlighted out of the box.
 
-1. Install dependencies:
+![Syntax Highlighting](marketplace/syntax-highlighting.png)
 
-```bash
-npm install
-```
+### 2. Compiler Diagnostics in Editor
 
-2. Open this folder in VS Code.
+Diagnostics from `sac2c` are shown as VS Code Problems and inline squiggles.
 
-3. Run the extension in a Development Host window:
+![Diagnostics View](marketplace/diagnostics-problems.png)
 
-- Press `F5` in VS Code.
+### 3. Configurable Diagnostic Presentation
 
-4. Open any `.sac` file and verify syntax highlighting is active.
+Choose how diagnostics are displayed:
+
+- `expanded`
+- `smart`
+- `hybrid`
+
+![Diagnostic Styles](marketplace/diagnostic-presentation.gif)
 
 ## Requirements
 
-For syntax highlighting only, no external tool is required.
+Syntax highlighting works without external tools.
 
-For diagnostics, `sac2c` is required via one of:
+For diagnostics, `sac2c` must be available through one of:
 
 - `sac.compiler.path` (explicit executable path)
 - bundled compiler in `vendor/sac2c/<channel>/<platform-target>/`
 - system `sac2c` on `PATH`
 
-Execution backends:
+Supported execution backends:
 
-- `local`: run `sac2c` directly on the host where the extension runs
-- `wsl`: run via `wsl.exe` (Windows host only)
-- `docker`: run via `docker run` with bind mount
-
-The extension does not auto-install or auto-start WSL/Docker.
+- `local`
+- `wsl` (Windows host only)
+- `docker`
 
 ## Extension Settings
 
-Main settings:
+Common settings:
 
 - `sac.languageServer.enable`
 - `sac.diagnostics.mode` (`onSave`, `onType`, `manual`)
@@ -83,39 +64,58 @@ Main settings:
 - `sac.diagnostics.includeStackInMessage`
 - `sac.diagnostics.maxStackFrames`
 - `sac.diagnostics.workspaceScan.enabled`
-- `sac.diagnostics.workspaceScan.onInitialize`
-- `sac.diagnostics.workspaceScan.onConfigurationChange`
-- `sac.diagnostics.workspaceScan.excludeDirectories`
 - `sac.compiler.channel` (`stable`, `develop`, `system`)
 - `sac.compiler.path`
 - `sac.compiler.executionBackend` (`local`, `wsl`, `docker`)
-- `sac.compiler.wsl.distribution`
-- `sac.compiler.docker.image`
-- `sac.compiler.docker.runArgs`
-- `sac.compiler.messaging.enabled`
-- `sac.compiler.messaging.args`
 - `sac.compiler.extraArgs`
-- `sac.compiler.fallbackToSystem`
 
-Default structured messaging args are:
+Default structured messaging args:
 
 ```text
 -cti-no-color -cti-no-source -cti-no-hint -cti-no-explain -cti-message-length 0 -cti-primary-header-format "%s: " -cti-continuation-header-format "%.0s"
 ```
 
-If your `sac2c` version uses a different syntax, override `sac.compiler.messaging.args`.
+If your `sac2c` version uses different flags, override `sac.compiler.messaging.args`.
 
-Diagnostics pipeline details are documented in `docs/diagnostics-pipeline.md`.
+## Quick Start
 
-Editor-agnostic diagnostics architecture and JSON/SARIF adapter notes are documented in `docs/editor-agnostic-diagnostics.md`.
+1. Install the extension.
+2. Open a `.sac` file.
+3. Ensure diagnostics mode is enabled (for example `onSave`).
+4. Configure compiler path/backend if needed.
+
+## Examples
+
+### Minimal SaC file
+
+```sac
+int main() {
+    return 0;
+}
+```
+
+### Trigger diagnostics
+
+Create a small typing or semantic error in a `.sac` file and save to see diagnostics in the Problems panel.
 
 ## Windows Notes
 
-`sac2c` is typically Linux/macOS-first. For Windows users, recommended options are:
+If you are on Windows and do not have a native `sac2c` binary, recommended options are:
 
-- Use VS Code Remote WSL and run this extension inside WSL with backend `local`
-- Use backend `wsl` and configure `sac.compiler.wsl.distribution`
-- Use backend `docker` and set `sac.compiler.docker.image`
+- Use VS Code Remote WSL and run backend `local` inside WSL
+- Use backend `wsl`
+- Use backend `docker`
 
-If none are available, keep syntax highlighting enabled and diagnostics disabled.
+## Documentation
+
+- Diagnostics pipeline: `docs/diagnostics-pipeline.md`
+- Editor-agnostic diagnostics notes: `docs/editor-agnostic-diagnostics.md`
+- Support: `SUPPORT.md`
+- Contributing: `CONTRIBUTING.md`
+
+## Feedback
+
+Issues and feature requests are welcome:
+
+- https://github.com/SacBase/vscode/issues
 
