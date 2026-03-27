@@ -90,6 +90,12 @@
         "icon": "./icons/logo.png"
       }
     ],
+    "snippets": [
+      {
+        "language": "sac",
+        "path": "./snippets/sac.code-snippets"
+      }
+    ],
     "iconThemes": [
       {
         "id": "sac-icon-theme",

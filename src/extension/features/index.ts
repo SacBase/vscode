@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 
 import { FeatureLifecycle, LanguageClientFeature } from "./languageClientFeature";
-import { SnippetFeature } from "./snippetFeature";
 
 export interface ExtensionFeatureController {
   dispose(): Promise<void>;
@@ -14,7 +13,6 @@ export async function registerExtensionFeatures(
   context: vscode.ExtensionContext,
 ): Promise<ExtensionFeatureController> {
   const features: FeatureLifecycle[] = [
-    new SnippetFeature(),
     new LanguageClientFeature(context),
   ];
 

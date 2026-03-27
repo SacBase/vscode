@@ -1,0 +1,168 @@
+{
+  "SaC Main Template": {
+    "prefix": "sac_main",
+    "body": [
+      "use StdIO : all;",
+      "use Array : all;",
+      "",
+      "int main ()",
+      "{",
+      "  ${0:printf(\"Hello SaC!\\n\");}",
+      "  return 0;",
+      "}"
+    ],
+    "description": "Standard SaC program template with imports."
+  },
+  "Tensor Comprehension": {
+    "prefix": [
+      "set{",
+      "tc",
+      "tensor",
+      "sac_comp"
+    ],
+    "body": [
+      "{ ${1:iv} -> ${2:expression} | ${1:iv} < ${3:shape} }${0}"
+    ],
+    "description": "Standard SaC tensor comprehension: { iv -> expr | range_spec }"
+  },
+  "Tensor Comprehension (Multi-generator)": {
+    "prefix": [
+      "set{{",
+      "tc_multi",
+      "tensor_multi"
+    ],
+    "body": [
+      "{",
+      "  ${1:iv} -> ${2:specific_expr} | ${3:lower} <= ${1:iv} < ${4:upper};",
+      "  ${1:iv} -> ${5:default_expr}  | ${1:iv} < ${6:total_shape}",
+      "}${0}"
+    ],
+    "description": "Tensor comprehension with multiple ranges (first match wins)."
+  },
+  "With-Loop (genarray)": {
+    "prefix": "with_gen",
+    "body": [
+      "with {",
+      "  (${1:}) <= ${2:iv} < (${3:shape}) : ${4:expression};",
+      "} : genarray(${3:shape}, ${5:default_value});"
+    ],
+    "description": "Standard with-loop for creating new arrays."
+  },
+  "With-Loop (modarray)": {
+    "prefix": "with_mod",
+    "body": [
+      "with {",
+      "  (${1:}) <= ${2:iv} < (${3:upper_bound}) : ${4:new_value};",
+      "} : modarray(${5:original_array});"
+    ],
+    "description": "With-loop for modifying an existing array."
+  },
+  "Rank-Polymorphic Function": {
+    "prefix": "sac_func_poly",
+    "body": [
+      "${1:int}[${2:d}:${3:shp}] ${4:func_name} (${1:int}[${2:d}:${3:shp}] ${5:arg})",
+      "{",
+      "  ${0:return ${5:arg};}",
+      "}"
+    ],
+    "description": "Function definition using rank-invariant type patterns."
+  },
+  "Multi-Return Function": {
+    "prefix": "sac_func_multi",
+    "body": [
+      "${1:int}, ${2:int} ${3:func_name} (int ${4:args})",
+      "{",
+      "  ${0:return (val1, val2);}",
+      "}"
+    ],
+    "description": "SaC function returning multiple values."
+  },
+  "SaC Function with Constraints": {
+    "prefix": "sac_func_const",
+    "body": [
+      "${1:double}[${2:m}:shp, ${3:n}:ishp] ${4:func_name} (int[${2:m}] target_shp, ${1:double}[${2:m}:oshp, ${3:n}:ishp] a)",
+      "| all(${5:0 <= target_shp}), all(${6:target_shp <= oshp})",
+      "{",
+      "  return { iv -> ${7:a[iv]} | iv < target_shp };",
+      "}"
+    ],
+    "description": "Function using dimensionality identifiers (m, n) and explicit value constraints."
+  },
+  "Element-wise Conditional (where)": {
+    "prefix": "sac_where",
+    "body": [
+      "where(${1:mask_array}, ${2:true_array_or_scalar}, ${3:false_array_or_scalar});"
+    ],
+    "description": "Built-in element-wise conditional: returns an array where mask is true, otherwise false elements."
+  },
+  "Rank-Polymorphic Matrix Operation": {
+    "prefix": "sac_matmul",
+    "body": [
+      "${1:double}[m, p] matmul (${1:double}[m, n] a, ${1:double}[n, p] b)",
+      "{",
+      "  return { [i, j] -> sum({ [k] -> a[i, k] * b[k, j] }) };",
+      "}"
+    ],
+    "description": "Classic matrix multiplication using implicit shape constraints on the 'n' dimension."
+  },
+  "Multi-dimensional Stencil Pattern": {
+    "prefix": "sac_stencil",
+    "body": [
+      "{ iv -> sum({ ov -> ${1:weights}[ov] * rotate(1 - ov, ${2:input_array})[iv] })",
+      "  | iv < shape(${2:input_array}) }"
+    ],
+    "description": "Standard relaxation/stencil pattern using nested tensor comprehensions and rotations."
+  },
+  "Overloaded Rank-Specific Function": {
+    "prefix": "sac_overload",
+    "body": [
+      "// Rank-specific implementation (e.g., Vector)",
+      "int[n] ${1:myFunc} (int[n] v) { return v; }",
+      "",
+      "// General rank-polymorphic implementation",
+      "int[.] ${1:myFunc} (int[.] a) {",
+      "  return { iv -> ${1:myFunc}(a[iv]) };",
+      "}"
+    ],
+    "description": "Pattern for overloading functions to handle specific ranks vs general arrays."
+  },
+  "Module Template": {
+    "prefix": "sac_module",
+    "body": [
+      "module ${1:ModuleName};",
+      "",
+      "provide all;",
+      "",
+      "import Array : all;",
+      "import StdIO : all;",
+      "",
+      "${0}"
+    ],
+    "description": "Boilerplate for a new SaC module."
+  },
+  "FFI External Function": {
+    "prefix": "sac_external",
+    "body": [
+      "external ${1:void} ${2:c_func_name} (${3:args});",
+      "#pragma linkname \"${2:c_func_name}\"",
+      "#pragma linkobj \"${4:source.o}\"",
+      "${0}"
+    ],
+    "description": "Declaration for calling external C functions."
+  },
+  "SaC Class Template": {
+    "prefix": "sac_class",
+    "body": [
+      "class ${1:ClassName};",
+      "",
+      "classtype ${2:int};",
+      "",
+      "export all;",
+      "",
+      "objdef ${1:ClassName} ${3:instance} = ${4:constructor}();",
+      "",
+      "${0}"
+    ],
+    "description": "Template for SaC classes and global objects."
+  }
+}
