@@ -9,6 +9,14 @@ const DOCS_FOLDER_BY_KIND: Record<HoverTarget["kind"], string> = {
   builtin: "builtins",
 };
 
+const BUILTIN_SHAPE_CLASS_LEGEND_MARKDOWN = [
+  "### Shape-Class Legend",
+  "- `S` = scalar",
+  "- `V` = vector",
+  "- `A` = array",
+  "- In signatures like `SxV`, `x` separates argument shape classes.",
+].join("\n");
+
 function isSafeDocName(name: string): boolean {
   return /^[A-Za-z0-9_]+$/.test(name);
 }
@@ -69,6 +77,18 @@ function buildDocCandidates(root: string, target: HoverTarget): string[] {
   const exactName = `${target.name}.md`;
   const lowerName = `${target.name.toLowerCase()}.md`;
 
+  if (target.kind === "builtin") {
+    const familyName = toBuiltinFamilyName(target.name);
+    const familyLowerName = familyName.toLowerCase();
+
+    const candidates = new Set<string>();
+    candidates.add(path.join(docsRoot, familyName));
+    candidates.add(path.join(docsRoot, familyLowerName));
+    candidates.add(path.join(docsRoot, exactName));
+    candidates.add(path.join(docsRoot, lowerName));
+    return [...candidates];
+  }
+
   if (exactName === lowerName) {
     return [path.join(docsRoot, exactName)];
   }
@@ -76,8 +96,40 @@ function buildDocCandidates(root: string, target: HoverTarget): string[] {
   return [path.join(docsRoot, exactName), path.join(docsRoot, lowerName)];
 }
 
+function toBuiltinFamilyName(name: string): string {
+  if (!name.startsWith("_") || !name.endsWith("_")) {
+    return `${name}.md`;
+  }
+
+  const core = name.slice(1, -1);
+  const separatorIndex = core.indexOf("_");
+  if (separatorIndex < 0) {
+    return `${name}.md`;
+  }
+
+  const family = core.slice(0, separatorIndex);
+  if (family.length === 0) {
+    return `${name}.md`;
+  }
+
+  return `_${family}_.md`;
+}
+
+function appendBuiltinLegend(markdown: string, target: HoverTarget): string {
+  if (target.kind !== "builtin") {
+    return markdown;
+  }
+
+  if (/^###\s+Shape-Class\s+Legend\b/im.test(markdown)) {
+    return markdown;
+  }
+
+  return `${markdown.trimEnd()}\n\n${BUILTIN_SHAPE_CLASS_LEGEND_MARKDOWN}`;
+}
+
 /**
- * Resolves markdown hover content from docs/<kind>s/<symbol>.md when available.
+ * Resolves markdown hover content from docs/<kind>/<symbol>.md when available.
+ * Builtins are resolved by family first (for example _add_SxS_ -> _add_.md).
  */
 export function resolveHoverDocumentation(
   workspaceRoot: string,
@@ -109,7 +161,7 @@ export function resolveHoverDocumentation(
   for (const root of rootsToCheck) {
     const markdown = readFirstExistingFile(buildDocCandidates(root, target));
     if (markdown !== null) {
-      return markdown;
+      return appendBuiltinLegend(markdown, target);
     }
   }
 

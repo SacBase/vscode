@@ -1,5 +1,22 @@
-### shape
+# `shape`
+Returns an array's shape vector.
 
-SaC StdLib function that returns or works with array shape information.
+### Signature
+```sac
+int[d] shape(<a>[d:shp] arr)
+```
 
-Call form: `shape(...)`
+### Description
+The result contains one extent per axis. For a scalar, the shape is `[]`.
+
+### Parameters
+- `arr`: Input array.
+
+### Returns
+- An integer vector with the size of each axis.
+
+### Example
+```sac
+shape([1, 2, 3])     // [3]
+shape([[1,2],[3,4]]) // [2, 2]
+```
