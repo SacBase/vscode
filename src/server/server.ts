@@ -22,7 +22,7 @@ import {
 import { buildDiagnosticWithRange } from "./diagnostics/range";
 import { buildRelatedInformation } from "./diagnostics/relatedInfo";
 import { DiagnosticsPresentationMode } from "./diagnostics/types";
-import { provideHover } from "./hover";
+import { provideHover } from "./hover-info/hover";
 import {
   CompilerResolutionSettings,
   resolveSac2cPath,

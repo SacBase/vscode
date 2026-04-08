@@ -9,7 +9,7 @@ import {
   groupCoreDiagnostics,
   parseSacCompilerOutput,
   renderCoreDiagnostics,
-} from "../../core/diagnostics";
+} from "$core/diagnostics";
 import {
   DiagnosticGroup,
   DiagnosticsPresentationSettings,

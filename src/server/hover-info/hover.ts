@@ -6,7 +6,7 @@ import {
   Range,
 } from "vscode-languageserver/node";
 
-import { formatHoverMarkdown, lookupHoverTarget } from "../core/hover";
+import { formatHoverMarkdown, lookupHoverTarget } from "$core/hover";
 import { resolveHoverDocumentation } from "./hoverDocs";
 
 function getLineText(document: TextDocument, line: number): string | null {

@@ -1,7 +1,18 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "Node16",
     "target": "ES2020",
+    "paths": {
+      "$core/*": [
+        "./src/core/*"
+      ],
+      "$server/*": [
+        "./src/server/*"
+      ],
+      "$extension/*": [
+        "./src/extension/*"
+      ]
+    },
     "lib": [
       "ES2020"
     ],
@@ -10,7 +21,7 @@
     "sourceMap": true,
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node16",
     "skipLibCheck": true,
     "types": [
       "node",
