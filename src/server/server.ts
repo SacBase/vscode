@@ -5,6 +5,8 @@ import { fileURLToPath, pathToFileURL } from "url";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
   createConnection,
+  Definition,
+  DefinitionParams,
   Diagnostic,
   Hover,
   HoverParams,
@@ -23,6 +25,7 @@ import { buildDiagnosticWithRange } from "./diagnostics/range";
 import { buildRelatedInformation } from "./diagnostics/relatedInfo";
 import { DiagnosticsPresentationMode } from "./diagnostics/types";
 import { provideHover } from "./hover-info/hover";
+import { provideDefinition } from "./navigation/provider";
 import {
   CompilerResolutionSettings,
   resolveSac2cPath,
@@ -735,6 +738,7 @@ connection.onInitialize((params) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       diagnosticProvider: undefined,
       hoverProvider: true,
+      definitionProvider: true,
     },
   };
 });
@@ -746,6 +750,22 @@ connection.onHover((params: HoverParams & TextDocumentPositionParams): Hover | n
   }
 
   return provideHover(document, params.position, workspaceRoot, extensionInstallRoot);
+});
+
+connection.onDefinition(async (params: DefinitionParams): Promise<Definition | null> => {
+  const document = documents.get(params.textDocument.uri);
+  if (!document) {
+    return null;
+  }
+
+  return provideDefinition({
+    document,
+    position: params.position,
+    workspaceRoot,
+    workspaceRoots,
+    openDocuments: documents.all(),
+    excludedDirNames: new Set(settings.workspaceScanExcludeDirectories),
+  });
 });
 
 connection.onInitialized(() => {
