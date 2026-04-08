@@ -6,7 +6,10 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import {
   createConnection,
   Diagnostic,
+  Hover,
+  HoverParams,
   ProposedFeatures,
+  TextDocumentPositionParams,
   TextDocuments,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
@@ -19,6 +22,7 @@ import {
 import { buildDiagnosticWithRange } from "./diagnostics/range";
 import { buildRelatedInformation } from "./diagnostics/relatedInfo";
 import { DiagnosticsPresentationMode } from "./diagnostics/types";
+import { provideHover } from "./hover";
 import {
   CompilerResolutionSettings,
   resolveSac2cPath,
@@ -62,6 +66,7 @@ const DEFAULT_WORKSPACE_SCAN_EXCLUDE_DIRS = [".git", "node_modules", "out", ".vs
 
 let workspaceRoot = process.cwd();
 let workspaceRoots: string[] = [workspaceRoot];
+let extensionInstallRoot = "";
 let settings: SacSettings = getDefaultSettings();
 const pendingTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
@@ -712,6 +717,9 @@ function scheduleOnTypeValidation(document: TextDocument): void {
 }
 
 connection.onInitialize((params) => {
+  const init = params.initializationOptions as { extensionPath?: unknown } | undefined;
+  extensionInstallRoot = typeof init?.extensionPath === "string" ? init.extensionPath : "";
+
   if (params.workspaceFolders && params.workspaceFolders.length > 0) {
     workspaceRoot = uriToFsPath(params.workspaceFolders[0].uri);
     workspaceRoots = params.workspaceFolders.map((folder) => uriToFsPath(folder.uri));
@@ -726,8 +734,18 @@ connection.onInitialize((params) => {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       diagnosticProvider: undefined,
+      hoverProvider: true,
     },
   };
+});
+
+connection.onHover((params: HoverParams & TextDocumentPositionParams): Hover | null => {
+  const document = documents.get(params.textDocument.uri);
+  if (!document) {
+    return null;
+  }
+
+  return provideHover(document, params.position, workspaceRoot, extensionInstallRoot);
 });
 
 connection.onInitialized(() => {

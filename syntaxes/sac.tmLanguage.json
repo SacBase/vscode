@@ -24,7 +24,7 @@
 			"include": "#sac-type-patterns"
 		},
 		{
-			"include": "#sac-builtins"
+			"include": "#sac-stdlib-functions"
 		},
 		{
 			"include": "#sac-shape-guards"
@@ -85,7 +85,7 @@
 					"include": "#sac-type-patterns"
 				},
 				{
-					"include": "#sac-builtins"
+					"include": "#sac-stdlib-functions"
 				},
 				{
 					"include": "#sac-shape-guards"
@@ -131,14 +131,14 @@
 				}
 			]
 		},
-		"sac-builtins": {
+		"sac-stdlib-functions": {
 			"patterns": [
 				{
-					"name": "support.function.primitive.sac",
+					"name": "support.function.builtin.sac",
 					"match": "\\b(_[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*_)\\b(?=\\s*\\()"
 				},
 				{
-					"name": "support.function.builtin.sac",
+					"name": "support.function.stdlib.sac",
 					"match": "\\b(shape|reshape|sel|take|drop|cat|dim|size|all|min|max|print|transpose|zero|toi|tof|toc|tob|tos|toui|toul|toull|toub|tous|genarray|modarray|fold|foldfix|propagate)\\b(?=\\s*\\()"
 				}
 			]
@@ -352,7 +352,7 @@
 					"begin": "\\b(genarray|modarray|sel|reshape|shape)\\s*\\(",
 					"beginCaptures": {
 						"1": {
-							"name": "support.function.builtin.sac"
+							"name": "support.function.stdlib.sac"
 						}
 					},
 					"end": "\\)",

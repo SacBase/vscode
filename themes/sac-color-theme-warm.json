@@ -140,14 +140,14 @@
     {
       "scope": "support.function.builtin.sac",
       "settings": {
-        "foreground": "#FF6633",
+        "foreground": "#FF3300",
         "fontStyle": "bold"
       }
     },
     {
-      "scope": "support.function.primitive.sac",
+      "scope": "support.function.stdlib.sac",
       "settings": {
-        "foreground": "#FF3300",
+        "foreground": "#FF6633",
         "fontStyle": "bold"
       }
     },

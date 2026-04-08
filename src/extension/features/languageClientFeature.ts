@@ -59,6 +59,7 @@ export class LanguageClientFeature implements FeatureLifecycle {
       outputChannel: vscode.window.createOutputChannel("SaC Language Server"),
       initializationOptions: {
         trace: toClientTraceLevel(traceSetting),
+        extensionPath: this.context.extensionPath,
       },
     };
 

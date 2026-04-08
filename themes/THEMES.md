@@ -17,8 +17,8 @@ This document provides a comprehensive overview of all token scopes and their de
 | `support.function` | Builtin/standard functions | `print`, `read` | `#DCDCAA` |
 | `entity.name.function.sac` | SaC-specific functions (bold) | `_expand_` | `#DCDCAA` **bold** |
 | `support.function.call.sac` | Function calls in SaC | `foo()` | `#DCDCAA` |
-| `support.function.builtin.sac` | SaC builtin functions (bold) | `_print_`, `_read_` | `#D8A878` **bold** |
-| `support.function.primitive.sac` | SaC primitive functions (bold) | `_add_`, `_mul_` | `#D880B8` **bold** |
+| `support.function.builtin.sac` | SaC builtin functions (bold) | `_shape_A_`, `_add_SxS_` | `#D880B8` **bold** |
+| `support.function.stdlib.sac` | SaC StdLib functions (bold) | `shape`, `reshape` | `#D8A878` **bold** |
 | `entity.name.type` | Type names | `struct`, `class` | `#569CD6` |
 | `support.type` | Supported types | `int`, `float` | `#569CD6` |
 | `keyword.control.sac` | Control flow statements (bold) | `if`, `else`, `return` | `#D8A0DF` **bold** |
@@ -44,7 +44,7 @@ This document provides a comprehensive overview of all token scopes and their de
 A cohesive theme inspired by VS Code's Dark+ theme, designed for dark mode with excellent contrast and consistency with C-style syntax highlighting. All SaC-specific elements have distinct, soft colors for clear visual distinction.
 
 - **Colors**: Magenta keywords, blue types, golden functions, green comments, light green numbers
-- **Distinct SaC elements**: Soft orange builtin functions, soft magenta primitive functions, white shape parameters
+- **Distinct SaC elements**: Soft magenta builtin functions, soft orange StdLib functions, white shape parameters
 - **Best for**: General-purpose coding with professional C theme aesthetic and clear SaC element distinction
 
 ### Warm
