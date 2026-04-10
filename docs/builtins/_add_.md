@@ -1,5 +1,5 @@
 # `_add_`
-Arithmetic, bitwise, or comparison builtin family.
+The primitive for addition. It performs element-wise addition on arrays, or scalar addition if both operands are scalars.
 
 ### Variants In `prf.def`
 - `_add_SxS_`

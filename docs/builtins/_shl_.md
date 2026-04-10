@@ -1,5 +1,5 @@
 # `_shl_`
-Arithmetic, bitwise, or comparison builtin family.
+Bitwise **Shift Left** operation, inheriting the behavior of the **C** `<<` and `>>` operators.
 
 ### Variants In `prf.def`
 - `_shl_SxS_`

@@ -1,5 +1,5 @@
 # `_shape_matches_dim_`
-Constraint-check builtin family used by type and shape checking.
+Ensures that the length of a vector used for selection matches the dimensionality of the target array.
 
 ### Variants In `prf.def`
 - `_shape_matches_dim_VxA_`

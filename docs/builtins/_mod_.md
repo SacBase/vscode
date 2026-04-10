@@ -1,5 +1,5 @@
 # `_mod_`
-Arithmetic, bitwise, or comparison builtin family.
+The primitive for modulo. It performs element-wise modulo on arrays, or scalar modulo if both operands are scalars.
 
 ### Variants In `prf.def`
 - `_mod_SxS_`

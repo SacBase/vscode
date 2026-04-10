@@ -1,5 +1,5 @@
 # `_div_`
-Arithmetic, bitwise, or comparison builtin family.
+The primitive for division. It performs element-wise division on arrays, or scalar division if both operands are scalars.
 
 ### Variants In `prf.def`
 - `_div_SxS_`

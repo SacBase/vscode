@@ -1,5 +1,5 @@
 # `_reciproc_`
-Unary builtin family.
+Returns the reciprocal (1/x) of a value, used for optimized division operations.
 
 ### Variants In `prf.def`
 - `_reciproc_S_`

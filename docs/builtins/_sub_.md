@@ -1,5 +1,5 @@
 # `_sub_`
-Arithmetic, bitwise, or comparison builtin family.
+The primitive for subtraction. It performs element-wise subtraction on arrays, or scalar subtraction if both operands are scalars.
 
 ### Variants In `prf.def`
 - `_sub_SxS_`

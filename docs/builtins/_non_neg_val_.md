@@ -1,5 +1,5 @@
 # `_non_neg_val_`
-Constraint-check builtin family used by type and shape checking.
+A safety primitive ensuring a value (typically a size or index) is not negative.
 
 ### Variants In `prf.def`
 - `_non_neg_val_S_`
