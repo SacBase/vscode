@@ -1,8 +1,14 @@
+import {
+  FALLBACK_DIAGNOSTIC_PATTERN,
+  NOISY_ABORT_PATTERN,
+  NOISY_COMPILATION_FAILED_PATTERN,
+  PATH_BACKSLASH_PATTERN,
+} from "../../../constants/regex";
 import { CoreDiagnosticSeverity, CoreParsedDiagnostic } from "./types";
 
 const NOISY_MESSAGE_PATTERNS: RegExp[] = [
-  /^compilation failed\b/i,
-  /^abort\b/i,
+  NOISY_COMPILATION_FAILED_PATTERN,
+  NOISY_ABORT_PATTERN,
 ];
 
 function toSeverity(level: string | undefined): CoreDiagnosticSeverity {
@@ -20,7 +26,7 @@ function toSeverity(level: string | undefined): CoreDiagnosticSeverity {
 }
 
 function normalizePath(value: string): string {
-  return value.replace(/\\\\/g, "/");
+  return value.replace(PATH_BACKSLASH_PATTERN, "/");
 }
 
 function parseTabSeparatedLine(line: string): CoreParsedDiagnostic | null {
@@ -51,8 +57,7 @@ function parseTabSeparatedLine(line: string): CoreParsedDiagnostic | null {
 }
 
 function parseFallbackLine(line: string): CoreParsedDiagnostic | null {
-  const fallbackRegex = /^(.*?):(\d+)(?::(\d+)(?:-(\d+))?)?(?::\s*(warning|error|fatal|note|info))?\s*:?\s*(.*)$/i;
-  const match = line.match(fallbackRegex);
+  const match = line.match(FALLBACK_DIAGNOSTIC_PATTERN);
   if (!match) {
     return null;
   }

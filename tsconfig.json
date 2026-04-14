@@ -3,11 +3,11 @@
     "module": "Node16",
     "target": "ES2020",
     "paths": {
-      "$core/*": [
-        "./src/core/*"
+      "$sac2c/*": [
+        "./src/sac2c/*"
       ],
-      "$server/*": [
-        "./src/server/*"
+      "$util/*": [
+        "./src/util/*"
       ],
       "$extension/*": [
         "./src/extension/*"

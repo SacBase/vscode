@@ -1,3 +1,5 @@
+import { escapeRegExp } from "$util/regex";
+import { BUILTIN_FUNCTION_CALL_PATTERN, FUNCTION_CALL_PATTERN } from "../../constants/regex";
 import { HoverMatch, HoverTarget } from "./types";
 // This is an initial set of StdLib wrappers. Prefer maintaining full details via docs markdown files.
 const STDLIB_FUNCTION_NAMES = [
@@ -35,12 +37,6 @@ const STDLIB_FUNCTION_NAMES = [
 const STDLIB_TARGETS = new Map<string, HoverTarget>(
   STDLIB_FUNCTION_NAMES.map((name) => [name, createHoverTarget(name, "stdlib")]),
 );
-
-const BUILTIN_FUNCTION_PATTERN = /(^|[^A-Za-z0-9_])(_[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*_)(?=\s*\()/g;
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
 
 function createHoverTarget(name: string, kind: HoverTarget["kind"]): HoverTarget {
   if (kind === "builtin") {
@@ -87,9 +83,31 @@ function lookupStdlib(lineText: string, column: number): HoverMatch | null {
   return null;
 }
 
-function lookupBuiltin(lineText: string, column: number): HoverMatch | null {
+function lookupAnyCallIdentifier(lineText: string, column: number): HoverMatch | null {
+  const pattern = new RegExp(FUNCTION_CALL_PATTERN.source, FUNCTION_CALL_PATTERN.flags);
   let match: RegExpExecArray | null;
-  while ((match = BUILTIN_FUNCTION_PATTERN.exec(lineText)) !== null) {
+  while ((match = pattern.exec(lineText)) !== null) {
+    const token = match[1];
+    const start = match.index;
+    const end = start + token.length;
+    if (!isColumnInsideMatch(column, start, end)) {
+      continue;
+    }
+
+    return {
+      target: createHoverTarget(token, "stdlib"),
+      start,
+      end,
+    };
+  }
+
+  return null;
+}
+
+function lookupBuiltin(lineText: string, column: number): HoverMatch | null {
+  BUILTIN_FUNCTION_CALL_PATTERN.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = BUILTIN_FUNCTION_CALL_PATTERN.exec(lineText)) !== null) {
     const token = match[2];
     const start = match.index + match[1].length;
     const end = start + token.length;
@@ -111,12 +129,17 @@ function lookupBuiltin(lineText: string, column: number): HoverMatch | null {
  * Finds hover information for a token on a single source line.
  */
 export function lookupHoverTarget(lineText: string, column: number): HoverMatch | null {
+  const builtin = lookupBuiltin(lineText, column);
+  if (builtin) {
+    return builtin;
+  }
+
   const stdlib = lookupStdlib(lineText, column);
   if (stdlib) {
     return stdlib;
   }
 
-  return lookupBuiltin(lineText, column);
+  return lookupAnyCallIdentifier(lineText, column);
 }
 
 /**

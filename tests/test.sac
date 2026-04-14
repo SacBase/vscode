@@ -1,0 +1,44 @@
+use Array: all;
+use StdIO: all;
+
+/**
+ * Increment scalar.
+ *
+ * Used for hover doc markdown coverage.
+ */
+int inc(int x)
+{
+    return x + 1;
+}
+
+/**
+ * Combine scalar values.
+ */
+int combine(int a, int b)
+{
+    return _add_SxS_(a, b);
+}
+
+/**
+ * Combine vectors element-wise.
+ */
+int[.] combine(int[.] a, int[.] b)
+{
+    return { iv -> a[iv] + b[iv] };
+}
+
+int[.] makeVec(int n)
+{
+    return genarray([n], 1);
+}
+
+int main()
+{
+    xs = makeVec(3);
+    ys = makeVec(3);
+    zs = combine(xs, ys);
+    a = combine(1, inc(2));
+    print(shape(zs));
+    print(a);
+    return 0;
+}

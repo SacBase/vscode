@@ -1,8 +1,10 @@
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Definition, Position } from "vscode-languageserver/node";
 
+import { queryStdlibDefinitions } from "$sac2c/parser/navigation/stdlib";
 import { queryCompilerDefinitions } from "./compilerAdapter";
 import { getSymbolAtPosition } from "./symbol";
+import { CompilerNavigationRuntimeConfig } from "./types";
 import { queryWorkspaceDefinitions } from "./workspaceDefinitions";
 
 export interface ProvideDefinitionContext {
@@ -12,6 +14,7 @@ export interface ProvideDefinitionContext {
   workspaceRoots: string[];
   openDocuments: TextDocument[];
   excludedDirNames: Set<string>;
+  runtime: CompilerNavigationRuntimeConfig;
 }
 
 /**
@@ -29,6 +32,7 @@ export async function provideDefinition(
     document: context.document,
     position: context.position,
     workspaceRoot: context.workspaceRoot,
+    runtime: context.runtime,
   });
 
   if (compilerResult && compilerResult.locations.length > 0) {
@@ -44,7 +48,12 @@ export async function provideDefinition(
   });
 
   if (fallback.length === 0) {
-    return null;
+    const stdlibFallback = queryStdlibDefinitions(symbol.name, context.workspaceRoot);
+    if (stdlibFallback.length === 0) {
+      return null;
+    }
+
+    return stdlibFallback;
   }
 
   return fallback;

@@ -3,10 +3,9 @@ import * as path from "path";
 import { pathToFileURL } from "url";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Location } from "vscode-languageserver/node";
+import { FUNCTION_DEFINITION_CAPTURE_PATTERN } from "../../constants/regex";
 
 import { SacDefinitionEntry } from "./types";
-
-const FUNCTION_DEFINITION_PATTERN = /\b([A-Za-z_][A-Za-z0-9_]*)\s*\([^;{}]*\)\s*\{/g;
 
 function isSacFilePath(filePath: string): boolean {
   return filePath.toLowerCase().endsWith(".sac");
@@ -69,8 +68,9 @@ function offsetToLineAndCharacter(sourceText: string, offset: number): { line: n
 function extractDefinitionsFromText(uri: string, sourceText: string): SacDefinitionEntry[] {
   const definitions: SacDefinitionEntry[] = [];
 
+  const definitionPattern = new RegExp(FUNCTION_DEFINITION_CAPTURE_PATTERN.source, FUNCTION_DEFINITION_CAPTURE_PATTERN.flags);
   let match: RegExpExecArray | null;
-  while ((match = FUNCTION_DEFINITION_PATTERN.exec(sourceText)) !== null) {
+  while ((match = definitionPattern.exec(sourceText)) !== null) {
     const fullMatch = match[0];
     const functionName = match[1];
     const relativeStart = fullMatch.indexOf(functionName);

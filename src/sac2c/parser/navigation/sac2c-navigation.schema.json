@@ -1,0 +1,616 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac-home.org/schema/sac2c-navigation.schema.json",
+  "title": "SaC navjson payload",
+  "description": "Compiler navigation index consumed by hover and goto-definition logic.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schemaVersion",
+    "files",
+    "tokens",
+    "symbols",
+    "bindings"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "indexKind": {
+      "type": "string",
+      "enum": [
+        "full",
+        "file-scoped"
+      ]
+    },
+    "producer": {
+      "$ref": "#/$defs/producer"
+    },
+    "workspace": {
+      "$ref": "#/$defs/workspace"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/fileEntry"
+      }
+    },
+    "tokens": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/token"
+      }
+    },
+    "symbols": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/symbol"
+      }
+    },
+    "bindings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/binding"
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/module"
+      }
+    },
+    "imports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/importEdge"
+      }
+    },
+    "calls": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/call"
+      }
+    },
+    "signatures": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/signatureEntry"
+      }
+    },
+    "docs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/docEntry"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/note"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "buildDate": {
+          "type": "string"
+        }
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "rootUri",
+        "pathStyle",
+        "positionEncoding"
+      ],
+      "properties": {
+        "rootUri": {
+          "type": "string"
+        },
+        "pathStyle": {
+          "type": "string"
+        },
+        "positionEncoding": {
+          "type": "string"
+        }
+      }
+    },
+    "position": {
+      "type": "object",
+      "required": [
+        "line",
+        "character"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "character": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "range": {
+      "type": "object",
+      "required": [
+        "start",
+        "end"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/position"
+        },
+        "end": {
+          "$ref": "#/$defs/position"
+        }
+      }
+    },
+    "fileEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "path"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "isGenerated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "token": {
+      "type": "object",
+      "required": [
+        "id",
+        "fileId",
+        "range",
+        "role"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "fileId": {
+          "$ref": "#/$defs/id"
+        },
+        "range": {
+          "$ref": "#/$defs/range"
+        },
+        "role": {
+          "type": "string"
+        },
+        "spelling": {
+          "type": "string"
+        },
+        "enclosingSymbolId": {
+          "type": "string"
+        }
+      }
+    },
+    "symbol": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "qualifiedName",
+        "definitionTokenId",
+        "moduleId",
+        "provenance"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "qualifiedName": {
+          "type": "string"
+        },
+        "definitionTokenId": {
+          "$ref": "#/$defs/id"
+        },
+        "declarationTokenId": {
+          "type": "string"
+        },
+        "moduleId": {
+          "$ref": "#/$defs/id"
+        },
+        "signatureIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "docId": {
+          "type": "string"
+        },
+        "provenance": {
+          "type": "string",
+          "enum": [
+            "user",
+            "stdlib",
+            "builtin",
+            "external"
+          ]
+        },
+        "visibility": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "required": [
+        "tokenId",
+        "resolution",
+        "candidateSymbolIds"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "tokenId": {
+          "$ref": "#/$defs/id"
+        },
+        "resolution": {
+          "type": "string",
+          "enum": [
+            "resolved",
+            "unresolved",
+            "ambiguous"
+          ]
+        },
+        "candidateSymbolIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selectedSymbolId": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "module": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "definitionTokenId"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "qualifiedName": {
+          "type": "string"
+        },
+        "definitionTokenId": {
+          "$ref": "#/$defs/id"
+        },
+        "fileIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "docId": {
+          "type": "string"
+        },
+        "provenance": {
+          "type": "string"
+        }
+      }
+    },
+    "importEdge": {
+      "type": "object",
+      "required": [
+        "importTokenId",
+        "importedModuleName"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "importTokenId": {
+          "$ref": "#/$defs/id"
+        },
+        "importedModuleName": {
+          "type": "string"
+        },
+        "importKind": {
+          "type": "string"
+        },
+        "resolvedModuleId": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "typeShape": {
+      "type": "object",
+      "required": [
+        "typeRepr"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "typeRepr": {
+          "type": "string"
+        },
+        "shapeClass": {
+          "type": "string"
+        },
+        "rank": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "isKnown": {
+          "type": "boolean"
+        }
+      }
+    },
+    "callCandidate": {
+      "type": "object",
+      "required": [
+        "symbolId",
+        "status"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "symbolId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "call": {
+      "type": "object",
+      "required": [
+        "calleeTokenId",
+        "candidates"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "calleeTokenId": {
+          "$ref": "#/$defs/id"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/callCandidate"
+          }
+        },
+        "argumentTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/typeShape"
+          }
+        },
+        "resultTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/typeShape"
+          }
+        }
+      }
+    },
+    "signatureParameter": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "typeShape": {
+          "$ref": "#/$defs/typeShape"
+        },
+        "isVariadic": {
+          "type": "boolean"
+        },
+        "isImplicit": {
+          "type": "boolean"
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "display",
+        "parameters",
+        "returns"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "display": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/signatureParameter"
+          }
+        },
+        "returns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/typeShape"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "signatureEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "signature"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "signature": {
+          "$ref": "#/$defs/signature"
+        }
+      }
+    },
+    "docParam": {
+      "type": "object",
+      "required": [
+        "name",
+        "description"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "doc": {
+      "type": "object",
+      "required": [
+        "format",
+        "text"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "format": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "params": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/docParam"
+          }
+        },
+        "returns": {
+          "type": "string"
+        }
+      }
+    },
+    "docEntry": {
+      "type": "object",
+      "required": [
+        "id",
+        "doc"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "doc": {
+          "$ref": "#/$defs/doc"
+        }
+      }
+    },
+    "note": {
+      "type": "object",
+      "required": [
+        "level",
+        "message"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "level": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

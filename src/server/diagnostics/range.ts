@@ -1,4 +1,13 @@
 import { Diagnostic } from "vscode-languageserver/node";
+import {
+  ALL_INSTANCES_SYMBOL_PATTERN,
+  IN_FUNCTION_SYMBOL_PATTERN,
+  NON_WHITESPACE_PATTERN,
+  SYMBOL_CHAR_PATTERN,
+  TOKEN_CANNOT_START_PATTERN,
+  TOKEN_FOUND_PATTERN,
+  TOKEN_FOUND_WITH_COMMA_PATTERN,
+} from "../../constants/regex";
 
 import { ParsedDiagnostic } from "./types";
 
@@ -32,9 +41,9 @@ function toBaseDiagnostic(parsed: ParsedDiagnostic): Diagnostic {
  * Attempts to extract a relevant token from sac2c message text.
  */
 function extractRelevantToken(message: string): string | null {
-  const tokenFoundMatch = message.match(/,\s*`([^`]+)`\s+token\s+found/i)
-    || message.match(/token\s+`([^`]+)`\s+found/i)
-    || message.match(/^token\s+([^\s]+)\s+cannot\s+start/i);
+  const tokenFoundMatch = message.match(TOKEN_FOUND_WITH_COMMA_PATTERN)
+    || message.match(TOKEN_FOUND_PATTERN)
+    || message.match(TOKEN_CANNOT_START_PATTERN);
 
   if (!tokenFoundMatch || !tokenFoundMatch[1]) {
     return null;
@@ -52,12 +61,12 @@ function extractRelevantToken(message: string): string | null {
  * Extracts likely symbol names from context-style messages.
  */
 function extractSymbolHint(message: string): string | null {
-  const allInstancesMatch = message.match(/all\s+instances\s+of\s+"([A-Za-z_][A-Za-z0-9_]*)"/i);
+  const allInstancesMatch = message.match(ALL_INSTANCES_SYMBOL_PATTERN);
   if (allInstancesMatch && allInstancesMatch[1]) {
     return allInstancesMatch[1];
   }
 
-  const inFunctionMatch = message.match(/^--\s+in\s+[A-Za-z_][A-Za-z0-9_]*::([A-Za-z_][A-Za-z0-9_]*)\s*\(/i);
+  const inFunctionMatch = message.match(IN_FUNCTION_SYMBOL_PATTERN);
   if (inFunctionMatch && inFunctionMatch[1]) {
     return inFunctionMatch[1];
   }
@@ -90,7 +99,7 @@ function expandWordBounds(lineText: string, index: number): [number, number] | n
     return null;
   }
 
-  const isWordChar = (ch: string): boolean => /[A-Za-z0-9_]/.test(ch);
+  const isWordChar = (ch: string): boolean => SYMBOL_CHAR_PATTERN.test(ch);
   if (!isWordChar(lineText[index])) {
     return null;
   }
@@ -112,7 +121,7 @@ function expandWordBounds(lineText: string, index: number): [number, number] | n
  * Computes fallback statement range when no precise token is available.
  */
 function computeFallbackRange(lineText: string, preferredColumn: number): [number, number] {
-  const firstNonWhitespace = lineText.search(/\S/);
+  const firstNonWhitespace = lineText.search(NON_WHITESPACE_PATTERN);
   if (firstNonWhitespace < 0) {
     return [0, 0];
   }

@@ -11,16 +11,16 @@ import {
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
 
-import { uriToFsPath } from "$util/documentUtils";
-import { getCompilerNavigationRuntime } from "./compilerRuntime";
-import { createDiagnosticsWorkflow } from "./diagnosticsWorkflow";
-import { provideHover } from "./hover-info/hover";
-import { provideDefinition } from "./navigation/provider";
 import {
   getDefaultSettings,
   SacSettings,
   updateSettings
-} from "./settings";
+} from "$extension/settings/settings";
+import { createDiagnosticsWorkflow } from "$sac2c/diagnostics/workflow";
+import { getCompilerNavigationRuntime } from "$sac2c/runtime/compilerRuntime";
+import { uriToFsPath } from "$util/documentUtils";
+import { provideHover } from "../../server/hover-info/hover";
+import { provideDefinition } from "../../server/navigation/provider";
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);

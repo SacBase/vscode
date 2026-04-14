@@ -1,4 +1,4 @@
-import { HoverTarget } from "$sac2c/hover/types";
+import { HoverTarget } from "../../hover/types";
 import {
   appendBuiltinLegend,
   appendStdlibTypeVariableNote,

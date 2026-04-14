@@ -17,3 +17,24 @@ export interface SacDefinitionEntry {
 export interface SacDefinitionQueryResult {
   locations: Location[];
 }
+
+export interface SacHoverQueryResult {
+  markdown: string;
+  signature: string | null;
+  symbolName: string;
+  symbolKind: string;
+  symbolProvenance: string;
+  resolutionReason: string | null;
+  range: {
+    start: { line: number; character: number };
+    end: { line: number; character: number };
+  };
+  definitionPath: string;
+  definitionLine: number;
+}
+
+export interface CompilerNavigationRuntimeConfig {
+  executable: string | null;
+  extraArgs: string[];
+  timeoutMs: number;
+}
