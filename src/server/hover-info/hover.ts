@@ -162,15 +162,18 @@ export async function provideHover(
     const docComment = readDefinitionDocComment(compilerHover.definitionPath, compilerHover.definitionLine);
     const sourceSignature = readDefinitionSignature(compilerHover.definitionPath, compilerHover.definitionLine);
     const preferredSignature = pickPreferredSignature(compilerHover.signature, sourceSignature);
+    const isUserSymbol = compilerHover.symbolProvenance === "user";
     let docsMarkdown: string | null = null;
     const docsTargets: HoverTarget[] = [];
-    if (lexedMatch) {
+
+    // For user symbols, docs must come from resolved definition comments only.
+    if (!isUserSymbol && lexedMatch) {
       docsTargets.push(lexedMatch.target);
     }
     if (compilerTarget) {
       docsTargets.push(compilerTarget);
     }
-    if (compilerHover.symbolProvenance !== "user") {
+    if (!isUserSymbol) {
       const symbolNameTarget = hoverTargetFromSymbolName(compilerHover.symbolName);
       if (symbolNameTarget) {
         docsTargets.push(symbolNameTarget);
@@ -184,7 +187,7 @@ export async function provideHover(
       }
     }
 
-    const preferStaticDocs = compilerHover.symbolProvenance !== "user";
+    const preferStaticDocs = !isUserSymbol;
     const docBody = preferStaticDocs ? (docsMarkdown ?? docComment) : (docComment ?? docsMarkdown);
     const metadata = [
       `Kind: \`${compilerHover.symbolKind}\``,
@@ -199,6 +202,14 @@ export async function provideHover(
 
     const hasUsefulDocs = Boolean(docBody?.trim());
     const hasUsefulSignature = Boolean(preferredSignature?.trim());
+
+    if (isUserSymbol) {
+      return {
+        contents: createMarkdownContent(markdown),
+        range: compilerHover.range,
+      };
+    }
+
     if (!hasUsefulDocs && !hasUsefulSignature) {
       logHoverDebug("hover-compiler-low-confidence-fallback", {
         symbolName: compilerHover.symbolName,
@@ -248,19 +259,18 @@ export async function provideHover(
         const filePath = fileURLToPath(document.uri);
         const docComment = readDefinitionDocComment(filePath, definitionLine);
         const signature = readDefinitionSignature(filePath, definitionLine);
-        if (!docComment && !signature) {
-          return null;
-        }
-        logHoverDebug("hover-source-call-hit", {
-          name: sourceCall.name,
-          definitionLine,
-          hasDocComment: Boolean(docComment),
-        }, debugLog);
+        if (docComment || signature) {
+          logHoverDebug("hover-source-call-hit", {
+            name: sourceCall.name,
+            definitionLine,
+            hasDocComment: Boolean(docComment),
+          }, debugLog);
 
-        return {
-          contents: createMarkdownContent(formatHoverDocumentationMarkdown(docComment ?? "", { signature })),
-          range: createLineRange(position.line, sourceCall.startCharacter, sourceCall.endCharacter),
-        };
+          return {
+            contents: createMarkdownContent(formatHoverDocumentationMarkdown(docComment ?? "", { signature })),
+            range: createLineRange(position.line, sourceCall.startCharacter, sourceCall.endCharacter),
+          };
+        }
       }
     }
   }

@@ -426,7 +426,13 @@ export function findFunctionDefinitionLineByName(sourceText: string, functionNam
 
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
     const lineText = lines[lineIndex];
-    if (pattern.test(lineText)) {
+    const trimmed = lineText.trim();
+    if (trimmed.startsWith("//") || trimmed.startsWith("/*") || trimmed.startsWith("*")) {
+      continue;
+    }
+
+    const nextNonEmptyLine = lines.slice(lineIndex + 1).find((nextLine) => nextLine.trim().length > 0);
+    if (pattern.test(lineText) && isPotentialFunctionDefinitionLine(lineText, nextNonEmptyLine)) {
       return lineIndex;
     }
   }

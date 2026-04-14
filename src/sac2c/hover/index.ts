@@ -139,7 +139,7 @@ export function lookupHoverTarget(lineText: string, column: number): HoverMatch 
     return stdlib;
   }
 
-  return lookupAnyCallIdentifier(lineText, column);
+  return null;
 }
 
 /**

@@ -67,7 +67,7 @@ export function buildNavArgs(
     "-v0",
     "-navjson",
     "-nav-mode",
-    "document-symbols",
+    mode,
     "-nav-file",
     documentFsPath,
     "-nav-line",
