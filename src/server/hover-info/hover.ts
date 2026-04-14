@@ -21,12 +21,17 @@ import {
 } from "$sac2c/parser/navigation/sourceDocs";
 import { BUILTIN_SYMBOL_NAME_PATTERN, IDENTIFIER_NAME_PATTERN } from "../../constants/regex";
 import { queryCompilerHover } from "../navigation/compilerAdapter";
-import { CompilerNavigationRuntimeConfig } from "../navigation/types";
+import { CompilerNavigationRuntimeConfig, HoverDebugLogger } from "../navigation/types";
 import { formatHoverDocumentationMarkdown, resolveHoverDocumentation } from "./hoverDocs";
 
 const HOVER_DEBUG_ENABLED = process.env.SAC_NAV_DEBUG === "1";
 
-function logHoverDebug(message: string, payload?: Record<string, unknown>): void {
+function logHoverDebug(message: string, payload?: Record<string, unknown>, debugLog?: HoverDebugLogger): void {
+  if (debugLog) {
+    debugLog(message, payload);
+    return;
+  }
+
   if (!HOVER_DEBUG_ENABLED) {
     return;
   }
@@ -129,25 +134,26 @@ export async function provideHover(
   workspaceRoot: string,
   extensionInstallRoot: string,
   runtime: CompilerNavigationRuntimeConfig,
+  debugLog?: HoverDebugLogger,
 ): Promise<Hover | null> {
   logHoverDebug("hover-request", {
     uri: document.uri,
     line: position.line,
     character: position.character,
     runtimeExecutable: runtime.executable,
-  });
+  }, debugLog);
 
   const compilerHover = await queryCompilerHover({
     document,
     position,
     workspaceRoot,
     runtime,
-  });
+  }, debugLog);
   if (compilerHover) {
     logHoverDebug("hover-compiler-hit", {
       definitionPath: compilerHover.definitionPath,
       definitionLine: compilerHover.definitionLine,
-    });
+    }, debugLog);
 
     const lineText = getLineText(document, position.line) ?? "";
     const lexedMatch = lookupHoverTarget(lineText, position.character);
@@ -197,7 +203,7 @@ export async function provideHover(
       logHoverDebug("hover-compiler-low-confidence-fallback", {
         symbolName: compilerHover.symbolName,
         symbolKind: compilerHover.symbolKind,
-      });
+      }, debugLog);
     } else {
       return {
         contents: createMarkdownContent(markdown),
@@ -206,7 +212,7 @@ export async function provideHover(
     }
   }
 
-  logHoverDebug("hover-compiler-miss");
+  logHoverDebug("hover-compiler-miss", undefined, debugLog);
 
   const sourceText = document.getText();
   const sourceDefinition = findFunctionDefinitionAtPosition(sourceText, position.line, position.character);
@@ -214,14 +220,14 @@ export async function provideHover(
     logHoverDebug("hover-source-definition-hit", {
       name: sourceDefinition.name,
       definitionLine: sourceDefinition.definitionLine,
-    });
+    }, debugLog);
 
     const docComment = readDefinitionDocComment(fileURLToPath(document.uri), sourceDefinition.definitionLine);
     const signature = extractDefinitionSignatureFromText(sourceText, sourceDefinition.definitionLine);
     if (docComment) {
-      logHoverDebug("hover-source-doc-hit", { length: docComment.length });
+      logHoverDebug("hover-source-doc-hit", { length: docComment.length }, debugLog);
     } else {
-      logHoverDebug("hover-source-doc-miss");
+      logHoverDebug("hover-source-doc-miss", undefined, debugLog);
     }
 
     if (!docComment && !signature) {
@@ -249,7 +255,7 @@ export async function provideHover(
           name: sourceCall.name,
           definitionLine,
           hasDocComment: Boolean(docComment),
-        });
+        }, debugLog);
 
         return {
           contents: createMarkdownContent(formatHoverDocumentationMarkdown(docComment ?? "", { signature })),
@@ -261,13 +267,16 @@ export async function provideHover(
 
   const lineText = getLineText(document, position.line);
   if (lineText === null) {
-    logHoverDebug("hover-no-line-text");
+    logHoverDebug("hover-no-line-text", undefined, debugLog);
     return null;
   }
 
   const match = lookupHoverTarget(lineText, position.character);
   if (!match) {
-    logHoverDebug("hover-no-stdlib-builtin-match");
+    logHoverDebug("hover-no-stdlib-builtin-match", {
+      character: position.character,
+      lineTextPreview: lineText.slice(Math.max(0, position.character - 40), Math.min(lineText.length, position.character + 40)),
+    }, debugLog);
     return null;
   }
 
@@ -282,7 +291,7 @@ export async function provideHover(
     target: match.target.name,
     kind: match.target.kind,
     hasDocs: Boolean(markdownFromDocs),
-  });
+  }, debugLog);
 
   return {
     contents: createMarkdownContent(markdownFromDocs ?? formatHoverMarkdown(match.target)),

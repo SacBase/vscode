@@ -12,13 +12,19 @@ import {
 import { buildNavArgs, runCompilerCommand } from "./compilerCommand";
 import {
   CompilerNavigationRuntimeConfig,
+  HoverDebugLogger,
   SacDefinitionQueryResult,
   SacHoverQueryResult,
 } from "./types";
 
 const NAV_DEBUG_ENABLED = process.env.SAC_NAV_DEBUG === "1";
 
-function logNavDebug(message: string, payload?: Record<string, unknown>): void {
+function logNavDebug(message: string, payload?: Record<string, unknown>, debugLog?: HoverDebugLogger): void {
+  if (debugLog) {
+    debugLog(message, payload);
+    return;
+  }
+
   if (!NAV_DEBUG_ENABLED) {
     return;
   }
@@ -88,13 +94,14 @@ export function parseCompilerHoverOutput(
   position: Position,
   workspaceRoot: string,
   sourceText?: string,
+  debugLog?: HoverDebugLogger,
 ): SacHoverQueryResult | null {
   const parsed = parseNavigationIndex(stdout);
   if (!parsed.index) {
     logNavDebug("parse-hover-failed", {
       error: parsed.error,
       stdoutPreview: stdout.slice(0, 500),
-    });
+    }, debugLog);
     return null;
   }
 
@@ -112,7 +119,7 @@ export function parseCompilerHoverOutput(
       file: documentFsPath,
       line: position.line,
       character: position.character,
-    });
+    }, debugLog);
     return null;
   }
 
@@ -173,13 +180,14 @@ export async function queryCompilerDefinitions(
  */
 export async function queryCompilerHover(
   context: CompilerDefinitionAdapterContext,
+  debugLog?: HoverDebugLogger,
 ): Promise<SacHoverQueryResult | null> {
   if (!context.document.uri.startsWith("file://")) {
     return null;
   }
 
   if (!context.runtime.executable) {
-    logNavDebug("hover-skip-no-executable");
+    logNavDebug("hover-skip-no-executable", undefined, debugLog);
     return null;
   }
 
@@ -194,7 +202,7 @@ export async function queryCompilerHover(
   if (!stdout) {
     logNavDebug("hover-no-stdout", {
       executable: context.runtime.executable,
-    });
+    }, debugLog);
     return null;
   }
 
@@ -204,5 +212,6 @@ export async function queryCompilerHover(
     context.position,
     context.workspaceRoot,
     context.document.getText(),
+    debugLog,
   );
 }

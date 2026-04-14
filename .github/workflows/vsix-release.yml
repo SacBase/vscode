@@ -1,0 +1,320 @@
+name: VSIX Releases
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  nightly:
+    name: Nightly VSIX
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: nightly-vsix-release
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build VSIX
+        run: npm run package
+
+      - name: Read package version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare nightly release metadata
+        id: nightly_meta
+        uses: actions/github-script@v7
+        env:
+          PACKAGE_VERSION: ${{ steps.version.outputs.version }}
+        with:
+          script: |
+            const version = process.env.PACKAGE_VERSION;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const releaseTag = 'nightly-builds';
+            const releaseName = 'Nightly Builds';
+            const releaseBody = [
+              '# Nightly Builds',
+              '',
+              'This release collects all nightly (beta) VSIX artifacts for this extension.',
+              '',
+              '## Install',
+              '1. Download the desired `.vsix` asset.',
+              '2. In VS Code: Extensions view -> `...` menu -> `Install from VSIX...`.',
+              '3. Select the downloaded file.',
+              '',
+              'Naming:',
+              '- `sac-language-support-<semver>-beta.<n>.vsix`',
+              '- `<n>` increments for each nightly build of same `<semver>`.',
+            ].join('\n');
+
+            let release;
+            try {
+              const found = await github.rest.repos.getReleaseByTag({ owner, repo, tag: releaseTag });
+              release = found.data;
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+
+              const created = await github.rest.repos.createRelease({
+                owner,
+                repo,
+                tag_name: releaseTag,
+                target_commitish: 'main',
+                name: releaseName,
+                body: releaseBody,
+                draft: false,
+                prerelease: true,
+              });
+              release = created.data;
+            }
+
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, {
+              owner,
+              repo,
+              release_id: release.id,
+              per_page: 100,
+            });
+
+            const escapedVersion = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`^sac-language-support-${escapedVersion}-beta\\.(\\d+)\\.vsix$`);
+            let maxBuild = 0;
+
+            for (const asset of assets) {
+              const match = asset.name.match(regex);
+              if (!match) {
+                continue;
+              }
+
+              const current = Number.parseInt(match[1], 10);
+              if (Number.isFinite(current) && current > maxBuild) {
+                maxBuild = current;
+              }
+            }
+
+            const nextBuild = maxBuild + 1;
+            const assetName = `sac-language-support-${version}-beta.${nextBuild}.vsix`;
+
+            core.setOutput('release_id', String(release.id));
+            core.setOutput('asset_name', assetName);
+
+      - name: Rename VSIX to nightly naming
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          ASSET_NAME: ${{ steps.nightly_meta.outputs.asset_name }}
+        run: |
+          set -euo pipefail
+          mv "sac-language-support-${VERSION}.vsix" "${ASSET_NAME}"
+
+      - name: Upload nightly VSIX asset
+        uses: actions/github-script@v7
+        env:
+          RELEASE_ID: ${{ steps.nightly_meta.outputs.release_id }}
+          ASSET_NAME: ${{ steps.nightly_meta.outputs.asset_name }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const releaseId = Number.parseInt(process.env.RELEASE_ID, 10);
+            const assetName = process.env.ASSET_NAME;
+            const assetPath = `${process.env.GITHUB_WORKSPACE}/${assetName}`;
+
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, {
+              owner,
+              repo,
+              release_id: releaseId,
+              per_page: 100,
+            });
+
+            const existing = assets.find((asset) => asset.name === assetName);
+            if (existing) {
+              await github.rest.repos.deleteReleaseAsset({
+                owner,
+                repo,
+                asset_id: existing.id,
+              });
+            }
+
+            await github.rest.repos.uploadReleaseAsset({
+              owner,
+              repo,
+              release_id: releaseId,
+              name: assetName,
+              data: fs.readFileSync(assetPath),
+            });
+
+  stable:
+    name: Stable VSIX
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: stable-vsix-release
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate stable publish tag and main ancestry
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${GITHUB_REF_NAME}"
+          MATCHED="false"
+          if [[ "${TAG_NAME}" =~ [Rr][Ee][Ll][Ee][Aa][Ss][Ee] ]] || [[ "${TAG_NAME}" =~ [Pp][Uu][Bb][Ll][Ii][Ss][Hh] ]]; then
+            MATCHED="true"
+          fi
+
+          TAG_COMMIT="$(git rev-list -n 1 "${TAG_NAME}")"
+          git fetch origin main --depth=1
+
+          ON_MAIN="false"
+          if git merge-base --is-ancestor "${TAG_COMMIT}" origin/main; then
+            ON_MAIN="true"
+          fi
+
+          echo "matched=${MATCHED}" >> "$GITHUB_OUTPUT"
+          echo "on_main=${ON_MAIN}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        if: steps.gate.outputs.matched == 'true' && steps.gate.outputs.on_main == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        if: steps.gate.outputs.matched == 'true' && steps.gate.outputs.on_main == 'true'
+        run: npm ci
+
+      - name: Build VSIX
+        if: steps.gate.outputs.matched == 'true' && steps.gate.outputs.on_main == 'true'
+        run: npm run package
+
+      - name: Read package version
+        if: steps.gate.outputs.matched == 'true' && steps.gate.outputs.on_main == 'true'
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare stable release metadata
+        if: steps.gate.outputs.matched == 'true' && steps.gate.outputs.on_main == 'true'
+        id: stable_meta
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const releaseTag = 'stable-releases';
+            const releaseName = 'Stable Releases';
+            const releaseBody = [
+              '# Stable Releases',
+              '',
+              'This release collects stable VSIX artifacts.',
+              '',
+              'Stable builds are produced from push tags containing `publish` or `release` (case-insensitive) that point to commits on `main`.',
+              '',
+              '## Install',
+              '1. Download `sac-language-support-<semver>.vsix`.',
+              '2. In VS Code: Extensions view -> `...` menu -> `Install from VSIX...`.',
+              '3. Select the downloaded file.',
+            ].join('\n');
+
+            let release;
+            try {
+              const found = await github.rest.repos.getReleaseByTag({ owner, repo, tag: releaseTag });
+              release = found.data;
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+
+              const created = await github.rest.repos.createRelease({
+                owner,
+                repo,
+                tag_name: releaseTag,
+                target_commitish: 'main',
+                name: releaseName,
+                body: releaseBody,
+                draft: false,
+                prerelease: false,
+              });
+              release = created.data;
+            }
+
+            core.setOutput('release_id', String(release.id));
+
+      - name: Upload stable VSIX asset
+        if: steps.gate.outputs.matched == 'true' && steps.gate.outputs.on_main == 'true'
+        uses: actions/github-script@v7
+        env:
+          RELEASE_ID: ${{ steps.stable_meta.outputs.release_id }}
+          VERSION: ${{ steps.version.outputs.version }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const releaseId = Number.parseInt(process.env.RELEASE_ID, 10);
+            const version = process.env.VERSION;
+            const assetName = `sac-language-support-${version}.vsix`;
+            const assetPath = `${process.env.GITHUB_WORKSPACE}/${assetName}`;
+
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, {
+              owner,
+              repo,
+              release_id: releaseId,
+              per_page: 100,
+            });
+
+            const existing = assets.find((asset) => asset.name === assetName);
+            if (existing) {
+              await github.rest.repos.deleteReleaseAsset({
+                owner,
+                repo,
+                asset_id: existing.id,
+              });
+            }
+
+            await github.rest.repos.uploadReleaseAsset({
+              owner,
+              repo,
+              release_id: releaseId,
+              name: assetName,
+              data: fs.readFileSync(assetPath),
+            });

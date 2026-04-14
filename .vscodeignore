@@ -1,4 +1,42 @@
+# Dev / editor
 .vscode/**
 .vscode-test/**
-.gitignore
 vsc-extension-quickstart.md
+
+# Git / CI metadata
+.git/**
+.github/**
+.gitignore
+
+# Source / tests / build output
+src/**
+test/**
+tests/**
+__tests__/**
+coverage/**
+.nyc_output/**
+**/*.ts
+**/*.map
+out/**/*.map
+*.vsix
+
+# Logs / package manager noise
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+yarn.lock
+pnpm-lock.yaml
+
+# Tooling config files
+tsconfig.json
+tsconfig.*.json
+.eslintrc*
+.prettierrc*
+.prettierignore
+
+# Non-runtime docs / misc
+CONTRIBUTING.md
+SUPPORT.md
+docs/private/**
+marketplace/**

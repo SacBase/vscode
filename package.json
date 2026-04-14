@@ -39,23 +39,24 @@
     "vscode": "^1.115.0"
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run bundle",
+    "clean:out": "node -e \"require('fs').rmSync('out', { recursive: true, force: true })\"",
+    "bundle": "npm run clean:out && esbuild src/extension.ts src/server/server.ts --bundle --platform=node --target=node20 --format=cjs --outdir=out --outbase=src --sourcemap --external:vscode --tsconfig=tsconfig.json",
     "compile": "tsc -p ./ && tsc-alias -p tsconfig.json",
     "watch": "concurrently -k \"tsc -watch -p ./\" \"tsc-alias -p tsconfig.json -w\"",
     "package": "vsce package"
-  },
-  "dependencies": {
-    "vscode-languageclient": "^9.0.1",
-    "vscode-languageserver": "^9.0.1",
-    "vscode-languageserver-textdocument": "^1.0.12"
   },
   "devDependencies": {
     "@types/node": "^25.5.2",
     "@types/vscode": "^1.115.0",
     "@vscode/vsce": "^3.7.1",
     "concurrently": "^9.1.2",
+    "esbuild": "^0.25.3",
     "tsc-alias": "^1.8.16",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.2",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
   },
   "contributes": {
     "languages": [

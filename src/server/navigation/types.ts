@@ -38,3 +38,5 @@ export interface CompilerNavigationRuntimeConfig {
   extraArgs: string[];
   timeoutMs: number;
 }
+
+export type HoverDebugLogger = (message: string, payload?: Record<string, unknown>) => void;

@@ -54,6 +54,17 @@ function runSafely(work: Promise<void>, context: string): void {
   });
 }
 
+function createHoverDebugLogger(enabled: boolean, prefix: string): ((message: string, payload?: Record<string, unknown>) => void) | undefined {
+  if (!enabled) {
+    return undefined;
+  }
+
+  return (message: string, payload?: Record<string, unknown>): void => {
+    const serialized = payload ? ` ${JSON.stringify(payload)}` : "";
+    connection.console.error(`[${prefix}] ${message}${serialized}`);
+  };
+}
+
 connection.onInitialize((params) => {
   const init = params.initializationOptions as { extensionPath?: unknown } | undefined;
   extensionInstallRoot = typeof init?.extensionPath === "string" ? init.extensionPath : "";
@@ -91,6 +102,7 @@ connection.onHover(async (params: HoverParams & TextDocumentPositionParams): Pro
       workspaceRoot,
       extensionInstallRoot,
       getCompilerNavigationRuntime(settings, workspaceRoot),
+      createHoverDebugLogger(settings.compilerTrace !== "off", "hover"),
     );
   } catch (error) {
     const message = error instanceof Error ? error.stack ?? error.message : String(error);

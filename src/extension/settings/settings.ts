@@ -22,6 +22,7 @@ export interface SacSettings extends CompilerResolutionSettings {
   messagingEnabled: boolean;
   messagingArgs: string[];
   compilerExtraArgs: string[];
+  compilerTrace: "off" | "messages" | "verbose";
 }
 
 export const DEFAULT_WORKSPACE_SCAN_EXCLUDE_DIRS = [".git", "node_modules", "out", ".vscode-test"];
@@ -62,6 +63,7 @@ export function getDefaultSettings(): SacSettings {
       "%.0s",
     ],
     compilerExtraArgs: [],
+    compilerTrace: "off",
   };
 }
 
@@ -102,6 +104,12 @@ export function updateSettings(configuration: unknown): SacSettings {
   const wsl = (compiler.wsl as Record<string, unknown> | undefined) || {};
   const docker = (compiler.docker as Record<string, unknown> | undefined) || {};
   const messaging = (compiler.messaging as Record<string, unknown> | undefined) || {};
+  const trace = compiler.trace;
+
+  const compilerTrace: SacSettings["compilerTrace"] =
+    trace === "messages" || trace === "verbose" || trace === "off"
+      ? trace
+      : "off";
 
   const mode = diagnostics.mode;
   const diagnosticsMode: SacSettings["diagnosticsMode"] =
@@ -156,5 +164,6 @@ export function updateSettings(configuration: unknown): SacSettings {
       "%.0s",
     ]),
     compilerExtraArgs: normalizeCompilerArgs(compiler.extraArgs, []),
+    compilerTrace,
   };
 }

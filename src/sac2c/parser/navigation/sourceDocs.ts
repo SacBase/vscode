@@ -299,7 +299,7 @@ export function findFunctionDefinitionAtPosition(
 
   const startCharacter = match.index + match[1].length + lineText.slice(match.index + match[1].length).indexOf(match[2]);
   const endCharacter = startCharacter + match[2].length;
-  if (character < startCharacter || character > endCharacter) {
+  if (character < startCharacter || character >= endCharacter) {
     return null;
   }
 
@@ -405,7 +405,7 @@ export function findFunctionCallAtPosition(
     const name = match[1];
     const startCharacter = match.index;
     const endCharacter = startCharacter + name.length;
-    if (character < startCharacter || character > endCharacter) {
+    if (character < startCharacter || character >= endCharacter) {
       continue;
     }
 
