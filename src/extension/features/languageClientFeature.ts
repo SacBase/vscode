@@ -7,7 +7,14 @@ import {
 } from "vscode-languageclient/node";
 
 interface FeatureLifecycle {
+  /**
+   * Starts feature resources.
+   */
   activate(): Promise<void>;
+
+  /**
+   * Stops feature resources.
+   */
   deactivate(): Promise<void>;
 }
 
@@ -31,9 +38,13 @@ export class LanguageClientFeature implements FeatureLifecycle {
 
   constructor(private readonly context: vscode.ExtensionContext) { }
 
+  /**
+   * Starts SaC language client when feature is enabled.
+   */
   public async activate(): Promise<void> {
     const config = vscode.workspace.getConfiguration("sac");
-    const enabled = config.get<boolean>("languageServer.enable", true);
+    const legacyEnabled = config.get<boolean>("languageServer.enable", true);
+    const enabled = config.get<boolean>("features.languageServer.enable", legacyEnabled);
     if (!enabled) {
       return;
     }
@@ -82,6 +93,9 @@ export class LanguageClientFeature implements FeatureLifecycle {
     }
   }
 
+  /**
+   * Stops active language client.
+   */
   public async deactivate(): Promise<void> {
     if (!this.client) {
       return;

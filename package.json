@@ -215,6 +215,52 @@
           "default": true,
           "description": "Enable the SaC language server."
         },
+        "sac.features.languageServer.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable language server feature module. Overrides sac.languageServer.enable when set."
+        },
+        "sac.features.formatter.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable formatter feature module registration."
+        },
+        "sac.features.chatParticipant.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable @sac chat participant feature module."
+        },
+        "sac.format.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable SaC document and range formatter."
+        },
+        "sac.format.onSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Format SaC file on save using extension formatter."
+        },
+        "sac.format.indentSize": {
+          "type": "number",
+          "default": 4,
+          "minimum": 2,
+          "description": "Indent size used by SaC formatter."
+        },
+        "sac.format.normalizeGuards": {
+          "type": "boolean",
+          "default": true,
+          "description": "Normalize guard prefixes to '| ' and ', ' with consistent spacing."
+        },
+        "sac.format.expandInlineWithLoops": {
+          "type": "boolean",
+          "default": true,
+          "description": "Expand inline with-loop bodies to multiline style when formatting."
+        },
+        "sac.format.expandInlineComprehensions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Expand inline tensor comprehensions to multiline style when formatting."
+        },
         "sac.diagnostics.mode": {
           "type": "string",
           "enum": [

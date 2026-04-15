@@ -49,3 +49,16 @@ export const DOC_TAG_EXAMPLE_PATTERN = /^@example\s*(.*)$/;
 export const RETURN_KEYWORD_PATTERN = /\breturn\b/;
 
 export const CONTROL_FLOW_KEYWORD_PATTERN = /\b(if|for|while|switch)\b/;
+
+export const SINGLE_LINE_COMMENT_PATTERN = /^\s*\/\//;
+
+export const INLINE_WITH_LOOP_PATTERN = /^return\s+with\s*\{\s*(\([^:]+\))\s*:\s*(.+?)\s*;\s*\}\s*:\s*genarray\s*\((.+)\)\s*;\s*$/;
+
+export const INLINE_TENSOR_COMPREHENSION_PATTERN = /^return\s*\{\s*(\[[^\]]+\])\s*->\s*(.+?)\s*\|\s*(.+)\s*\}\s*;\s*$/;
+
+export const TENSOR_RETURN_BLOCK_START_PATTERN = /^return\s*\{$/;
+
+export const TENSOR_RETURN_BLOCK_END_PATTERN = /^\};$/;
+
+export const TENSOR_ARROW_PATTERN = /->/;
+

@@ -8,6 +8,12 @@ type SacChatMetadata = {
   command: string;
 };
 
+/**
+ * Builds chat result metadata used by follow-up provider.
+ *
+ * @param command Executed command name.
+ * @returns Chat result with metadata payload.
+ */
 function chatResult(command: string): vscode.ChatResult {
   return {
     metadata: {
@@ -16,6 +22,12 @@ function chatResult(command: string): vscode.ChatResult {
   };
 }
 
+/**
+ * Builds default participant response when no command is provided.
+ *
+ * @param prompt User prompt text.
+ * @returns Markdown response text.
+ */
 function buildDefaultResponse(prompt: string): string {
   const normalizedPrompt = prompt.trim();
   if (normalizedPrompt.length === 0) {
@@ -39,7 +51,15 @@ function buildDefaultResponse(prompt: string): string {
 export class ChatParticipantFeature implements FeatureLifecycle {
   private participant: vscode.ChatParticipant | undefined;
 
+  /**
+   * Registers chat participant and command handlers.
+   */
   public async activate(): Promise<void> {
+    const enabled = vscode.workspace.getConfiguration("sac").get<boolean>("features.chatParticipant.enable", true);
+    if (!enabled) {
+      return;
+    }
+
     const handler: vscode.ChatRequestHandler = async (request, _context, stream): Promise<vscode.ChatResult> => {
       if (request.command === "sac-diagnose") {
         stream.markdown("SaC diagnostics workflow:\n\n1. Run `sac2c` with minimal flags first.\n2. Fix the first parser/type error before secondary errors.\n3. Re-run and iterate until the first blocking error is resolved.");
@@ -82,6 +102,9 @@ export class ChatParticipantFeature implements FeatureLifecycle {
     };
   }
 
+  /**
+   * Disposes chat participant registration.
+   */
   public async deactivate(): Promise<void> {
     this.participant?.dispose();
     this.participant = undefined;
