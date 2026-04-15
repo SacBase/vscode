@@ -1,45 +1,14 @@
+import { FUNCTION_DEFINITION_CAPTURE_PATTERN } from "$constants/regex";
+import { collectSacFiles } from "$util/documentUtils";
+import { cloneRegex } from "$util/regex";
+import { offsetToLineAndCharacter } from "$util/sourceFile";
 import * as fs from "fs";
 import * as path from "path";
 import { pathToFileURL } from "url";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Location } from "vscode-languageserver/node";
-import { FUNCTION_DEFINITION_CAPTURE_PATTERN } from "../../constants/regex";
 
-import { SacDefinitionEntry } from "./types";
-
-function isSacFilePath(filePath: string): boolean {
-  return filePath.toLowerCase().endsWith(".sac");
-}
-
-function collectSacFiles(rootDir: string, excludedDirNames: Set<string>): string[] {
-  const files: string[] = [];
-
-  const visit = (dirPath: string): void => {
-    let entries: fs.Dirent[];
-    try {
-      entries = fs.readdirSync(dirPath, { withFileTypes: true });
-    } catch {
-      return;
-    }
-
-    for (const entry of entries) {
-      const fullPath = path.join(dirPath, entry.name);
-      if (entry.isDirectory()) {
-        if (!excludedDirNames.has(entry.name)) {
-          visit(fullPath);
-        }
-        continue;
-      }
-
-      if (entry.isFile() && isSacFilePath(fullPath)) {
-        files.push(fullPath);
-      }
-    }
-  };
-
-  visit(rootDir);
-  return files;
-}
+import { SacDefinitionEntry } from "$server/navigation/types";
 
 function getTextByUri(openDocuments: TextDocument[]): Map<string, string> {
   const result = new Map<string, string>();
@@ -49,26 +18,10 @@ function getTextByUri(openDocuments: TextDocument[]): Map<string, string> {
   return result;
 }
 
-function offsetToLineAndCharacter(sourceText: string, offset: number): { line: number; character: number } {
-  let line = 0;
-  let character = 0;
-
-  for (let index = 0; index < offset && index < sourceText.length; index += 1) {
-    if (sourceText[index] === "\n") {
-      line += 1;
-      character = 0;
-      continue;
-    }
-    character += 1;
-  }
-
-  return { line, character };
-}
-
 function extractDefinitionsFromText(uri: string, sourceText: string): SacDefinitionEntry[] {
   const definitions: SacDefinitionEntry[] = [];
 
-  const definitionPattern = new RegExp(FUNCTION_DEFINITION_CAPTURE_PATTERN.source, FUNCTION_DEFINITION_CAPTURE_PATTERN.flags);
+  const definitionPattern = cloneRegex(FUNCTION_DEFINITION_CAPTURE_PATTERN);
   let match: RegExpExecArray | null;
   while ((match = definitionPattern.exec(sourceText)) !== null) {
     const fullMatch = match[0];

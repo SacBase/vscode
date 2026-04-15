@@ -1,5 +1,5 @@
-import { DiagnosticsPresentationMode } from "./diagnostics/types";
-import { CompilerResolutionSettings } from "./sac2cResolver";
+import { DiagnosticsPresentationMode } from "$server/diagnostics/types";
+import { CompilerResolutionSettings } from "$server/sac2cResolver";
 
 export interface SacSettings extends CompilerResolutionSettings {
   diagnosticsMode: "onSave" | "onType" | "manual";

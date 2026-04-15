@@ -230,6 +230,11 @@
           "default": true,
           "description": "Enable @sac chat participant feature module."
         },
+        "sac.features.outline.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable local Outline symbol provider for SaC files."
+        },
         "sac.format.enable": {
           "type": "boolean",
           "default": true,

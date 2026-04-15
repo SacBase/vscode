@@ -1,4 +1,4 @@
-import { selectBestOverloadSymbol } from "./overloadInference";
+import { selectBestOverloadSymbol } from "$sac2c/parser/navigation/overloadInference";
 import {
   buildFileMap,
   findBinding,
@@ -6,13 +6,13 @@ import {
   findTargetToken,
   findTokenById,
   normalizeComparePath,
-} from "./pathResolution";
-import { formatSignature } from "./signatureFormatting";
+} from "$sac2c/parser/navigation/pathResolution";
+import { formatSignature } from "$sac2c/parser/navigation/signatureFormatting";
 import {
   NavigationDefinitionHit,
   NavigationHoverHit,
   NavigationIndex,
-} from "./types";
+} from "$sac2c/parser/navigation/types";
 
 /**
  * Resolves goto-definition target from navjson index for cursor position.

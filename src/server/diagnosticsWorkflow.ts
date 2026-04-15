@@ -20,15 +20,15 @@ import {
   isLikelyMessagingFlagFailure,
   runSac2c,
   SacCompilerRunResult,
-} from "./compilerRuntime";
+} from "$server/compilerRuntime";
 import {
   groupDiagnostics,
   parseCompilerOutput,
   presentDiagnostics,
-} from "./diagnostics/adapter";
-import { buildDiagnosticWithRange } from "./diagnostics/range";
-import { buildRelatedInformation } from "./diagnostics/relatedInfo";
-import { SacSettings } from "./settings";
+} from "$server/diagnostics/adapter";
+import { buildDiagnosticWithRange } from "$server/diagnostics/range";
+import { buildRelatedInformation } from "$server/diagnostics/relatedInfo";
+import { SacSettings } from "$server/settings";
 
 interface DiagnosticsWorkflowDeps {
   connection: Connection;

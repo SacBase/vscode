@@ -3,9 +3,9 @@ import {
   appendBuiltinLegend,
   appendStdlibTypeVariableNote,
   formatHoverDocumentationMarkdown
-} from "./hoverDocFormatting";
-import { lookupHoverDocumentation } from "./hoverDocLookup";
-export { formatHoverDocumentationMarkdown, HoverFormattingOptions } from "./hoverDocFormatting";
+} from "$server/hover-info/hoverDocFormatting";
+import { lookupHoverDocumentation } from "$server/hover-info/hoverDocLookup";
+export { formatHoverDocumentationMarkdown, HoverFormattingOptions } from "$server/hover-info/hoverDocFormatting";
 
 /**
  * Resolves markdown hover content from docs/<kind>/<symbol>.md when available.

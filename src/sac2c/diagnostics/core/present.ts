@@ -4,7 +4,7 @@ import {
   CoreDiagnosticsPresentationSettings,
   CoreParsedDiagnostic,
   CoreRenderedDiagnostic,
-} from "./types";
+} from "$sac2c/diagnostics/core/types";
 
 function formatLocationLabel(diagnostic: CoreParsedDiagnostic): string {
   const fileName = diagnostic.location.filePath.split("/").filter(Boolean).pop() || diagnostic.location.filePath;

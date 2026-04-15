@@ -12,15 +12,15 @@ import {
 } from "vscode-languageserver/node";
 
 import { uriToFsPath } from "$util/documentUtils";
-import { getCompilerNavigationRuntime } from "./compilerRuntime";
-import { createDiagnosticsWorkflow } from "./diagnosticsWorkflow";
-import { provideHover } from "./hover-info/hover";
-import { provideDefinition } from "./navigation/provider";
+import { getCompilerNavigationRuntime } from "$server/compilerRuntime";
+import { createDiagnosticsWorkflow } from "$server/diagnosticsWorkflow";
+import { provideHover } from "$server/hover-info/hover";
+import { provideDefinition } from "$server/navigation/provider";
 import {
   getDefaultSettings,
   SacSettings,
   updateSettings
-} from "./settings";
+} from "$server/settings";
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);

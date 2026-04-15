@@ -6,7 +6,7 @@ import {
   Position,
 } from "vscode-languageserver/node";
 
-import { ParsedDiagnostic } from "./types";
+import { ParsedDiagnostic } from "$server/diagnostics/types";
 
 /**
  * Converts parsed diagnostics into LSP related-information entries.

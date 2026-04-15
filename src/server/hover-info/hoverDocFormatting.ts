@@ -4,7 +4,7 @@ import {
   normalizeHeadingLabel,
   parseDocSections,
   trimBlankEdges,
-} from "./hoverDocSectionParser";
+} from "$server/hover-info/hoverDocSectionParser";
 
 const BUILTIN_SHAPE_CLASS_LEGEND_MARKDOWN = [
   "### Shape-Class Legend",

@@ -15,7 +15,7 @@ import {
   DiagnosticsPresentationSettings,
   ParsedDiagnostic,
   RenderedDiagnostic,
-} from "./types";
+} from "$server/diagnostics/types";
 
 function toLspSeverity(severity: CoreDiagnosticSeverity): DiagnosticSeverity {
   if (severity === "warning") {

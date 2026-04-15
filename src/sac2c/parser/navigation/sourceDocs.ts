@@ -10,7 +10,7 @@ import {
   FUNCTION_CALL_PATTERN,
   FUNCTION_DEFINITION_HEADER_PATTERN,
   RETURN_KEYWORD_PATTERN,
-} from "../../../constants/regex";
+} from "$constants/regex";
 
 function normalizeSimpleHtmlToMarkdown(text: string): string {
   return text

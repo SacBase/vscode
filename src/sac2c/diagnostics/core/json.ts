@@ -1,4 +1,4 @@
-import { CoreDiagnosticsReportV1, CoreRenderedDiagnostic } from "./types";
+import { CoreDiagnosticsReportV1, CoreRenderedDiagnostic } from "$sac2c/diagnostics/core/types";
 
 interface SarifRegion {
   startLine: number;

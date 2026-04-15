@@ -1,4 +1,4 @@
-import { NavigationIndex, NavigationSignatureEntry, NavigationSymbol } from "./types";
+import { NavigationIndex, NavigationSignatureEntry, NavigationSymbol } from "$sac2c/parser/navigation/types";
 
 export type ValueShape = "scalar" | "array" | "unknown";
 

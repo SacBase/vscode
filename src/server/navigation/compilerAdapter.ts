@@ -9,13 +9,13 @@ import {
   resolveHoverFromIndex,
 } from "$sac2c/parser/navigation/query";
 
-import { buildNavArgs, runCompilerCommand } from "./compilerCommand";
+import { buildNavArgs, runCompilerCommand } from "$server/navigation/compilerCommand";
 import {
   CompilerNavigationRuntimeConfig,
   HoverDebugLogger,
   SacDefinitionQueryResult,
   SacHoverQueryResult,
-} from "./types";
+} from "$server/navigation/types";
 
 const NAV_DEBUG_ENABLED = process.env.SAC_NAV_DEBUG === "1";
 

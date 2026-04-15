@@ -2,11 +2,17 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { formatSacSource } from "../formatter/sacFormatter";
-import { FeatureLifecycle } from "./languageClientFeature";
-
-const SAC_LANGUAGE = "sac";
-const SAC_FORMAT_FILE = ".sac-format";
+import {
+  SAC_CONFIG_SECTION,
+  SAC_FORMAT_CONFIG_SECTION,
+  SAC_FORMAT_FILENAME,
+  SAC_LANGUAGE_ID,
+  SAC_URI_FILE_SCHEME,
+} from "$constants/language";
+import { TRAILING_SINGLE_NEWLINE_PATTERN } from "$constants/regex";
+import { FeatureLifecycle } from "$extension/features/languageClientFeature";
+import { formatSacSource } from "$extension/formatter/sacFormatter";
+import { preserveTrailingNewlines, splitNormalizedLines } from "$util/newlines";
 
 type RuntimeFormatConfig = {
   enabled: boolean;
@@ -16,30 +22,6 @@ type RuntimeFormatConfig = {
   expandInlineWithLoops: boolean;
   expandInlineComprehensions: boolean;
 };
-
-/**
- * Counts trailing newline characters in normalized newline space.
- *
- * @param text Input text.
- * @returns Number of trailing `\n` characters.
- */
-function trailingNewlineCount(text: string): number {
-  const segment = text.match(/(?:\r?\n)+$/)?.[0] ?? "";
-  return segment.length === 0 ? 0 : segment.replace(/\r/g, "").length;
-}
-
-/**
- * Reapplies original trailing newline shape after formatting pass.
- *
- * @param formatted Formatter output.
- * @param original Original source text.
- * @returns Text with preserved trailing newline count.
- */
-function preserveTrailingNewlines(formatted: string, original: string): string {
-  const expected = trailingNewlineCount(original);
-  const normalizedBody = formatted.replace(/\n+$/g, "");
-  return `${normalizedBody}${"\n".repeat(expected)}`;
-}
 
 /**
  * Computes full editable range for document replacement.
@@ -92,7 +74,7 @@ function parseNumber(value: string): number | undefined {
  */
 function parseSacFormatFile(content: string): Partial<RuntimeFormatConfig> {
   const overrides: Partial<RuntimeFormatConfig> = {};
-  const lines = content.replace(/\r\n/g, "\n").split("\n");
+  const lines = splitNormalizedLines(content);
 
   for (const rawLine of lines) {
     const line = rawLine.trim();
@@ -156,7 +138,7 @@ function findNearestSacFormat(document: vscode.TextDocument): string | null {
   let current = path.dirname(document.uri.fsPath);
 
   while (true) {
-    const candidate = path.join(current, SAC_FORMAT_FILE);
+    const candidate = path.join(current, SAC_FORMAT_FILENAME);
     if (fs.existsSync(candidate)) {
       return candidate;
     }
@@ -181,7 +163,7 @@ function findNearestSacFormat(document: vscode.TextDocument): string | null {
  * @returns Fully resolved runtime formatter config.
  */
 function readFormatConfig(document: vscode.TextDocument): RuntimeFormatConfig {
-  const config = vscode.workspace.getConfiguration("sac.format");
+  const config = vscode.workspace.getConfiguration(SAC_FORMAT_CONFIG_SECTION);
   const resolved: RuntimeFormatConfig = {
     enabled: config.get<boolean>("enable", true),
     onSave: config.get<boolean>("onSave", false),
@@ -229,12 +211,12 @@ export class FormattingFeature implements FeatureLifecycle {
    * Activates document/range formatter + optional format-on-save hook.
    */
   public async activate(): Promise<void> {
-    const featureEnabled = vscode.workspace.getConfiguration("sac").get<boolean>("features.formatter.enable", true);
+    const featureEnabled = vscode.workspace.getConfiguration(SAC_CONFIG_SECTION).get<boolean>("features.formatter.enable", true);
     if (!featureEnabled) {
       return;
     }
 
-    const selector: vscode.DocumentSelector = [{ language: SAC_LANGUAGE, scheme: "file" }];
+    const selector: vscode.DocumentSelector = [{ language: SAC_LANGUAGE_ID, scheme: SAC_URI_FILE_SCHEME }];
 
     const provider: vscode.DocumentFormattingEditProvider & vscode.DocumentRangeFormattingEditProvider = {
       provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
@@ -263,7 +245,7 @@ export class FormattingFeature implements FeatureLifecycle {
 
         const selected = document.getText(range);
         // Range formatting should not force extra trailing newline in selection.
-        const formatted = preserveTrailingNewlines(formatSacSource(selected, config), selected).replace(/\n$/, "");
+        const formatted = preserveTrailingNewlines(formatSacSource(selected, config), selected).replace(TRAILING_SINGLE_NEWLINE_PATTERN, "");
         if (formatted === selected) {
           return [];
         }
@@ -277,7 +259,7 @@ export class FormattingFeature implements FeatureLifecycle {
 
     this.disposables.push(
       vscode.workspace.onWillSaveTextDocument((event) => {
-        if (event.document.languageId !== SAC_LANGUAGE || event.document.uri.scheme !== "file") {
+        if (event.document.languageId !== SAC_LANGUAGE_ID || event.document.uri.scheme !== SAC_URI_FILE_SCHEME) {
           return;
         }
 

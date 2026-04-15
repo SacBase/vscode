@@ -1,6 +1,6 @@
 import { escapeRegExp } from "$util/regex";
-import { BUILTIN_FUNCTION_CALL_PATTERN, FUNCTION_CALL_PATTERN } from "../../constants/regex";
-import { HoverMatch, HoverTarget } from "./types";
+import { BUILTIN_FUNCTION_CALL_PATTERN, FUNCTION_CALL_PATTERN } from "$constants/regex";
+import { HoverMatch, HoverTarget } from "$sac2c/hover/types";
 // This is an initial set of StdLib wrappers. Prefer maintaining full details via docs markdown files.
 const STDLIB_FUNCTION_NAMES = [
   "shape",

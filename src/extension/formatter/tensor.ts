@@ -1,10 +1,12 @@
 import {
+  COMMA_SPACING_PATTERN,
   INLINE_TENSOR_COMPREHENSION_PATTERN,
   TENSOR_ARROW_PATTERN,
   TENSOR_RETURN_BLOCK_END_PATTERN,
   TENSOR_RETURN_BLOCK_START_PATTERN,
-} from "../../constants/regex";
-import { findTopLevelGuardPipe, findTopLevelToken, splitTopLevel } from "./text";
+  WHITESPACE_RUN_PATTERN,
+} from "$constants/regex";
+import { findTopLevelGuardPipe, findTopLevelToken, splitTopLevel } from "$extension/formatter/text";
 
 type TensorComprehensionClause = {
   indexVector: string;
@@ -19,7 +21,7 @@ type TensorComprehensionClause = {
  * @returns Expression with `, ` spacing.
  */
 function normalizeCommaSpacing(text: string): string {
-  return text.replace(/\s*,\s*/g, ", ").trim();
+  return text.replace(COMMA_SPACING_PATTERN, ", ").trim();
 }
 
 /**
@@ -98,7 +100,7 @@ function normalizeTensorComprehensionBlock(blockLines: string[]): string[] | nul
     return null;
   }
 
-  const rawInner = innerLines.join(" ").replace(/\s+/g, " ").trim();
+  const rawInner = innerLines.join(" ").replace(WHITESPACE_RUN_PATTERN, " ").trim();
   if (rawInner.length === 0) {
     return null;
   }

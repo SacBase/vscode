@@ -11,6 +11,15 @@
       ],
       "$extension/*": [
         "./src/extension/*"
+      ],
+      "$constants/*": [
+        "./src/constants/*"
+      ],
+      "$server/*": [
+        "./src/server/*"
+      ],
+      "$copilot/*": [
+        "./src/copilot/*"
       ]
     },
     "lib": [

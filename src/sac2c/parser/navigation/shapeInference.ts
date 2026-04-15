@@ -1,17 +1,17 @@
 import { splitTopLevel } from "$util/textSplit";
-import { ASSIGNMENT_PATTERN, IDENTIFIER_CHARS } from "../../../constants/regex";
-import { extractCallExpressionSource } from "./callExpression";
+import { ASSIGNMENT_PATTERN, IDENTIFIER_CHARS } from "$constants/regex";
+import { extractCallExpressionSource } from "$sac2c/parser/navigation/callExpression";
 import {
   getCandidateParameterShapes,
   getCandidateReturnShape,
   scoreShapeCompatibility,
   ValueShape,
-} from "./shapeScoring";
+} from "$sac2c/parser/navigation/shapeScoring";
 import {
   NavigationIndex,
   NavigationSymbol,
   NavigationToken,
-} from "./types";
+} from "$sac2c/parser/navigation/types";
 
 
 function inferExpressionShape(

@@ -2,13 +2,14 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 
+import { SAC_FILE_EXTENSION, SAC_LANGUAGE_ID, SAC_URI_FILE_SCHEME } from "$constants/language";
 import { TextDocument } from "vscode-languageserver-textdocument";
 
 /**
  * Checks whether an LSP text document points to a local file URI.
  */
 export function isFileDocument(document: TextDocument): boolean {
-  return document.uri.startsWith("file://");
+  return document.uri.startsWith(`${SAC_URI_FILE_SCHEME}://`);
 }
 
 /**
@@ -30,7 +31,7 @@ export function normalizePathForCompare(filePath: string): string {
  * Checks whether path points to a SaC source file.
  */
 export function isSacFilePath(filePath: string): boolean {
-  return filePath.toLowerCase().endsWith(".sac");
+  return filePath.toLowerCase().endsWith(SAC_FILE_EXTENSION);
 }
 
 /**
@@ -72,7 +73,7 @@ export function collectSacFiles(rootDir: string, excludedDirNames: Set<string>):
 export function createDocumentFromFile(fsPath: string): TextDocument | null {
   try {
     const content = fs.readFileSync(fsPath, "utf8");
-    return TextDocument.create(pathToFileURL(fsPath).toString(), "sac", 0, content);
+    return TextDocument.create(pathToFileURL(fsPath).toString(), SAC_LANGUAGE_ID, 0, content);
   } catch {
     return null;
   }

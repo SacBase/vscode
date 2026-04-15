@@ -1,5 +1,16 @@
-import { CONTROL_FLOW_KEYWORD_PATTERN } from "../../constants/regex";
-import { delimiterBalance, splitTopLevel } from "./text";
+import { SAC_NON_FUNCTION_HEADER_KEYWORDS } from "$constants/language";
+import {
+  CONTROL_FLOW_KEYWORD_PATTERN,
+  FUNCTION_SIGNATURE_TRAILING_PAREN_PATTERN,
+  INLINE_GUARD_SPLIT_PATTERN,
+  PIPE_LOGICAL_CONTINUATION_PATTERN,
+  PIPE_LOGICAL_PREFIX_PATTERN,
+} from "$constants/regex";
+import { delimiterBalance, splitTopLevel } from "$extension/formatter/text";
+
+function startsWithKeyword(trimmed: string, keyword: string): boolean {
+  return trimmed === keyword || trimmed.startsWith(`${keyword} `);
+}
 
 function isLikelyFunctionHeader(text: string): boolean {
   const trimmed = text.trim();
@@ -7,7 +18,7 @@ function isLikelyFunctionHeader(text: string): boolean {
     return false;
   }
 
-  if (trimmed.startsWith("return ") || trimmed.startsWith("if ") || trimmed.startsWith("for ") || trimmed.startsWith("while ") || trimmed.startsWith("switch ")) {
+  if (SAC_NON_FUNCTION_HEADER_KEYWORDS.some((keyword) => startsWithKeyword(trimmed, keyword))) {
     return false;
   }
 
@@ -15,7 +26,7 @@ function isLikelyFunctionHeader(text: string): boolean {
     return false;
   }
 
-  return /\([^;{}]*\)\s*$/.test(trimmed);
+  return FUNCTION_SIGNATURE_TRAILING_PAREN_PATTERN.test(trimmed);
 }
 
 /**
@@ -25,7 +36,7 @@ function isLikelyFunctionHeader(text: string): boolean {
  * @returns One or more normalized guard lines.
  */
 export function splitFunctionInlineGuards(line: string): string[] {
-  const match = line.match(/^(.*\))\s*\|\s*(.+)$/);
+  const match = line.match(INLINE_GUARD_SPLIT_PATTERN);
   if (!match) {
     return [line];
   }
@@ -90,7 +101,7 @@ export function mergeGuardLogicalContinuations(lines: string[]): string[] {
 
   for (const line of lines) {
     const trimmed = line.trim();
-    const isPipeContinuation = /^\|\s*\|/.test(trimmed);
+    const isPipeContinuation = PIPE_LOGICAL_CONTINUATION_PATTERN.test(trimmed);
     const isLogicalContinuation = trimmed.startsWith("||") || trimmed.startsWith("&&") || isPipeContinuation;
 
     if (!isLogicalContinuation || merged.length === 0) {
@@ -105,7 +116,7 @@ export function mergeGuardLogicalContinuations(lines: string[]): string[] {
       continue;
     }
 
-    const continuation = isPipeContinuation ? `|| ${trimmed.replace(/^\|\s*\|\s*/, "")}` : trimmed;
+    const continuation = isPipeContinuation ? `|| ${trimmed.replace(PIPE_LOGICAL_PREFIX_PATTERN, "")}` : trimmed;
     merged[merged.length - 1] = `${previous} ${continuation}`;
   }
 

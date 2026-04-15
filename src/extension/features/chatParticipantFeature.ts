@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { FeatureLifecycle } from "./languageClientFeature";
+import { FeatureLifecycle } from "$extension/features/languageClientFeature";
 
 const PARTICIPANT_ID = "sac-language-support.sac";
 

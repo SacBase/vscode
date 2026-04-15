@@ -1,4 +1,4 @@
-import { NavigationIndex, ParseNavigationIndexResult } from "./types";
+import { NavigationIndex, ParseNavigationIndexResult } from "$sac2c/parser/navigation/types";
 
 /**
  * Extracts first complete JSON object from mixed compiler output.

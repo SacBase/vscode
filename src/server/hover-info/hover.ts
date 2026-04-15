@@ -19,10 +19,10 @@ import {
   readDefinitionDocComment,
   readDefinitionSignature,
 } from "$sac2c/parser/navigation/sourceDocs";
-import { BUILTIN_SYMBOL_NAME_PATTERN, IDENTIFIER_NAME_PATTERN } from "../../constants/regex";
-import { queryCompilerHover } from "../navigation/compilerAdapter";
-import { CompilerNavigationRuntimeConfig, HoverDebugLogger } from "../navigation/types";
-import { formatHoverDocumentationMarkdown, resolveHoverDocumentation } from "./hoverDocs";
+import { BUILTIN_SYMBOL_NAME_PATTERN, IDENTIFIER_NAME_PATTERN } from "$constants/regex";
+import { queryCompilerHover } from "$server/navigation/compilerAdapter";
+import { CompilerNavigationRuntimeConfig, HoverDebugLogger } from "$server/navigation/types";
+import { formatHoverDocumentationMarkdown, resolveHoverDocumentation } from "$server/hover-info/hoverDocs";
 
 const HOVER_DEBUG_ENABLED = process.env.SAC_NAV_DEBUG === "1";
 

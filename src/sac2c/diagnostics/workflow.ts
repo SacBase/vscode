@@ -16,15 +16,15 @@ import {
   normalizePathForCompare,
   uriToFsPath,
 } from "$util/documentUtils";
-import { groupDiagnostics, parseCompilerOutput, presentDiagnostics } from "../../server/diagnostics/adapter";
-import { buildDiagnosticWithRange } from "../../server/diagnostics/range";
-import { buildRelatedInformation } from "../../server/diagnostics/relatedInfo";
+import { groupDiagnostics, parseCompilerOutput, presentDiagnostics } from "$server/diagnostics/adapter";
+import { buildDiagnosticWithRange } from "$server/diagnostics/range";
+import { buildRelatedInformation } from "$server/diagnostics/relatedInfo";
 import {
   createInvocation,
   isLikelyMessagingFlagFailure,
   runSac2c,
   SacCompilerRunResult,
-} from "../runtime/compilerRuntime";
+} from "$sac2c/runtime/compilerRuntime";
 
 interface DiagnosticsWorkflowDeps {
   connection: Connection;

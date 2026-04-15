@@ -2,8 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 
-import { SAFE_DOC_NAME_PATTERN } from "../../../constants/regex";
-import { HoverTarget } from "../../hover/types";
+import { SAFE_DOC_NAME_PATTERN } from "$constants/regex";
+import { HoverTarget } from "$sac2c/hover/types";
 
 const DOCS_FOLDER_BY_KIND: Record<HoverTarget["kind"], string> = {
   stdlib: "stdlib",

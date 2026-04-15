@@ -7,7 +7,7 @@ import {
   DOC_SECTION_HEADING_PATTERN,
   SIGNATURE_CODE_BLOCK_PATTERN,
   TOP_LEVEL_HEADING_PATTERN,
-} from "../../constants/regex";
+} from "$constants/regex";
 
 export { normalizeHeadingLabel, trimBlankEdges };
 

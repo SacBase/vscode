@@ -1,6 +1,4 @@
-// Shared regexes used by navigation/hover parsing logic.
-//! I use a lot of regexes because either the compiler cannot provide the info in a nice format, 
-//! or I did not know another way to do it quickly and eaisly
+// Shared regexes used across navigation, formatter, and helper parsing code.
 
 export const IDENTIFIER_CHARS = "[A-Za-z_][A-Za-z0-9_]*";
 
@@ -22,6 +20,9 @@ export const SIGNATURE_CODE_BLOCK_PATTERN = /```(?:sac)?\s*\n([\s\S]*?)```/gi;
 
 export const FUNCTION_DEFINITION_CAPTURE_PATTERN = /\b([A-Za-z_][A-Za-z0-9_]*)\s*\([^;{}]*\)\s*\{/g;
 export const MODULE_DECLARATION_CAPTURE_PATTERN = /^\s*module\s+([A-Za-z_][A-Za-z0-9_]*)\s*;/m;
+export const FUNCTION_SIGNATURE_TRAILING_PAREN_PATTERN = /\([^;{}]*\)\s*$/;
+export const FUNCTION_HEADER_CANDIDATE_PATTERN = /^[A-Za-z_][\w\[\]\s,:*<>]*\([^;{}]*\)\s*$/;
+export const CONTROL_OR_RETURN_HEADER_PATTERN = /^(if|for|while|switch|return)\b/;
 
 export const SYMBOL_CHAR_PATTERN = /[A-Za-z0-9_]/;
 export const SYMBOL_START_CHAR_PATTERN = /[A-Za-z_]/;
@@ -37,6 +38,13 @@ export const TOKEN_CANNOT_START_PATTERN = /^token\s+([^\s]+)\s+cannot\s+start/i;
 export const ALL_INSTANCES_SYMBOL_PATTERN = /all\s+instances\s+of\s+"([A-Za-z_][A-Za-z0-9_]*)"/i;
 export const IN_FUNCTION_SYMBOL_PATTERN = /^--\s+in\s+[A-Za-z_][A-Za-z0-9_]*::([A-Za-z_][A-Za-z0-9_]*)\s*\(/i;
 export const NON_WHITESPACE_PATTERN = /\S/;
+export const TRAILING_WHITESPACE_PATTERN = /[ \t]+$/g;
+export const TRAILING_NEWLINES_PATTERN = /\n+$/g;
+export const TRAILING_SINGLE_NEWLINE_PATTERN = /\n$/;
+export const TRAILING_NEWLINE_SEGMENT_PATTERN = /(?:\r?\n)+$/;
+export const CARRIAGE_RETURN_PATTERN = /\r/g;
+export const CRLF_PATTERN = /\r\n/g;
+export const WHITESPACE_RUN_PATTERN = /\s+/g;
 
 export const ASSIGNMENT_PATTERN = /\b([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+?);\s*$/;
 
@@ -47,6 +55,7 @@ export const DOC_TAG_RETURN_PATTERN = /^@return\s*(.*)$/;
 export const DOC_TAG_EXAMPLE_PATTERN = /^@example\s*(.*)$/;
 
 export const RETURN_KEYWORD_PATTERN = /\breturn\b/;
+export const RETURN_STATEMENT_START_PATTERN = /^return\b/;
 
 export const CONTROL_FLOW_KEYWORD_PATTERN = /\b(if|for|while|switch)\b/;
 
@@ -61,4 +70,9 @@ export const TENSOR_RETURN_BLOCK_START_PATTERN = /^return\s*\{$/;
 export const TENSOR_RETURN_BLOCK_END_PATTERN = /^\};$/;
 
 export const TENSOR_ARROW_PATTERN = /->/;
+export const INLINE_GUARD_SPLIT_PATTERN = /^(.*\))\s*\|\s*(.+)$/;
+export const PIPE_LOGICAL_CONTINUATION_PATTERN = /^\|\s*\|/;
+export const PIPE_LOGICAL_PREFIX_PATTERN = /^\|\s*\|\s*/;
+export const COMMA_SPACING_PATTERN = /\s*,\s*/g;
+export const DOC_BLOCK_ASTERISK_PREFIX_PATTERN = /^\*+\s?/;
 

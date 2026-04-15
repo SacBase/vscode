@@ -7,9 +7,9 @@ import {
   TOKEN_CANNOT_START_PATTERN,
   TOKEN_FOUND_PATTERN,
   TOKEN_FOUND_WITH_COMMA_PATTERN,
-} from "../../constants/regex";
+} from "$constants/regex";
 
-import { ParsedDiagnostic } from "./types";
+import { ParsedDiagnostic } from "$server/diagnostics/types";
 
 /**
  * Clamps a number into a closed integer interval.

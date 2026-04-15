@@ -1,3 +1,9 @@
+import {
+  SAC_CONFIG_SECTION,
+  SAC_FILE_GLOB,
+  SAC_LANGUAGE_ID,
+  SAC_URI_FILE_SCHEME,
+} from "$constants/language";
 import * as path from "path";
 import * as vscode from "vscode";
 import {
@@ -42,7 +48,7 @@ export class LanguageClientFeature implements FeatureLifecycle {
    * Starts SaC language client when feature is enabled.
    */
   public async activate(): Promise<void> {
-    const config = vscode.workspace.getConfiguration("sac");
+    const config = vscode.workspace.getConfiguration(SAC_CONFIG_SECTION);
     const legacyEnabled = config.get<boolean>("languageServer.enable", true);
     const enabled = config.get<boolean>("features.languageServer.enable", legacyEnabled);
     if (!enabled) {
@@ -61,10 +67,10 @@ export class LanguageClientFeature implements FeatureLifecycle {
 
     const traceSetting = config.get<string>("compiler.trace", "off");
     const clientOptions = {
-      documentSelector: [{ scheme: "file", language: "sac" }],
+      documentSelector: [{ scheme: SAC_URI_FILE_SCHEME, language: SAC_LANGUAGE_ID }],
       synchronize: {
-        configurationSection: "sac",
-        fileEvents: vscode.workspace.createFileSystemWatcher("**/*.sac"),
+        configurationSection: SAC_CONFIG_SECTION,
+        fileEvents: vscode.workspace.createFileSystemWatcher(SAC_FILE_GLOB),
       },
       traceOutputChannel: vscode.window.createOutputChannel("SaC Language Server Trace"),
       outputChannel: vscode.window.createOutputChannel("SaC Language Server"),

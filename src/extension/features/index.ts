@@ -1,8 +1,9 @@
 import * as vscode from "vscode";
 
-import { ChatParticipantFeature } from "./chatParticipantFeature";
-import { FormattingFeature } from "./formattingFeature";
-import { FeatureLifecycle, LanguageClientFeature } from "./languageClientFeature";
+import { ChatParticipantFeature } from "$extension/features/chatParticipantFeature";
+import { FormattingFeature } from "$extension/features/formattingFeature";
+import { FeatureLifecycle, LanguageClientFeature } from "$extension/features/languageClientFeature";
+import { OutlineFeature } from "$extension/features/outlineFeature";
 
 export interface ExtensionFeatureController {
   dispose(): Promise<void>;
@@ -17,6 +18,7 @@ export async function registerExtensionFeatures(
   const features: FeatureLifecycle[] = [
     new ChatParticipantFeature(),
     new FormattingFeature(),
+    new OutlineFeature(),
     new LanguageClientFeature(context),
   ];
 

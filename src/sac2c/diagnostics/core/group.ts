@@ -1,4 +1,4 @@
-import { CoreDiagnosticGroup, CoreParsedDiagnostic } from "./types";
+import { CoreDiagnosticGroup, CoreParsedDiagnostic } from "$sac2c/diagnostics/core/types";
 
 function isContextFrame(message: string): boolean {
   return /^--\s+in\s+/i.test(message.trim());

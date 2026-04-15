@@ -1,4 +1,4 @@
-import { INLINE_WITH_LOOP_PATTERN } from "../../constants/regex";
+import { INLINE_WITH_LOOP_PATTERN } from "$constants/regex";
 
 /**
  * Expands inline return-with-loop pattern into multiline block.

@@ -2,10 +2,10 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { Definition, Position } from "vscode-languageserver/node";
 
 import { queryStdlibDefinitions } from "$sac2c/parser/navigation/stdlib";
-import { queryCompilerDefinitions } from "./compilerAdapter";
-import { getSymbolAtPosition } from "./symbol";
-import { CompilerNavigationRuntimeConfig } from "./types";
-import { queryWorkspaceDefinitions } from "./workspaceDefinitions";
+import { queryCompilerDefinitions } from "$server/navigation/compilerAdapter";
+import { getSymbolAtPosition } from "$server/navigation/symbol";
+import { CompilerNavigationRuntimeConfig } from "$server/navigation/types";
+import { queryWorkspaceDefinitions } from "$server/navigation/workspaceDefinitions";
 
 export interface ProvideDefinitionContext {
   document: TextDocument;

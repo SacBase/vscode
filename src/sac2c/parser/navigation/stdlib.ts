@@ -2,65 +2,20 @@ import * as fs from "fs";
 import * as path from "path";
 import { pathToFileURL } from "url";
 
-import { Location } from "vscode-languageserver/node";
 import {
   FUNCTION_CALL_PATTERN,
   FUNCTION_DEFINITION_CAPTURE_PATTERN,
   MODULE_DECLARATION_CAPTURE_PATTERN,
-} from "../../../constants/regex";
-
-function isSacFilePath(filePath: string): boolean {
-  return filePath.toLowerCase().endsWith(".sac");
-}
-
-function collectSacFiles(rootDir: string): string[] {
-  const files: string[] = [];
-
-  const visit = (dirPath: string): void => {
-    let entries: fs.Dirent[];
-    try {
-      entries = fs.readdirSync(dirPath, { withFileTypes: true });
-    } catch {
-      return;
-    }
-
-    for (const entry of entries) {
-      const fullPath = path.join(dirPath, entry.name);
-      if (entry.isDirectory()) {
-        visit(fullPath);
-        continue;
-      }
-
-      if (entry.isFile() && isSacFilePath(fullPath)) {
-        files.push(fullPath);
-      }
-    }
-  };
-
-  visit(rootDir);
-  return files;
-}
-
-function offsetToLineAndCharacter(sourceText: string, offset: number): { line: number; character: number } {
-  let line = 0;
-  let character = 0;
-
-  for (let index = 0; index < offset && index < sourceText.length; index += 1) {
-    if (sourceText[index] === "\n") {
-      line += 1;
-      character = 0;
-      continue;
-    }
-    character += 1;
-  }
-
-  return { line, character };
-}
+} from "$constants/regex";
+import { collectSacFiles } from "$util/documentUtils";
+import { cloneRegex } from "$util/regex";
+import { offsetToLineAndCharacter } from "$util/sourceFile";
+import { Location } from "vscode-languageserver/node";
 
 function extractDefinitionsFromText(uri: string, sourceText: string): Location[] {
   const locations: Location[] = [];
 
-  const modulePattern = new RegExp(MODULE_DECLARATION_CAPTURE_PATTERN.source, MODULE_DECLARATION_CAPTURE_PATTERN.flags);
+  const modulePattern = cloneRegex(MODULE_DECLARATION_CAPTURE_PATTERN);
   const moduleMatch = modulePattern.exec(sourceText);
   if (moduleMatch) {
     const moduleName = moduleMatch[1];
@@ -78,7 +33,7 @@ function extractDefinitionsFromText(uri: string, sourceText: string): Location[]
     });
   }
 
-  const definitionPattern = new RegExp(FUNCTION_DEFINITION_CAPTURE_PATTERN.source, FUNCTION_DEFINITION_CAPTURE_PATTERN.flags);
+  const definitionPattern = cloneRegex(FUNCTION_DEFINITION_CAPTURE_PATTERN);
   let match: RegExpExecArray | null;
   while ((match = definitionPattern.exec(sourceText)) !== null) {
     const fullMatch = match[0];
@@ -138,7 +93,7 @@ export function queryStdlibDefinitions(symbolName: string, workspaceRoot: string
   const seen = new Set<string>();
 
   for (const root of discoverStdlibSrcRoots(workspaceRoot)) {
-    for (const filePath of collectSacFiles(root)) {
+    for (const filePath of collectSacFiles(root, new Set<string>())) {
       const normalizedPath = path.normalize(filePath);
       if (seen.has(normalizedPath)) {
         continue;
@@ -152,7 +107,7 @@ export function queryStdlibDefinitions(symbolName: string, workspaceRoot: string
 
       for (const location of extractDefinitionsFromText(pathToFileURL(filePath).toString(), sourceText)) {
         const lineText = sourceText.split(/\r?\n/)[location.range.start.line] ?? "";
-        const callPattern = new RegExp(FUNCTION_CALL_PATTERN.source);
+        const callPattern = cloneRegex(FUNCTION_CALL_PATTERN);
         const definitionMatch = lineText.match(callPattern);
         if (definitionMatch?.[1] === symbolName) {
           locations.push(location);

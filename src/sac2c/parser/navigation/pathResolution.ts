@@ -7,7 +7,7 @@ import {
   NavigationRange,
   NavigationSymbol,
   NavigationToken,
-} from "./types";
+} from "$sac2c/parser/navigation/types";
 
 export function normalizeComparePath(filePath: string): string {
   const normalized = path.normalize(filePath);

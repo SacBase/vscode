@@ -1,8 +1,16 @@
-import { mergeGuardExpressionContinuations, mergeGuardLogicalContinuations, splitFunctionInlineGuards, splitGuardChain } from "./guards";
-import { expandInlineComprehension, normalizeTensorComprehensions } from "./tensor";
-import { countBraceDelta, countLeadingClosers, isLineComment, normalizeGuardPrefix, normalizeLineCommentSpacing } from "./text";
-import { DEFAULT_OPTIONS, SacFormattingOptions } from "./types";
-import { expandInlineWithLoop } from "./withLoop";
+import {
+  CONTROL_OR_RETURN_HEADER_PATTERN,
+  DOC_BLOCK_ASTERISK_PREFIX_PATTERN,
+  FUNCTION_HEADER_CANDIDATE_PATTERN,
+  RETURN_STATEMENT_START_PATTERN,
+  TRAILING_WHITESPACE_PATTERN,
+} from "$constants/regex";
+import { mergeGuardExpressionContinuations, mergeGuardLogicalContinuations, splitFunctionInlineGuards, splitGuardChain } from "$extension/formatter/guards";
+import { expandInlineComprehension, normalizeTensorComprehensions } from "$extension/formatter/tensor";
+import { countBraceDelta, countLeadingClosers, isLineComment, normalizeGuardPrefix, normalizeLineCommentSpacing } from "$extension/formatter/text";
+import { DEFAULT_OPTIONS, SacFormattingOptions } from "$extension/formatter/types";
+import { expandInlineWithLoop } from "$extension/formatter/withLoop";
+import { preserveTrailingNewlines, splitNormalizedLines, trimTrailingNewlines } from "$util/newlines";
 
 /**
  * Applies all pre-indentation transforms.
@@ -12,7 +20,7 @@ import { expandInlineWithLoop } from "./withLoop";
  * @returns Preprocessed line array for final indentation pass.
  */
 function preExpand(input: string, options: SacFormattingOptions): string[] {
-  const sourceLines = input.replace(/\r\n/g, "\n").split("\n");
+  const sourceLines = splitNormalizedLines(input);
   const expanded: string[] = [];
 
   for (const line of sourceLines) {
@@ -60,12 +68,6 @@ export function formatSacSource(source: string, userOptions: Partial<SacFormatti
     ...DEFAULT_OPTIONS,
     ...userOptions,
   };
-  // Preserve EOF newline shape exactly as input (0/1/many).
-  const trailingSegment = source.match(/(?:\r?\n)+$/)?.[0] ?? "";
-  const trailingNewlineCount = trailingSegment.length === 0
-    ? 0
-    : trailingSegment.replace(/\r/g, "").length;
-
   const lines = preExpand(source, options);
   const formatted: string[] = [];
   let indentLevel = 0;
@@ -84,7 +86,7 @@ export function formatSacSource(source: string, userOptions: Partial<SacFormatti
     if (isLineComment(trimmed)) {
       const normalizedComment = normalizeLineCommentSpacing(trimmed);
       const normalized = `${" ".repeat(options.indentSize * indentLevel)}${normalizedComment}`;
-      formatted.push(normalized.replace(/[ \t]+$/g, ""));
+      formatted.push(normalized.replace(TRAILING_WHITESPACE_PATTERN, ""));
       continue;
     }
 
@@ -101,7 +103,7 @@ export function formatSacSource(source: string, userOptions: Partial<SacFormatti
         formatted.push(`${" ".repeat(docIndentBase * options.indentSize + 1)}*/`);
         inDocBlock = false;
       } else {
-        const body = content.replace(/^\*+\s?/, "").trim();
+        const body = content.replace(DOC_BLOCK_ASTERISK_PREFIX_PATTERN, "").trim();
         formatted.push(`${" ".repeat(docIndentBase * options.indentSize + 1)}*${body.length > 0 ? ` ${body}` : ""}`);
       }
       continue;
@@ -128,23 +130,23 @@ export function formatSacSource(source: string, userOptions: Partial<SacFormatti
     // Keep with-loop close arm aligned to original `with` column.
     if (withColumnStack.length > 0 && content.startsWith("} :")) {
       const withColumn = withColumnStack[withColumnStack.length - 1];
-      formatted.push(`${" ".repeat(withColumn)}${content}`.replace(/[ \t]+$/g, ""));
+      formatted.push(`${" ".repeat(withColumn)}${content}`.replace(TRAILING_WHITESPACE_PATTERN, ""));
       withColumnStack.pop();
     } else if (withColumnStack.length > 0 && content.startsWith("(")) {
       const withColumn = withColumnStack[withColumnStack.length - 1];
-      formatted.push(`${" ".repeat(withColumn + 2)}${content}`.replace(/[ \t]+$/g, ""));
+      formatted.push(`${" ".repeat(withColumn + 2)}${content}`.replace(TRAILING_WHITESPACE_PATTERN, ""));
     } else {
       const normalized = `${" ".repeat(options.indentSize * baseIndent)}${content}`;
-      formatted.push(normalized.replace(/[ \t]+$/g, ""));
+      formatted.push(normalized.replace(TRAILING_WHITESPACE_PATTERN, ""));
     }
 
-    if (/^[A-Za-z_][\w\[\]\s,:*<>]*\([^;{}]*\)\s*$/.test(content)
-      && !/^(if|for|while|switch|return)\b/.test(content)) {
+    if (FUNCTION_HEADER_CANDIDATE_PATTERN.test(content)
+      && !CONTROL_OR_RETURN_HEADER_PATTERN.test(content)) {
       guardIndentHint = baseIndent + 1;
     }
 
     if (!(content.startsWith("|") || content.startsWith(","))) {
-      if (content.startsWith("{") || content.endsWith(";") || content.startsWith("return ")) {
+      if (content.startsWith("{") || content.endsWith(";") || RETURN_STATEMENT_START_PATTERN.test(content)) {
         guardIndentHint = null;
       }
     }
@@ -152,6 +154,6 @@ export function formatSacSource(source: string, userOptions: Partial<SacFormatti
     indentLevel = Math.max(0, indentLevel + countBraceDelta(content));
   }
 
-  const output = formatted.join("\n").replace(/\n+$/g, "");
-  return `${output}${"\n".repeat(trailingNewlineCount)}`;
+  const output = trimTrailingNewlines(formatted.join("\n"));
+  return preserveTrailingNewlines(output, source);
 }

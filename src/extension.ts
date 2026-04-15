@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import {
   ExtensionFeatureController,
   registerExtensionFeatures,
-} from "./extension/features";
+} from "$extension/features";
 
 let controller: ExtensionFeatureController | undefined;
 
