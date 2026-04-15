@@ -41,9 +41,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "scopeName"
-          ]
+          "required": ["scopeName"]
         }
       ]
     },
@@ -65,9 +63,7 @@
           }
         }
       },
-      "required": [
-        "patterns"
-      ]
+      "required": ["patterns"]
     },
     "captures": {
       "type": "object",
@@ -165,66 +161,38 @@
         "begin": {
           "anyOf": [
             {
-              "required": [
-                "end"
-              ]
+              "required": ["end"]
             },
             {
-              "required": [
-                "while"
-              ]
+              "required": ["while"]
             }
           ]
         },
-        "end": [
-          "begin"
-        ],
-        "while": [
-          "begin"
-        ],
+        "end": ["begin"],
+        "while": ["begin"],
         "contentName": {
           "anyOf": [
             {
-              "required": [
-                "begin",
-                "end"
-              ]
+              "required": ["begin", "end"]
             },
             {
-              "required": [
-                "begin",
-                "while"
-              ]
+              "required": ["begin", "while"]
             }
           ]
         },
         "beginCaptures": {
           "anyOf": [
             {
-              "required": [
-                "begin",
-                "end"
-              ]
+              "required": ["begin", "end"]
             },
             {
-              "required": [
-                "begin",
-                "while"
-              ]
+              "required": ["begin", "while"]
             }
           ]
         },
-        "whileCaptures": [
-          "begin",
-          "while"
-        ],
-        "endCaptures": [
-          "begin",
-          "end"
-        ],
-        "applyEndPatternLast": [
-          "end"
-        ]
+        "whileCaptures": ["begin", "while"],
+        "endCaptures": ["begin", "end"],
+        "applyEndPatternLast": ["end"]
       }
     },
     "name": {

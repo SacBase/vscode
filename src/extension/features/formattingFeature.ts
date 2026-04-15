@@ -234,10 +234,7 @@ export class FormattingFeature implements FeatureLifecycle {
         return [vscode.TextEdit.replace(fullDocumentRange(document), formatted)];
       },
 
-      provideDocumentRangeFormattingEdits(
-        document: vscode.TextDocument,
-        range: vscode.Range,
-      ): vscode.TextEdit[] {
+      provideDocumentRangeFormattingEdits(document: vscode.TextDocument, range: vscode.Range): vscode.TextEdit[] {
         const config = readFormatConfig(document);
         if (!config.enabled) {
           return [];
@@ -245,7 +242,10 @@ export class FormattingFeature implements FeatureLifecycle {
 
         const selected = document.getText(range);
         // Range formatting should not force extra trailing newline in selection.
-        const formatted = preserveTrailingNewlines(formatSacSource(selected, config), selected).replace(TRAILING_SINGLE_NEWLINE_PATTERN, "");
+        const formatted = preserveTrailingNewlines(formatSacSource(selected, config), selected).replace(
+          TRAILING_SINGLE_NEWLINE_PATTERN,
+          "",
+        );
         if (formatted === selected) {
           return [];
         }
@@ -269,14 +269,12 @@ export class FormattingFeature implements FeatureLifecycle {
         }
 
         event.waitUntil(
-          vscode.commands.executeCommand<vscode.TextEdit[]>(
-            "vscode.executeFormatDocumentProvider",
-            event.document.uri,
-            {
+          vscode.commands
+            .executeCommand<vscode.TextEdit[]>("vscode.executeFormatDocumentProvider", event.document.uri, {
               tabSize: config.indentSize,
               insertSpaces: true,
-            },
-          ).then((edits) => edits ?? []),
+            })
+            .then((edits) => edits ?? []),
         );
       }),
     );

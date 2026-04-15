@@ -6,10 +6,7 @@ import {
 } from "$constants/regex";
 import { CoreDiagnosticSeverity, CoreParsedDiagnostic } from "$sac2c/diagnostics/core/types";
 
-const NOISY_MESSAGE_PATTERNS: RegExp[] = [
-  NOISY_COMPILATION_FAILED_PATTERN,
-  NOISY_ABORT_PATTERN,
-];
+const NOISY_MESSAGE_PATTERNS: RegExp[] = [NOISY_COMPILATION_FAILED_PATTERN, NOISY_ABORT_PATTERN];
 
 function toSeverity(level: string | undefined): CoreDiagnosticSeverity {
   const normalized = (level || "error").toLowerCase();
@@ -75,9 +72,7 @@ function parseFallbackLine(line: string): CoreParsedDiagnostic | null {
 
   const normalizedColumn = Number.isNaN(columnNumber) ? 0 : Math.max(columnNumber - 1, 0);
   // sac2c reports one-based inclusive end columns; LSP uses zero-based exclusive end columns.
-  const normalizedEndColumn = Number.isNaN(endColumnNumber)
-    ? undefined
-    : Math.max(endColumnNumber, normalizedColumn + 1);
+  const normalizedEndColumn = Number.isNaN(endColumnNumber) ? undefined : Math.max(endColumnNumber, normalizedColumn + 1);
 
   return {
     location: {

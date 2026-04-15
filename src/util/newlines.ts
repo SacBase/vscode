@@ -1,9 +1,4 @@
-import {
-  CARRIAGE_RETURN_PATTERN,
-  CRLF_PATTERN,
-  TRAILING_NEWLINE_SEGMENT_PATTERN,
-  TRAILING_NEWLINES_PATTERN,
-} from "$constants/regex";
+import { CARRIAGE_RETURN_PATTERN, CRLF_PATTERN, TRAILING_NEWLINE_SEGMENT_PATTERN, TRAILING_NEWLINES_PATTERN } from "$constants/regex";
 
 /**
  * Normalizes CRLF to LF for parser/formatter operations.

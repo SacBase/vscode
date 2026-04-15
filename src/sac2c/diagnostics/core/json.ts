@@ -82,23 +82,14 @@ export function toSarifLog(report: CoreDiagnosticsReportV1): SarifLog {
         results: report.diagnostics.map((entry) => ({
           level: toSarifLevel(entry.anchor.severity),
           message: { text: entry.message },
-          locations: [
-            toSarifLocation(
-              entry.anchor.location.filePath,
-              entry.anchor.location.line,
-              entry.anchor.location.column,
-            ),
-          ],
-          relatedLocations: entry.related.length > 0
-            ? entry.related.map((related) => ({
-              ...toSarifLocation(
-                related.location.filePath,
-                related.location.line,
-                related.location.column,
-              ),
-              message: { text: related.message },
-            }))
-            : undefined,
+          locations: [toSarifLocation(entry.anchor.location.filePath, entry.anchor.location.line, entry.anchor.location.column)],
+          relatedLocations:
+            entry.related.length > 0
+              ? entry.related.map((related) => ({
+                  ...toSarifLocation(related.location.filePath, related.location.line, related.location.column),
+                  message: { text: related.message },
+                }))
+              : undefined,
         })),
       },
     ],

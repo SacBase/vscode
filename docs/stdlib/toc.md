@@ -1,7 +1,9 @@
 # `toc`
+
 Builds a complex value.
 
 ### Common Signatures
+
 ```sac
 complex toc(int r, int i)
 complex toc(float r, float i)
@@ -13,4 +15,5 @@ complex toc(double r)
 ```
 
 ### Description
+
 Defined in `ComplexBasics.sac` for composing complex numbers from Cartesian values.

@@ -1,10 +1,6 @@
 import { existsSync } from "fs";
 import { pathToFileURL } from "url";
-import {
-  DiagnosticRelatedInformation,
-  Location,
-  Position,
-} from "vscode-languageserver/node";
+import { DiagnosticRelatedInformation, Location, Position } from "vscode-languageserver/node";
 
 import { ParsedDiagnostic } from "$server/diagnostics/types";
 
@@ -31,9 +27,7 @@ export function buildRelatedInformation(entries: ParsedDiagnostic[]): Diagnostic
         start,
         end: {
           line: start.line,
-          character: entry.endColumn !== undefined
-            ? Math.max(entry.endColumn, start.character + 1)
-            : start.character + 1,
+          character: entry.endColumn !== undefined ? Math.max(entry.endColumn, start.character + 1) : start.character + 1,
         },
       },
     };

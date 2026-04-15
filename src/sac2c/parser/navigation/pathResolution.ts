@@ -1,13 +1,7 @@
 import * as path from "path";
 import { fileURLToPath } from "url";
 
-import {
-  NavigationBinding,
-  NavigationIndex,
-  NavigationRange,
-  NavigationSymbol,
-  NavigationToken,
-} from "$sac2c/parser/navigation/types";
+import { NavigationBinding, NavigationIndex, NavigationRange, NavigationSymbol, NavigationToken } from "$sac2c/parser/navigation/types";
 
 export function normalizeComparePath(filePath: string): string {
   const normalized = path.normalize(filePath);
@@ -83,8 +77,7 @@ export function findTargetToken(
       continue;
     }
 
-    const span = (token.range.end.line - token.range.start.line) * 1_000_000
-      + (token.range.end.character - token.range.start.character);
+    const span = (token.range.end.line - token.range.start.line) * 1_000_000 + (token.range.end.character - token.range.start.character);
 
     if (span < bestSpan) {
       best = token;

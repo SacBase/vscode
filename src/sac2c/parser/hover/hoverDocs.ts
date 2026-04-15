@@ -2,7 +2,7 @@ import { HoverTarget } from "$sac2c/hover/types";
 import {
   appendBuiltinLegend,
   appendStdlibTypeVariableNote,
-  formatHoverDocumentationMarkdown
+  formatHoverDocumentationMarkdown,
 } from "$sac2c/parser/hover/hoverDocFormatting";
 import { lookupHoverDocumentation } from "$sac2c/parser/hover/hoverDocLookup";
 export { formatHoverDocumentationMarkdown, HoverFormattingOptions } from "$sac2c/parser/hover/hoverDocFormatting";

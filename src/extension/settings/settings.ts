@@ -106,20 +106,14 @@ export function updateSettings(configuration: unknown): SacSettings {
   const messaging = (compiler.messaging as Record<string, unknown> | undefined) || {};
   const trace = compiler.trace;
 
-  const compilerTrace: SacSettings["compilerTrace"] =
-    trace === "messages" || trace === "verbose" || trace === "off"
-      ? trace
-      : "off";
+  const compilerTrace: SacSettings["compilerTrace"] = trace === "messages" || trace === "verbose" || trace === "off" ? trace : "off";
 
   const mode = diagnostics.mode;
-  const diagnosticsMode: SacSettings["diagnosticsMode"] =
-    mode === "onType" || mode === "manual" || mode === "onSave" ? mode : "onSave";
+  const diagnosticsMode: SacSettings["diagnosticsMode"] = mode === "onType" || mode === "manual" || mode === "onSave" ? mode : "onSave";
 
   const presentation = diagnostics.presentation;
   const diagnosticsPresentation: DiagnosticsPresentationMode =
-    presentation === "expanded" || presentation === "smart" || presentation === "hybrid"
-      ? presentation
-      : "expanded";
+    presentation === "expanded" || presentation === "smart" || presentation === "hybrid" ? presentation : "expanded";
 
   return {
     diagnosticsMode,
@@ -131,20 +125,13 @@ export function updateSettings(configuration: unknown): SacSettings {
     workspaceScanEnabled: workspaceScan.enabled !== false,
     workspaceScanOnInitialize: workspaceScan.onInitialize !== false,
     workspaceScanOnConfigurationChange: workspaceScan.onConfigurationChange !== false,
-    workspaceScanExcludeDirectories: normalizeStringList(
-      workspaceScan.excludeDirectories,
-      [...DEFAULT_WORKSPACE_SCAN_EXCLUDE_DIRS],
-    ),
+    workspaceScanExcludeDirectories: normalizeStringList(workspaceScan.excludeDirectories, [...DEFAULT_WORKSPACE_SCAN_EXCLUDE_DIRS]),
     compilerChannel:
-      compiler.channel === "stable" || compiler.channel === "develop" || compiler.channel === "system"
-        ? compiler.channel
-        : "system",
+      compiler.channel === "stable" || compiler.channel === "develop" || compiler.channel === "system" ? compiler.channel : "system",
     compilerPath: typeof compiler.path === "string" ? compiler.path : "",
     fallbackToSystem: compiler.fallbackToSystem !== false,
     executionBackend:
-      compiler.executionBackend === "wsl"
-        || compiler.executionBackend === "docker"
-        || compiler.executionBackend === "local"
+      compiler.executionBackend === "wsl" || compiler.executionBackend === "docker" || compiler.executionBackend === "local"
         ? compiler.executionBackend
         : "local",
     wslDistribution: typeof wsl.distribution === "string" ? wsl.distribution : "",

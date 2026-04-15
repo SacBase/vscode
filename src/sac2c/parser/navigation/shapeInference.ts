@@ -7,12 +7,7 @@ import {
   scoreShapeCompatibility,
   ValueShape,
 } from "$sac2c/parser/navigation/shapeScoring";
-import {
-  NavigationIndex,
-  NavigationSymbol,
-  NavigationToken,
-} from "$sac2c/parser/navigation/types";
-
+import { NavigationIndex, NavigationSymbol, NavigationToken } from "$sac2c/parser/navigation/types";
 
 function inferExpressionShape(
   expressionText: string,
@@ -64,13 +59,9 @@ function inferCallReturnShape(
     return "unknown";
   }
 
-  const argumentShapes = splitTopLevel(argumentText, ",").map((expression) => inferExpressionShape(
-    expression,
-    sourceText,
-    index,
-    variableShapes,
-    depth + 1,
-  ));
+  const argumentShapes = splitTopLevel(argumentText, ",").map((expression) =>
+    inferExpressionShape(expression, sourceText, index, variableShapes, depth + 1),
+  );
 
   let bestShape: ValueShape = "unknown";
   let bestScore = -1;
@@ -100,13 +91,7 @@ function buildVariableShapeMap(sourceText: string, index: NavigationIndex): Map<
         continue;
       }
 
-      const inferredShape = inferExpressionShape(
-        assignmentMatch[2],
-        sourceText,
-        index,
-        variableShapes,
-        0,
-      );
+      const inferredShape = inferExpressionShape(assignmentMatch[2], sourceText, index, variableShapes, 0);
       if (inferredShape !== "unknown") {
         variableShapes.set(assignmentMatch[1], inferredShape);
       }
@@ -156,13 +141,9 @@ export function selectBestOverloadSymbol(
 
   for (const candidate of candidates) {
     const parameterShapes = getCandidateParameterShapes(index, candidate);
-    const argumentShapes = splitTopLevel(callArgumentText, ",").map((expression) => inferExpressionShape(
-      expression,
-      sourceText,
-      index,
-      variableShapes,
-      0,
-    ));
+    const argumentShapes = splitTopLevel(callArgumentText, ",").map((expression) =>
+      inferExpressionShape(expression, sourceText, index, variableShapes, 0),
+    );
 
     const score = scoreShapeCompatibility(parameterShapes, argumentShapes);
     if (score === null || score < bestScore) {

@@ -12,9 +12,7 @@ export interface ExtensionFeatureController {
 /**
  * Registers all extension features through independent modules.
  */
-export async function registerExtensionFeatures(
-  context: vscode.ExtensionContext,
-): Promise<ExtensionFeatureController> {
+export async function registerExtensionFeatures(context: vscode.ExtensionContext): Promise<ExtensionFeatureController> {
   const features: FeatureLifecycle[] = [
     new ChatParticipantFeature(),
     new FormattingFeature(),

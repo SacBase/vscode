@@ -114,10 +114,7 @@ function getBundledTargetDir(contextRoot: string, channel: "stable" | "develop")
  * @param workspaceRoot Workspace root used to resolve bundled binaries.
  * @returns Resolution result containing executable path or an explanatory reason.
  */
-export function resolveSac2cPath(
-  config: CompilerResolutionSettings,
-  workspaceRoot: string,
-): CompilerResolution {
+export function resolveSac2cPath(config: CompilerResolutionSettings, workspaceRoot: string): CompilerResolution {
   const executableName = getExecutableName();
   const explicitPath = (config.compilerPath || "").trim();
 

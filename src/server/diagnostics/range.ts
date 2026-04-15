@@ -22,9 +22,7 @@ function clamp(value: number, min: number, max: number): number {
  * Builds a base LSP diagnostic from parsed payload.
  */
 function toBaseDiagnostic(parsed: ParsedDiagnostic): Diagnostic {
-  const endCharacter = parsed.endColumn !== undefined
-    ? Math.max(parsed.endColumn, parsed.column + 1)
-    : parsed.column + 1;
+  const endCharacter = parsed.endColumn !== undefined ? Math.max(parsed.endColumn, parsed.column + 1) : parsed.column + 1;
 
   return {
     severity: parsed.severity,
@@ -41,9 +39,8 @@ function toBaseDiagnostic(parsed: ParsedDiagnostic): Diagnostic {
  * Attempts to extract a relevant token from sac2c message text.
  */
 function extractRelevantToken(message: string): string | null {
-  const tokenFoundMatch = message.match(TOKEN_FOUND_WITH_COMMA_PATTERN)
-    || message.match(TOKEN_FOUND_PATTERN)
-    || message.match(TOKEN_CANNOT_START_PATTERN);
+  const tokenFoundMatch =
+    message.match(TOKEN_FOUND_WITH_COMMA_PATTERN) || message.match(TOKEN_FOUND_PATTERN) || message.match(TOKEN_CANNOT_START_PATTERN);
 
   if (!tokenFoundMatch || !tokenFoundMatch[1]) {
     return null;
@@ -157,9 +154,7 @@ export function buildDiagnosticWithRange(parsed: ParsedDiagnostic, lineText: str
   }
 
   let start = clamp(parsed.column, 0, lineLength - 1);
-  let end = parsed.endColumn !== undefined
-    ? clamp(parsed.endColumn, 0, lineLength)
-    : clamp(start + 1, 0, lineLength);
+  let end = parsed.endColumn !== undefined ? clamp(parsed.endColumn, 0, lineLength) : clamp(start + 1, 0, lineLength);
 
   if (parsed.endColumn !== undefined && end > start) {
     diagnostic.range.start.character = start;

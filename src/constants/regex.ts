@@ -75,4 +75,3 @@ export const PIPE_LOGICAL_CONTINUATION_PATTERN = /^\|\s*\|/;
 export const PIPE_LOGICAL_PREFIX_PATTERN = /^\|\s*\|\s*/;
 export const COMMA_SPACING_PATTERN = /\s*,\s*/g;
 export const DOC_BLOCK_ASTERISK_PREFIX_PATTERN = /^\*+\s?/;
-

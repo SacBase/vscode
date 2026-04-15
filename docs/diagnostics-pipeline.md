@@ -15,17 +15,20 @@ Because of these limitations, the extension uses a best-effort approach that com
 ## Data Flow
 
 1. Parse
+
 - File: `src/core/diagnostics/parse.ts`
 - Converts one-line `sac2c` output into normalized entries (`file`, `line`, `column`, `severity`, `message`).
 - Drops summary noise like `Compilation failed ...`.
 
 2. Group
+
 - File: `src/core/diagnostics/group.ts`
 - Groups entries into root-cause chains.
 - First non-context entry is the primary cause.
 - Following `-- in ...` entries are context frames.
 
 3. Present
+
 - File: `src/core/diagnostics/present.ts`
 - Applies rendering mode:
   - `expanded`: emit all local entries.
@@ -33,12 +36,14 @@ Because of these limitations, the extension uses a best-effort approach that com
   - `hybrid`: smart output plus extra local context entries.
 
 4. Range Selection
+
 - File: `src/server/diagnostics/range.ts`
 - First uses compiler-provided column spans when available (for example `line:start-end`).
 - Otherwise chooses squiggle range with token/symbol heuristics.
 - Falls back to statement-level ranges when compiler columns are too weak.
 
 5. Related Information
+
 - File: `src/server/diagnostics/relatedInfo.ts`
 - Adds origin and frame references to hover/Problems details when enabled.
 

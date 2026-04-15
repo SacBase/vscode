@@ -16,10 +16,5 @@ export function expandInlineWithLoop(line: string): string[] {
   const expression = match[2].trim();
   const genarrayArgs = match[3].trim();
 
-  return [
-    "return with {",
-    `${generator} :`,
-    expression,
-    `} : genarray(${genarrayArgs});`,
-  ];
+  return ["return with {", `${generator} :`, expression, `} : genarray(${genarrayArgs});`];
 }

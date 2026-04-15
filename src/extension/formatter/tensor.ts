@@ -105,7 +105,9 @@ function normalizeTensorComprehensionBlock(blockLines: string[]): string[] | nul
     return null;
   }
 
-  const clauses = splitTopLevel(rawInner, ";").map((entry) => entry.trim()).filter((entry) => entry.length > 0);
+  const clauses = splitTopLevel(rawInner, ";")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
   if (clauses.length === 0) {
     return null;
   }

@@ -2,7 +2,7 @@
 
 All notable changes to the "sac-language-support" extension will be documented in this file.
 
-## [0.0.1]: [release date]
+## 0.0.1 - 16 April 2026
 
 ### Language + Editor Support
 
@@ -18,9 +18,9 @@ All notable changes to the "sac-language-support" extension will be documented i
 - Added SaC language server activation and lifecycle wiring from the extension host.
 - Added diagnostics publication to Problems panel + inline squiggles.
 - Added hover provider for:
-	- builtins + stdlib docs from `docs/builtins` and `docs/stdlib`
-	- compiler-index-backed symbols when available
-	- source-defined function docs/signatures fallback
+  - builtins + stdlib docs from `docs/builtins` and `docs/stdlib`
+  - compiler-index-backed symbols when available
+  - source-defined function docs/signatures fallback
 - Added go-to-definition provider using compiler navigation index with source/stdlib fallbacks.
 - Added safe server error handling (`runSafely`) so failures are logged instead of crashing server process.
 
@@ -30,14 +30,14 @@ All notable changes to the "sac-language-support" extension will be documented i
 - Added diagnostics presentation modes: `expanded`, `smart`, `hybrid`.
 - Added best-effort parser/grouping pipeline for `sac2c` output.
 - Added related information + stack/context rendering controls:
-	- `sac.diagnostics.includeRelatedInformation`
-	- `sac.diagnostics.includeStackInMessage`
-	- `sac.diagnostics.maxStackFrames`
+  - `sac.diagnostics.includeRelatedInformation`
+  - `sac.diagnostics.includeStackInMessage`
+  - `sac.diagnostics.maxStackFrames`
 - Added workspace-wide diagnostics scan controls:
-	- `sac.diagnostics.workspaceScan.enabled`
-	- `sac.diagnostics.workspaceScan.onInitialize`
-	- `sac.diagnostics.workspaceScan.onConfigurationChange`
-	- `sac.diagnostics.workspaceScan.excludeDirectories`
+  - `sac.diagnostics.workspaceScan.enabled`
+  - `sac.diagnostics.workspaceScan.onInitialize`
+  - `sac.diagnostics.workspaceScan.onConfigurationChange`
+  - `sac.diagnostics.workspaceScan.excludeDirectories`
 
 **Compiler prerequisite (current fork status):**
 
@@ -50,13 +50,13 @@ All notable changes to the "sac-language-support" extension will be documented i
 - Added explicit compiler path override via `sac.compiler.path`.
 - Added fallback behavior to system compiler when bundled channel binary is missing.
 - Added backend execution modes:
-	- `local`
-	- `wsl` (Windows host)
-	- `docker`
+  - `local`
+  - `wsl` (Windows host)
+  - `docker`
 - Added configurable extra compiler args and deterministic messaging args:
-	- `sac.compiler.extraArgs`
-	- `sac.compiler.messaging.enabled`
-	- `sac.compiler.messaging.args`
+  - `sac.compiler.extraArgs`
+  - `sac.compiler.messaging.enabled`
+  - `sac.compiler.messaging.args`
 
 ### Navigation + Hover Docs Infrastructure
 
@@ -73,7 +73,12 @@ All notable changes to the "sac-language-support" extension will be documented i
 
 - Added diagnostics architecture docs (`docs/diagnostics-pipeline.md`, `docs/editor-agnostic-diagnostics.md`).
 - Added extension packaging optimization:
-	- esbuild bundle pipeline for extension + server outputs
-	- prepublish bundle hook before `vsce package`
-	- lean `.vscodeignore` rules for smaller VSIX artifacts
+  - esbuild bundle pipeline for extension + server outputs
+  - prepublish bundle hook before `vsce package`
+  - lean `.vscodeignore` rules for smaller VSIX artifacts
 - Added initial GitHub workflow foundation for nightly/stable VSIX release automation.
+
+### Tooling Baseline
+
+- Added Node.js runtime pin via `.nvmrc`.
+- Added npm behavior pin via `.npmrc` and package-manager metadata.

@@ -82,18 +82,20 @@ function renderSmartLike(
     }
 
     const related: CoreParsedDiagnostic[] = [];
-    if (group.primary.location.filePath !== anchor.location.filePath
-      || group.primary.location.line !== anchor.location.line
-      || group.primary.message !== anchor.message
+    if (
+      group.primary.location.filePath !== anchor.location.filePath ||
+      group.primary.location.line !== anchor.location.line ||
+      group.primary.message !== anchor.message
     ) {
       related.push(group.primary);
     }
 
     const limitedFrames = group.frames.slice(-Math.max(settings.maxStackFrames, 0));
     for (const frame of limitedFrames) {
-      if (frame.location.filePath === anchor.location.filePath
-        && frame.location.line === anchor.location.line
-        && frame.message === anchor.message
+      if (
+        frame.location.filePath === anchor.location.filePath &&
+        frame.location.line === anchor.location.line &&
+        frame.message === anchor.message
       ) {
         continue;
       }

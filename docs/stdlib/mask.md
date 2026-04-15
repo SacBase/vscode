@@ -1,7 +1,9 @@
 # `mask`
+
 Mask-based selection with vector-focused overloads.
 
 ### Common Signatures
+
 ```sac
 <a>[n] mask(bool[n] p, <a>[n] a, <a>[n] b)
 <a>[n] mask(bool[n] p, <a>[n] a, <a> b)
@@ -11,4 +13,5 @@ Mask-based selection with vector-focused overloads.
 ```
 
 ### Description
+
 Semantically similar to `where`, but implemented differently and intended for scalar/vector style use cases.

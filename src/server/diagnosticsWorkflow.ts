@@ -2,30 +2,11 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { TextDocument } from "vscode-languageserver-textdocument";
-import {
-  Connection,
-  Diagnostic,
-  TextDocuments,
-} from "vscode-languageserver/node";
+import { Connection, Diagnostic, TextDocuments } from "vscode-languageserver/node";
 
-import {
-  collectSacFiles,
-  createDocumentFromFile,
-  isFileDocument,
-  normalizePathForCompare,
-  uriToFsPath,
-} from "$util/documentUtils";
-import {
-  createInvocation,
-  isLikelyMessagingFlagFailure,
-  runSac2c,
-  SacCompilerRunResult,
-} from "$server/compilerRuntime";
-import {
-  groupDiagnostics,
-  parseCompilerOutput,
-  presentDiagnostics,
-} from "$server/diagnostics/adapter";
+import { collectSacFiles, createDocumentFromFile, isFileDocument, normalizePathForCompare, uriToFsPath } from "$util/documentUtils";
+import { createInvocation, isLikelyMessagingFlagFailure, runSac2c, SacCompilerRunResult } from "$server/compilerRuntime";
+import { groupDiagnostics, parseCompilerOutput, presentDiagnostics } from "$server/diagnostics/adapter";
 import { buildDiagnosticWithRange } from "$server/diagnostics/range";
 import { buildRelatedInformation } from "$server/diagnostics/relatedInfo";
 import { SacSettings } from "$server/settings";
@@ -80,17 +61,12 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
     const groups = groupDiagnostics(normalizedParsedDiagnostics);
     const lines = document.getText().split(/\r?\n/);
 
-    const rendered = presentDiagnostics(
-      normalizedParsedDiagnostics,
-      groups,
-      requestedFilePath,
-      {
-        presentation: settings.diagnosticsPresentation,
-        includeRelatedInformation: settings.diagnosticsIncludeRelatedInformation,
-        includeStackInMessage: settings.diagnosticsIncludeStackInMessage,
-        maxStackFrames: settings.diagnosticsMaxStackFrames,
-      },
-    );
+    const rendered = presentDiagnostics(normalizedParsedDiagnostics, groups, requestedFilePath, {
+      presentation: settings.diagnosticsPresentation,
+      includeRelatedInformation: settings.diagnosticsIncludeRelatedInformation,
+      includeStackInMessage: settings.diagnosticsIncludeStackInMessage,
+      maxStackFrames: settings.diagnosticsMaxStackFrames,
+    });
 
     return rendered
       .filter((entry) => diagnosticAppliesToDocument(entry.anchor.file, requestedFilePath))
@@ -121,12 +97,8 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
       return;
     }
 
-    const invocationWithMessaging = createInvocation(
-      settings,
-      workspaceRoot,
-      fsPath,
-      true,
-      (message) => deps.connection.window.showWarningMessage(message),
+    const invocationWithMessaging = createInvocation(settings, workspaceRoot, fsPath, true, (message) =>
+      deps.connection.window.showWarningMessage(message),
     );
     if (!invocationWithMessaging) {
       clearDocumentDiagnostics(document.uri);
@@ -135,11 +107,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
 
     let runResult: SacCompilerRunResult;
     try {
-      runResult = await runSac2c(
-        invocationWithMessaging.command,
-        invocationWithMessaging.args,
-        invocationWithMessaging.cwd,
-      );
+      runResult = await runSac2c(invocationWithMessaging.command, invocationWithMessaging.args, invocationWithMessaging.cwd);
     } catch (error) {
       const err = error as Error;
       deps.connection.window.showErrorMessage(`Failed to execute sac2c: ${err.message}`);
@@ -147,17 +115,9 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
       return;
     }
 
-    if (
-      settings.messagingEnabled
-      && isLikelyMessagingFlagFailure(runResult.stderr)
-      && settings.messagingArgs.length > 0
-    ) {
-      const invocationWithoutMessaging = createInvocation(
-        settings,
-        workspaceRoot,
-        fsPath,
-        false,
-        (message) => deps.connection.window.showWarningMessage(message),
+    if (settings.messagingEnabled && isLikelyMessagingFlagFailure(runResult.stderr) && settings.messagingArgs.length > 0) {
+      const invocationWithoutMessaging = createInvocation(settings, workspaceRoot, fsPath, false, (message) =>
+        deps.connection.window.showWarningMessage(message),
       );
       if (!invocationWithoutMessaging) {
         clearDocumentDiagnostics(document.uri);

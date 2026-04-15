@@ -5,9 +5,20 @@ import {
   RETURN_STATEMENT_START_PATTERN,
   TRAILING_WHITESPACE_PATTERN,
 } from "$constants/regex";
-import { mergeGuardExpressionContinuations, mergeGuardLogicalContinuations, splitFunctionInlineGuards, splitGuardChain } from "$extension/formatter/guards";
+import {
+  mergeGuardExpressionContinuations,
+  mergeGuardLogicalContinuations,
+  splitFunctionInlineGuards,
+  splitGuardChain,
+} from "$extension/formatter/guards";
 import { expandInlineComprehension, normalizeTensorComprehensions } from "$extension/formatter/tensor";
-import { countBraceDelta, countLeadingClosers, isLineComment, normalizeGuardPrefix, normalizeLineCommentSpacing } from "$extension/formatter/text";
+import {
+  countBraceDelta,
+  countLeadingClosers,
+  isLineComment,
+  normalizeGuardPrefix,
+  normalizeLineCommentSpacing,
+} from "$extension/formatter/text";
 import { DEFAULT_OPTIONS, SacFormattingOptions } from "$extension/formatter/types";
 import { expandInlineWithLoop } from "$extension/formatter/withLoop";
 import { preserveTrailingNewlines, splitNormalizedLines, trimTrailingNewlines } from "$util/newlines";
@@ -49,11 +60,7 @@ function preExpand(input: string, options: SacFormattingOptions): string[] {
     expanded.push(...chunks);
   }
 
-  return normalizeTensorComprehensions(
-    mergeGuardLogicalContinuations(
-      mergeGuardExpressionContinuations(expanded),
-    ),
-  );
+  return normalizeTensorComprehensions(mergeGuardLogicalContinuations(mergeGuardExpressionContinuations(expanded)));
 }
 
 /**
@@ -140,8 +147,7 @@ export function formatSacSource(source: string, userOptions: Partial<SacFormatti
       formatted.push(normalized.replace(TRAILING_WHITESPACE_PATTERN, ""));
     }
 
-    if (FUNCTION_HEADER_CANDIDATE_PATTERN.test(content)
-      && !CONTROL_OR_RETURN_HEADER_PATTERN.test(content)) {
+    if (FUNCTION_HEADER_CANDIDATE_PATTERN.test(content) && !CONTROL_OR_RETURN_HEADER_PATTERN.test(content)) {
       guardIndentHint = baseIndent + 1;
     }
 

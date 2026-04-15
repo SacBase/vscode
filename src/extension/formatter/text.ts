@@ -51,7 +51,7 @@ export function countBraceDelta(text: string): number {
       continue;
     }
 
-    if (current === "\"") {
+    if (current === '"') {
       inString = !inString;
       continue;
     }
@@ -155,7 +155,7 @@ export function splitTopLevel(text: string, delimiter: string): string[] {
       continue;
     }
 
-    if (char === "\"") {
+    if (char === '"') {
       inString = !inString;
       buffer += char;
       continue;
@@ -176,12 +176,7 @@ export function splitTopLevel(text: string, delimiter: string): string[] {
         braceDepth = Math.max(0, braceDepth - 1);
       }
 
-      if (
-        char === delimiter
-        && parenDepth === 0
-        && bracketDepth === 0
-        && braceDepth === 0
-      ) {
+      if (char === delimiter && parenDepth === 0 && bracketDepth === 0 && braceDepth === 0) {
         parts.push(buffer.trim());
         buffer = "";
         continue;
@@ -216,7 +211,7 @@ export function findTopLevelToken(text: string, token: string): number {
       continue;
     }
 
-    if (char === "\"") {
+    if (char === '"') {
       inString = !inString;
       continue;
     }
@@ -236,12 +231,7 @@ export function findTopLevelToken(text: string, token: string): number {
         braceDepth = Math.max(0, braceDepth - 1);
       }
 
-      if (
-        parenDepth === 0
-        && bracketDepth === 0
-        && braceDepth === 0
-        && text.slice(index, index + token.length) === token
-      ) {
+      if (parenDepth === 0 && bracketDepth === 0 && braceDepth === 0 && text.slice(index, index + token.length) === token) {
         return index;
       }
     }
@@ -273,7 +263,7 @@ export function findTopLevelGuardPipe(text: string, startIndex: number): number 
       continue;
     }
 
-    if (char === "\"") {
+    if (char === '"') {
       inString = !inString;
       continue;
     }
@@ -307,14 +297,7 @@ export function findTopLevelGuardPipe(text: string, startIndex: number): number 
       continue;
     }
 
-    if (
-      char === "|"
-      && parenDepth === 0
-      && bracketDepth === 0
-      && braceDepth === 0
-      && prev !== "|"
-      && next !== "|"
-    ) {
+    if (char === "|" && parenDepth === 0 && bracketDepth === 0 && braceDepth === 0 && prev !== "|" && next !== "|") {
       return index;
     }
   }
@@ -341,7 +324,7 @@ export function delimiterBalance(text: string): number {
       continue;
     }
 
-    if (char === "\"") {
+    if (char === '"') {
       inString = !inString;
       continue;
     }

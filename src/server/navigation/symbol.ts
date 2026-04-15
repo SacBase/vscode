@@ -12,10 +12,7 @@ function getLineText(document: TextDocument, line: number): string | null {
 /**
  * Extracts the symbol at the cursor position.
  */
-export function getSymbolAtPosition(
-  document: TextDocument,
-  position: Position,
-): SacSymbolOccurrence | null {
+export function getSymbolAtPosition(document: TextDocument, position: Position): SacSymbolOccurrence | null {
   const lineText = getLineText(document, position.line);
   if (!lineText) {
     return null;

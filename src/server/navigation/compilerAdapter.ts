@@ -4,18 +4,10 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { Location, Position } from "vscode-languageserver/node";
 
 import { parseNavigationIndex } from "$sac2c/parser/navigation/parser";
-import {
-  resolveDefinitionFromIndex,
-  resolveHoverFromIndex,
-} from "$sac2c/parser/navigation/query";
+import { resolveDefinitionFromIndex, resolveHoverFromIndex } from "$sac2c/parser/navigation/query";
 
 import { buildNavArgs, runCompilerCommand } from "$server/navigation/compilerCommand";
-import {
-  CompilerNavigationRuntimeConfig,
-  HoverDebugLogger,
-  SacDefinitionQueryResult,
-  SacHoverQueryResult,
-} from "$server/navigation/types";
+import { CompilerNavigationRuntimeConfig, HoverDebugLogger, SacDefinitionQueryResult, SacHoverQueryResult } from "$server/navigation/types";
 
 const NAV_DEBUG_ENABLED = process.env.SAC_NAV_DEBUG === "1";
 
@@ -59,14 +51,7 @@ export function parseCompilerDefinitionOutput(
     return null;
   }
 
-  const hits = resolveDefinitionFromIndex(
-    parsed.index,
-    workspaceRoot,
-    documentFsPath,
-    position.line,
-    position.character,
-    sourceText,
-  );
+  const hits = resolveDefinitionFromIndex(parsed.index, workspaceRoot, documentFsPath, position.line, position.character, sourceText);
 
   if (hits.length === 0) {
     logNavDebug("definition-no-hit", {
@@ -98,28 +83,29 @@ export function parseCompilerHoverOutput(
 ): SacHoverQueryResult | null {
   const parsed = parseNavigationIndex(stdout);
   if (!parsed.index) {
-    logNavDebug("parse-hover-failed", {
-      error: parsed.error,
-      stdoutPreview: stdout.slice(0, 500),
-    }, debugLog);
+    logNavDebug(
+      "parse-hover-failed",
+      {
+        error: parsed.error,
+        stdoutPreview: stdout.slice(0, 500),
+      },
+      debugLog,
+    );
     return null;
   }
 
-  const hit = resolveHoverFromIndex(
-    parsed.index,
-    workspaceRoot,
-    documentFsPath,
-    position.line,
-    position.character,
-    sourceText,
-  );
+  const hit = resolveHoverFromIndex(parsed.index, workspaceRoot, documentFsPath, position.line, position.character, sourceText);
 
   if (!hit) {
-    logNavDebug("hover-no-hit", {
-      file: documentFsPath,
-      line: position.line,
-      character: position.character,
-    }, debugLog);
+    logNavDebug(
+      "hover-no-hit",
+      {
+        file: documentFsPath,
+        line: position.line,
+        character: position.character,
+      },
+      debugLog,
+    );
     return null;
   }
 
@@ -139,9 +125,7 @@ export function parseCompilerHoverOutput(
 /**
  * Queries compiler-backed definition data when compiler is configured/available.
  */
-export async function queryCompilerDefinitions(
-  context: CompilerDefinitionAdapterContext,
-): Promise<SacDefinitionQueryResult | null> {
+export async function queryCompilerDefinitions(context: CompilerDefinitionAdapterContext): Promise<SacDefinitionQueryResult | null> {
   if (!context.document.uri.startsWith("file://")) {
     return null;
   }
@@ -166,13 +150,7 @@ export async function queryCompilerDefinitions(
     return null;
   }
 
-  return parseCompilerDefinitionOutput(
-    stdout,
-    documentFsPath,
-    context.position,
-    context.workspaceRoot,
-    context.document.getText(),
-  );
+  return parseCompilerDefinitionOutput(stdout, documentFsPath, context.position, context.workspaceRoot, context.document.getText());
 }
 
 /**
@@ -200,18 +178,15 @@ export async function queryCompilerHover(
   );
 
   if (!stdout) {
-    logNavDebug("hover-no-stdout", {
-      executable: context.runtime.executable,
-    }, debugLog);
+    logNavDebug(
+      "hover-no-stdout",
+      {
+        executable: context.runtime.executable,
+      },
+      debugLog,
+    );
     return null;
   }
 
-  return parseCompilerHoverOutput(
-    stdout,
-    documentFsPath,
-    context.position,
-    context.workspaceRoot,
-    context.document.getText(),
-    debugLog,
-  );
+  return parseCompilerHoverOutput(stdout, documentFsPath, context.position, context.workspaceRoot, context.document.getText(), debugLog);
 }

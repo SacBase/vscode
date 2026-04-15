@@ -1,13 +1,5 @@
-import {
-  normalizeHeadingLabel,
-  readFirstCodeBlockFirstLine,
-  trimBlankEdges,
-} from "$util/markdown";
-import {
-  DOC_SECTION_HEADING_PATTERN,
-  SIGNATURE_CODE_BLOCK_PATTERN,
-  TOP_LEVEL_HEADING_PATTERN,
-} from "$constants/regex";
+import { normalizeHeadingLabel, readFirstCodeBlockFirstLine, trimBlankEdges } from "$util/markdown";
+import { DOC_SECTION_HEADING_PATTERN, SIGNATURE_CODE_BLOCK_PATTERN, TOP_LEVEL_HEADING_PATTERN } from "$constants/regex";
 
 export { normalizeHeadingLabel, trimBlankEdges };
 
@@ -23,14 +15,16 @@ export interface ParsedDocSections {
 }
 
 export function findSignatureSection(sections: Map<string, ParsedSection>): ParsedSection | null {
-  return sections.get("signature")
-    ?? sections.get("signatures")
-    ?? sections.get("common signatures")
-    ?? sections.get("call form")
-    ?? sections.get("call forms")
-    ?? sections.get("typical call form")
-    ?? sections.get("typical call forms")
-    ?? null;
+  return (
+    sections.get("signature") ??
+    sections.get("signatures") ??
+    sections.get("common signatures") ??
+    sections.get("call form") ??
+    sections.get("call forms") ??
+    sections.get("typical call form") ??
+    sections.get("typical call forms") ??
+    null
+  );
 }
 
 export function extractSignatureLine(signatureSection: ParsedSection | null): string | null {

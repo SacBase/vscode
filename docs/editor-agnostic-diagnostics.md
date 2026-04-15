@@ -11,6 +11,7 @@ This project now separates compiler-diagnostics logic into a reusable core modul
 ## Module Split
 
 1. Generic core
+
 - Path: `src/core/diagnostics/`
 - No imports from VS Code or LSP libraries.
 - Responsibilities:
@@ -20,6 +21,7 @@ This project now separates compiler-diagnostics logic into a reusable core modul
   - export canonical JSON and SARIF
 
 2. VS Code/LSP adapter layer
+
 - Path: `src/server/diagnostics/`
 - Responsibilities:
   - map core severities to LSP severities
@@ -27,6 +29,7 @@ This project now separates compiler-diagnostics logic into a reusable core modul
   - apply squiggle-range heuristics for VS Code visualization
 
 3. Server orchestration
+
 - Path: `src/server/server.ts`
 - Responsibilities:
   - invoke `sac2c`

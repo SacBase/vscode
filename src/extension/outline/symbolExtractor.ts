@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
 
-import {
-  FUNCTION_DEFINITION_CAPTURE_PATTERN,
-  MODULE_DECLARATION_CAPTURE_PATTERN,
-} from "$constants/regex";
+import { FUNCTION_DEFINITION_CAPTURE_PATTERN, MODULE_DECLARATION_CAPTURE_PATTERN } from "$constants/regex";
 import { toGlobalRegex } from "$util/regex";
 import { findMatchingBrace, maskNonCodeText } from "$util/sourceFile";
 
@@ -50,10 +47,7 @@ export function extractOutlineSymbols(document: vscode.TextDocument): vscode.Doc
 
     const nameInMatch = matchText.indexOf(functionName);
     const nameOffset = start + Math.max(0, nameInMatch);
-    const selectionRange = new vscode.Range(
-      document.positionAt(nameOffset),
-      document.positionAt(nameOffset + functionName.length),
-    );
+    const selectionRange = new vscode.Range(document.positionAt(nameOffset), document.positionAt(nameOffset + functionName.length));
 
     symbols.push(new vscode.DocumentSymbol(functionName, "function", vscode.SymbolKind.Function, fnRange, selectionRange));
   }

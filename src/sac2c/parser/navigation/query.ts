@@ -8,11 +8,7 @@ import {
   normalizeComparePath,
 } from "$sac2c/parser/navigation/pathResolution";
 import { formatSignature } from "$sac2c/parser/navigation/signatureFormatting";
-import {
-  NavigationDefinitionHit,
-  NavigationHoverHit,
-  NavigationIndex,
-} from "$sac2c/parser/navigation/types";
+import { NavigationDefinitionHit, NavigationHoverHit, NavigationIndex } from "$sac2c/parser/navigation/types";
 
 /**
  * Resolves goto-definition target from navjson index for cursor position.
@@ -50,10 +46,12 @@ export function resolveDefinitionFromIndex(
     return [];
   }
 
-  return [{
-    path: definitionPath,
-    range: definitionToken.range,
-  }];
+  return [
+    {
+      path: definitionPath,
+      range: definitionToken.range,
+    },
+  ];
 }
 
 /**
@@ -83,9 +81,7 @@ export function resolveHoverFromIndex(
   const resolvedSymbol = selectBestOverloadSymbol(index, sourceText, target, selected);
 
   const signatureId = resolvedSymbol.signatureIds?.[0];
-  const signature = signatureId
-    ? index.signatures?.find((entry) => entry.id === signatureId) ?? null
-    : null;
+  const signature = signatureId ? (index.signatures?.find((entry) => entry.id === signatureId) ?? null) : null;
 
   const signatureMarkdown = formatSignature(resolvedSymbol.name, signature);
   const definitionToken = findTokenById(index, resolvedSymbol.definitionTokenId);

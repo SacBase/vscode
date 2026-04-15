@@ -5,13 +5,7 @@
   "description": "Compiler navigation index consumed by hover and goto-definition logic.",
   "type": "object",
   "additionalProperties": true,
-  "required": [
-    "schemaVersion",
-    "files",
-    "tokens",
-    "symbols",
-    "bindings"
-  ],
+  "required": ["schemaVersion", "files", "tokens", "symbols", "bindings"],
   "properties": {
     "schemaVersion": {
       "type": "integer",
@@ -19,10 +13,7 @@
     },
     "indexKind": {
       "type": "string",
-      "enum": [
-        "full",
-        "file-scoped"
-      ]
+      "enum": ["full", "file-scoped"]
     },
     "producer": {
       "$ref": "#/$defs/producer"
@@ -99,10 +90,7 @@
     "producer": {
       "type": "object",
       "additionalProperties": true,
-      "required": [
-        "name",
-        "version"
-      ],
+      "required": ["name", "version"],
       "properties": {
         "name": {
           "type": "string"
@@ -121,11 +109,7 @@
     "workspace": {
       "type": "object",
       "additionalProperties": true,
-      "required": [
-        "rootUri",
-        "pathStyle",
-        "positionEncoding"
-      ],
+      "required": ["rootUri", "pathStyle", "positionEncoding"],
       "properties": {
         "rootUri": {
           "type": "string"
@@ -140,10 +124,7 @@
     },
     "position": {
       "type": "object",
-      "required": [
-        "line",
-        "character"
-      ],
+      "required": ["line", "character"],
       "additionalProperties": false,
       "properties": {
         "line": {
@@ -158,10 +139,7 @@
     },
     "range": {
       "type": "object",
-      "required": [
-        "start",
-        "end"
-      ],
+      "required": ["start", "end"],
       "additionalProperties": false,
       "properties": {
         "start": {
@@ -174,10 +152,7 @@
     },
     "fileEntry": {
       "type": "object",
-      "required": [
-        "id",
-        "path"
-      ],
+      "required": ["id", "path"],
       "additionalProperties": true,
       "properties": {
         "id": {
@@ -200,12 +175,7 @@
     },
     "token": {
       "type": "object",
-      "required": [
-        "id",
-        "fileId",
-        "range",
-        "role"
-      ],
+      "required": ["id", "fileId", "range", "role"],
       "additionalProperties": true,
       "properties": {
         "id": {
@@ -230,15 +200,7 @@
     },
     "symbol": {
       "type": "object",
-      "required": [
-        "id",
-        "kind",
-        "name",
-        "qualifiedName",
-        "definitionTokenId",
-        "moduleId",
-        "provenance"
-      ],
+      "required": ["id", "kind", "name", "qualifiedName", "definitionTokenId", "moduleId", "provenance"],
       "additionalProperties": true,
       "properties": {
         "id": {
@@ -274,12 +236,7 @@
         },
         "provenance": {
           "type": "string",
-          "enum": [
-            "user",
-            "stdlib",
-            "builtin",
-            "external"
-          ]
+          "enum": ["user", "stdlib", "builtin", "external"]
         },
         "visibility": {
           "type": "string"
@@ -294,11 +251,7 @@
     },
     "binding": {
       "type": "object",
-      "required": [
-        "tokenId",
-        "resolution",
-        "candidateSymbolIds"
-      ],
+      "required": ["tokenId", "resolution", "candidateSymbolIds"],
       "additionalProperties": true,
       "properties": {
         "tokenId": {
@@ -306,11 +259,7 @@
         },
         "resolution": {
           "type": "string",
-          "enum": [
-            "resolved",
-            "unresolved",
-            "ambiguous"
-          ]
+          "enum": ["resolved", "unresolved", "ambiguous"]
         },
         "candidateSymbolIds": {
           "type": "array",
@@ -328,11 +277,7 @@
     },
     "module": {
       "type": "object",
-      "required": [
-        "id",
-        "name",
-        "definitionTokenId"
-      ],
+      "required": ["id", "name", "definitionTokenId"],
       "additionalProperties": true,
       "properties": {
         "id": {
@@ -363,10 +308,7 @@
     },
     "importEdge": {
       "type": "object",
-      "required": [
-        "importTokenId",
-        "importedModuleName"
-      ],
+      "required": ["importTokenId", "importedModuleName"],
       "additionalProperties": true,
       "properties": {
         "importTokenId": {
@@ -388,9 +330,7 @@
     },
     "typeShape": {
       "type": "object",
-      "required": [
-        "typeRepr"
-      ],
+      "required": ["typeRepr"],
       "additionalProperties": true,
       "properties": {
         "typeRepr": {
@@ -400,10 +340,7 @@
           "type": "string"
         },
         "rank": {
-          "type": [
-            "integer",
-            "null"
-          ]
+          "type": ["integer", "null"]
         },
         "isKnown": {
           "type": "boolean"
@@ -412,10 +349,7 @@
     },
     "callCandidate": {
       "type": "object",
-      "required": [
-        "symbolId",
-        "status"
-      ],
+      "required": ["symbolId", "status"],
       "additionalProperties": true,
       "properties": {
         "symbolId": {
@@ -434,10 +368,7 @@
     },
     "call": {
       "type": "object",
-      "required": [
-        "calleeTokenId",
-        "candidates"
-      ],
+      "required": ["calleeTokenId", "candidates"],
       "additionalProperties": true,
       "properties": {
         "calleeTokenId": {
@@ -465,9 +396,7 @@
     },
     "signatureParameter": {
       "type": "object",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "additionalProperties": true,
       "properties": {
         "name": {
@@ -487,11 +416,7 @@
     },
     "signature": {
       "type": "object",
-      "required": [
-        "display",
-        "parameters",
-        "returns"
-      ],
+      "required": ["display", "parameters", "returns"],
       "additionalProperties": true,
       "properties": {
         "display": {
@@ -519,10 +444,7 @@
     },
     "signatureEntry": {
       "type": "object",
-      "required": [
-        "id",
-        "signature"
-      ],
+      "required": ["id", "signature"],
       "additionalProperties": true,
       "properties": {
         "id": {
@@ -535,10 +457,7 @@
     },
     "docParam": {
       "type": "object",
-      "required": [
-        "name",
-        "description"
-      ],
+      "required": ["name", "description"],
       "additionalProperties": true,
       "properties": {
         "name": {
@@ -551,10 +470,7 @@
     },
     "doc": {
       "type": "object",
-      "required": [
-        "format",
-        "text"
-      ],
+      "required": ["format", "text"],
       "additionalProperties": true,
       "properties": {
         "format": {
@@ -579,10 +495,7 @@
     },
     "docEntry": {
       "type": "object",
-      "required": [
-        "id",
-        "doc"
-      ],
+      "required": ["id", "doc"],
       "additionalProperties": true,
       "properties": {
         "id": {
@@ -595,10 +508,7 @@
     },
     "note": {
       "type": "object",
-      "required": [
-        "level",
-        "message"
-      ],
+      "required": ["level", "message"],
       "additionalProperties": true,
       "properties": {
         "level": {

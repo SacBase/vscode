@@ -2,12 +2,7 @@
  * Normalizes markdown heading labels to lowercase lookup keys.
  */
 export function normalizeHeadingLabel(value: string): string {
-  return value
-    .replace(/`/g, "")
-    .replace(/[*_]/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
+  return value.replace(/`/g, "").replace(/[*_]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
 }
 
 /**

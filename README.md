@@ -3,6 +3,7 @@
 SaC Language Support adds first-class editing support for SaC (Single Assignment C) in Visual Studio Code.
 
 It provides:
+
 - SaC language registration for `.sac` files
 - Syntax highlighting and language configuration
 - Compiler-backed diagnostics via `sac2c` (Problems panel + editor squiggles)
@@ -119,4 +120,3 @@ If you are on Windows and do not have a native `sac2c` binary, recommended optio
 Issues and feature requests are welcome:
 
 - https://github.com/SacBase/vscode/issues
-

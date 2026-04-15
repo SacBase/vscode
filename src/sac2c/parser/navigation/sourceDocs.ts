@@ -267,8 +267,7 @@ function isPotentialFunctionDefinitionLine(lineText: string, nextNonEmptyLine?: 
   const tail = lineText.slice(match.index + match[0].length);
   const nextStartsBody = nextNonEmptyLine?.trim().startsWith("{") === true;
   const nextStartsAssertions = nextNonEmptyLine?.trim().startsWith("|") === true;
-  return !tail.includes(";")
-    && (tail.includes("{") || lineText.includes("|") || nextStartsBody || nextStartsAssertions);
+  return !tail.includes(";") && (tail.includes("{") || lineText.includes("|") || nextStartsBody || nextStartsAssertions);
 }
 
 /**

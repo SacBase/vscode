@@ -6,12 +6,7 @@ import { Position } from "vscode-languageserver/node";
  * Executes compiler command safely and returns captured stdout.
  * Timeout kill prevents server hangs when compiler blocks.
  */
-export function runCompilerCommand(
-  executable: string,
-  args: string[],
-  cwd: string,
-  timeoutMs: number,
-): Promise<string | null> {
+export function runCompilerCommand(executable: string, args: string[], cwd: string, timeoutMs: number): Promise<string | null> {
   return new Promise((resolve) => {
     const child = spawn(executable, args, {
       cwd,
@@ -57,12 +52,7 @@ export function runCompilerCommand(
 /**
  * Builds navjson compiler args for single-file cursor query mode.
  */
-export function buildNavArgs(
-  mode: "definition" | "hover",
-  documentFsPath: string,
-  position: Position,
-  extraArgs: string[],
-): string[] {
+export function buildNavArgs(mode: "definition" | "hover", documentFsPath: string, position: Position, extraArgs: string[]): string[] {
   return [
     "-v0",
     "-navjson",

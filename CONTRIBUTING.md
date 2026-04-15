@@ -86,4 +86,3 @@ Recommended naming:
 ## Support
 
 For user support and issue templates, see `SUPPORT.md`.
-

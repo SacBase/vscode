@@ -73,8 +73,7 @@ export function parseNavigationIndex(stdout: string): ParseNavigationIndexResult
   }
 
   const index = parsed as Partial<NavigationIndex>;
-  if (!Array.isArray(index.files) || !Array.isArray(index.tokens)
-    || !Array.isArray(index.symbols) || !Array.isArray(index.bindings)) {
+  if (!Array.isArray(index.files) || !Array.isArray(index.tokens) || !Array.isArray(index.symbols) || !Array.isArray(index.bindings)) {
     return {
       index: null,
       error: "navjson missing required arrays: files/tokens/symbols/bindings.",

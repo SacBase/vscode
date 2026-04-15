@@ -75,7 +75,7 @@ export function maskNonCodeText(source: string): string {
       continue;
     }
 
-    if (current === "\"" || current === "'") {
+    if (current === '"' || current === "'") {
       chars[index] = MASK_CHAR;
       inString = true;
       stringQuote = current;

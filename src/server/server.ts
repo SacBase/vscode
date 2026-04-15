@@ -16,11 +16,7 @@ import { getCompilerNavigationRuntime } from "$server/compilerRuntime";
 import { createDiagnosticsWorkflow } from "$server/diagnosticsWorkflow";
 import { provideHover } from "$server/hover-info/hover";
 import { provideDefinition } from "$server/navigation/provider";
-import {
-  getDefaultSettings,
-  SacSettings,
-  updateSettings
-} from "$server/settings";
+import { getDefaultSettings, SacSettings, updateSettings } from "$server/settings";
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
@@ -54,7 +50,10 @@ function runSafely(work: Promise<void>, context: string): void {
   });
 }
 
-function createHoverDebugLogger(enabled: boolean, prefix: string): ((message: string, payload?: Record<string, unknown>) => void) | undefined {
+function createHoverDebugLogger(
+  enabled: boolean,
+  prefix: string,
+): ((message: string, payload?: Record<string, unknown>) => void) | undefined {
   if (!enabled) {
     return undefined;
   }
@@ -105,7 +104,7 @@ connection.onHover(async (params: HoverParams & TextDocumentPositionParams): Pro
       createHoverDebugLogger(settings.compilerTrace !== "off", "hover"),
     );
   } catch (error) {
-    const message = error instanceof Error ? error.stack ?? error.message : String(error);
+    const message = error instanceof Error ? (error.stack ?? error.message) : String(error);
     connection.console.error(`[hover] provider crashed: ${message}`);
     return null;
   }
@@ -129,13 +128,16 @@ connection.onDefinition(async (params: DefinitionParams): Promise<Definition | n
 });
 
 connection.onInitialized(() => {
-  runSafely((async () => {
-    const sacConfig = await connection.workspace.getConfiguration("sac");
-    settings = updateSettings({ sac: sacConfig as unknown });
-    if (settings.workspaceScanOnInitialize) {
-      await diagnosticsWorkflow.validateAllWorkspaceSacFiles();
-    }
-  })(), "onInitialized");
+  runSafely(
+    (async () => {
+      const sacConfig = await connection.workspace.getConfiguration("sac");
+      settings = updateSettings({ sac: sacConfig as unknown });
+      if (settings.workspaceScanOnInitialize) {
+        await diagnosticsWorkflow.validateAllWorkspaceSacFiles();
+      }
+    })(),
+    "onInitialized",
+  );
 });
 
 connection.onDidChangeConfiguration((change) => {

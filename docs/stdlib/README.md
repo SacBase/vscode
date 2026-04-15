@@ -3,10 +3,12 @@
 This folder contains hover markdown for SaC StdLib symbols.
 
 Scope in this pass:
+
 - StdLib functions declared via `BUILT_IN(...)` in the local `Stdlib` source tree.
 - Closely related StdLib wrappers that are part of the same API surface (for example `fprint`, `toc`).
 
 Primary source files used:
+
 - `Stdlib/include/arraybasics.mac`
 - `Stdlib/include/arraytransform.mac`
 - `Stdlib/include/templates.mac`
@@ -20,6 +22,7 @@ Primary source files used:
 - `Stdlib/src/structures/ComplexBasics.sac`
 
 Naming rules:
+
 - One markdown file per hover symbol.
 - File name is the symbol name in lowercase where applicable, for example `shape.md`.
 - Content is rendered directly by the hover provider.

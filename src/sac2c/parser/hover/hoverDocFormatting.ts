@@ -25,14 +25,7 @@ export interface HoverFormattingOptions {
   signature?: string | null;
 }
 
-const STRUCTURED_SECTION_ORDER = [
-  "description",
-  "parameters",
-  "returns",
-  "return",
-  "example",
-  "examples",
-] as const;
+const STRUCTURED_SECTION_ORDER = ["description", "parameters", "returns", "return", "example", "examples"] as const;
 
 function addSectionBlock(blocks: string[], title: string, bodyLines: string[]): void {
   const trimmed = trimBlankEdges(bodyLines);
@@ -51,13 +44,9 @@ export function formatHoverDocumentationMarkdown(markdown: string, options: Hove
   const signatureLine = options.signature?.trim() || extractedSignatureLine;
 
   const descriptionSection = sections.get("description");
-  const descriptionLines = descriptionSection
-    ? descriptionSection.lines
-    : preamble;
+  const descriptionLines = descriptionSection ? descriptionSection.lines : preamble;
 
-  const hasStructuredContent = Boolean(signatureLine)
-    || headingCount > 0
-    || trimBlankEdges(descriptionLines).length > 0;
+  const hasStructuredContent = Boolean(signatureLine) || headingCount > 0 || trimBlankEdges(descriptionLines).length > 0;
   if (!hasStructuredContent) {
     return markdown;
   }

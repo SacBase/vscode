@@ -10,46 +10,31 @@
       }
     },
     {
-      "scope": [
-        "comment",
-        "punctuation.definition.comment"
-      ],
+      "scope": ["comment", "punctuation.definition.comment"],
       "settings": {
         "foreground": "#6B7C59"
       }
     },
     {
-      "scope": [
-        "string",
-        "punctuation.definition.string"
-      ],
+      "scope": ["string", "punctuation.definition.string"],
       "settings": {
         "foreground": "#C3FF99"
       }
     },
     {
-      "scope": [
-        "constant.numeric",
-        "constant.language"
-      ],
+      "scope": ["constant.numeric", "constant.language"],
       "settings": {
         "foreground": "#E4FF88"
       }
     },
     {
-      "scope": [
-        "keyword",
-        "storage"
-      ],
+      "scope": ["keyword", "storage"],
       "settings": {
         "foreground": "#BBFF00"
       }
     },
     {
-      "scope": [
-        "entity.name.function",
-        "support.function"
-      ],
+      "scope": ["entity.name.function", "support.function"],
       "settings": {
         "foreground": "#EAFF99"
       }
@@ -68,10 +53,7 @@
       }
     },
     {
-      "scope": [
-        "entity.name.type",
-        "support.type"
-      ],
+      "scope": ["entity.name.type", "support.type"],
       "settings": {
         "foreground": "#CCFF66"
       }
@@ -183,11 +165,7 @@
       }
     },
     {
-      "scope": [
-        "punctuation.section.brackets.begin.sac",
-        "punctuation.section.brackets.end.sac",
-        "punctuation.separator.comma.sac"
-      ],
+      "scope": ["punctuation.section.brackets.begin.sac", "punctuation.section.brackets.end.sac", "punctuation.separator.comma.sac"],
       "settings": {
         "foreground": "#D9FF88"
       }

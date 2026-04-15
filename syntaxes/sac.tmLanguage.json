@@ -1,368 +1,368 @@
 {
-	"$schema": "./sac.tmLanguage.schema.json",
-	"name": "SaC",
-	"scopeName": "source.sac",
-	"description": [
-		"Syntax highlighting for SaC (Single Assignment C)",
-		"We reuse the C syntax highlighting for most of the code, and add some additional keywords specific to SaC.",
-		"Schema was fetched with: curl -L -o sac.tmLanguage.schema.json https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json"
-	],
-	"patterns": [
-		{
-			"include": "#sac-module-imports"
-		},
-		{
-			"include": "#sac-types"
-		},
-		{
-			"include": "#sac-keywords"
-		},
-		{
-			"include": "#sac-pragmas"
-		},
-		{
-			"include": "#sac-type-patterns"
-		},
-		{
-			"include": "#sac-stdlib-functions"
-		},
-		{
-			"include": "#sac-shape-guards"
-		},
-		{
-			"include": "#sac-functions"
-		},
-		{
-			"include": "source.c"
-		}
-	],
-	"injections": {
-		"L:meta.parens.c - comment - string": {
-			"patterns": [
-				{
-					"include": "#sac-types"
-				},
-				{
-					"include": "#sac-shapes-in-calls"
-				}
-			]
-		},
-		"L:meta.function.definition.parameters.c - comment - string": {
-			"patterns": [
-				{
-					"include": "#sac-types"
-				},
-				{
-					"include": "#sac-shapes-in-calls"
-				}
-			]
-		},
-		"L:meta.function.parameters.c - comment - string": {
-			"patterns": [
-				{
-					"include": "#sac-types"
-				},
-				{
-					"include": "#sac-shapes-in-calls"
-				}
-			]
-		},
-		"L:source.sac - comment - string": {
-			"patterns": [
-				{
-					"include": "#sac-module-imports"
-				},
-				{
-					"include": "#sac-types"
-				},
-				{
-					"include": "#sac-keywords"
-				},
-				{
-					"include": "#sac-pragmas"
-				},
-				{
-					"include": "#sac-type-patterns"
-				},
-				{
-					"include": "#sac-stdlib-functions"
-				},
-				{
-					"include": "#sac-shape-guards"
-				},
-				{
-					"include": "#sac-functions"
-				},
-				{
-					"include": "#sac-shape-function-calls"
-				}
-			]
-		}
-	},
-	"repository": {
-		"sac-module-imports": {
-			"patterns": [
-				{
-					"begin": "\\b(use|import)\\b",
-					"beginCaptures": {
-						"1": {
-							"name": "keyword.control.import.sac"
-						}
-					},
-					"end": ";",
-					"patterns": [
-						{
-							"name": "keyword.control.import.all.sac",
-							"match": "\\ball\\b"
-						},
-						{
-							"name": "keyword.control.import.except.sac",
-							"match": "\\bexcept\\b"
-						},
-						{
-							"name": "entity.name.module.sac",
-							"match": "[a-zA-Z_]\\w*(?:::[a-zA-Z_]\\w*)?"
-						},
-						{
-							"name": "keyword.operator.set.sac",
-							"match": "[{}:]"
-						}
-					]
-				}
-			]
-		},
-		"sac-stdlib-functions": {
-			"patterns": [
-				{
-					"name": "support.function.builtin.sac",
-					"match": "\\b(_[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*_)\\b(?=\\s*\\()"
-				},
-				{
-					"name": "support.function.stdlib.sac",
-					"match": "\\b(shape|reshape|sel|take|drop|cat|dim|size|all|min|max|print|transpose|zero|toi|tof|toc|tob|tos|toui|toul|toull|toub|tous|genarray|modarray|fold|foldfix|propagate)\\b(?=\\s*\\()"
-				}
-			]
-		},
-		"sac-types": {
-			"patterns": [
-				{
-					"match": "\\b(int|bool|char|float|double)\\b",
-					"name": "storage.type.sac"
-				}
-			]
-		},
-		"sac-type-patterns": {
-			"patterns": [
-				{
-					"begin": "(int|bool|char|float|double)\\s*\\[",
-					"beginCaptures": {
-						"0": {
-							"name": "punctuation.section.brackets.begin.sac"
-						},
-						"1": {
-							"name": "storage.type.sac"
-						}
-					},
-					"end": "\\]",
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.section.brackets.end.sac"
-						}
-					},
-					"patterns": [
-						{
-							"name": "variable.parameter.shape.sac",
-							"match": "[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?"
-						},
-						{
-							"name": "keyword.operator.shape.separator.sac",
-							"match": "[:,]"
-						}
-					]
-				}
-			]
-		},
-		"sac-shapes-anywhere": {
-			"patterns": [
-				{
-					"begin": "\\[",
-					"beginCaptures": {
-						"0": {
-							"name": "punctuation.section.brackets.begin.sac"
-						}
-					},
-					"end": "\\]",
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.section.brackets.end.sac"
-						}
-					},
-					"patterns": [
-						{
-							"name": "variable.parameter.shape.sac",
-							"match": "(?:\\.|[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?)"
-						},
-						{
-							"name": "keyword.operator.shape.separator.sac",
-							"match": "[:,]"
-						}
-					]
-				}
-			]
-		},
-		"sac-keywords": {
-			"patterns": [
-				{
-					"name": "keyword.control.sac",
-					"match": "\\b(if|else|while|do|for|return|typedef|classtype|class|objdef|external|struct|step|width)\\b"
-				}
-			]
-		},
-		"sac-pragmas": {
-			"patterns": [
-				{
-					"name": "keyword.control.directive.pragma.sac",
-					"match": "#\\s*pragma\\s+(linkobj|linksign|header|linkname|sacarg|effect|ctype|gpumem)\\b"
-				}
-			]
-		},
-		"sac-functions": {
-			"patterns": [
-				{
-					"begin": "\\b(int|bool|char|float|double)\\b",
-					"beginCaptures": {
-						"1": {
-							"name": "storage.type.sac"
-						}
-					},
-					"end": "(?=\\{)",
-					"patterns": [
-						{
-							"begin": "\\[",
-							"beginCaptures": {
-								"0": {
-									"name": "punctuation.section.brackets.begin.sac"
-								}
-							},
-							"end": "\\]",
-							"endCaptures": {
-								"0": {
-									"name": "punctuation.section.brackets.end.sac"
-								}
-							},
-							"patterns": [
-								{
-									"name": "variable.parameter.shape.sac",
-									"match": "[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?"
-								},
-								{
-									"name": "keyword.operator.shape.separator.sac",
-									"match": "[:,]"
-								}
-							]
-						},
-						{
-							"name": "entity.name.function.sac",
-							"match": "[a-zA-Z_]\\w*(?=\\s*\\()"
-						}
-					]
-				},
-				{
-					"begin": "\\b[A-Za-z_]\\w*(?:\\s*\\[[^\\]]*\\])*\\s+([A-Za-z_]\\w*)(?=\\s*\\()",
-					"beginCaptures": {
-						"1": {
-							"name": "entity.name.function.sac"
-						}
-					},
-					"end": "(?=\\{)"
-				}
-			]
-		},
-		"sac-shape-guards": {
-			"patterns": [
-				{
-					"name": "keyword.operator.guard.sac",
-					"match": "\\|"
-				}
-			]
-		},
-		"sac-shapes-in-calls": {
-			"patterns": [
-				{
-					"begin": "\\[",
-					"beginCaptures": {
-						"0": {
-							"name": "punctuation.section.brackets.begin.sac"
-						}
-					},
-					"end": "\\]",
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.section.brackets.end.sac"
-						}
-					},
-					"patterns": [
-						{
-							"name": "variable.parameter.shape.sac",
-							"match": "(?:\\.|[*+]|[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?)"
-						},
-						{
-							"name": "keyword.operator.shape.separator.sac",
-							"match": "[,:]"
-						},
-						{
-							"name": "constant.numeric",
-							"match": "\\d+"
-						}
-					]
-				}
-			]
-		},
-		"sac-shapes-in-blocks": {
-			"patterns": [
-				{
-					"begin": "\\[",
-					"beginCaptures": {
-						"0": {
-							"name": "punctuation.section.brackets.begin.sac"
-						}
-					},
-					"end": "\\]",
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.section.brackets.end.sac"
-						}
-					},
-					"patterns": [
-						{
-							"name": "variable.parameter.shape.sac",
-							"match": "(?:\\.|[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?)"
-						},
-						{
-							"name": "keyword.operator.shape.separator.sac",
-							"match": "[:,]"
-						}
-					]
-				}
-			]
-		},
-		"sac-shape-function-calls": {
-			"patterns": [
-				{
-					"begin": "\\b(genarray|modarray|sel|reshape|shape)\\s*\\(",
-					"beginCaptures": {
-						"1": {
-							"name": "support.function.stdlib.sac"
-						}
-					},
-					"end": "\\)",
-					"patterns": [
-						{
-							"include": "#sac-shapes-in-calls"
-						}
-					]
-				}
-			]
-		}
-	}
+  "$schema": "./sac.tmLanguage.schema.json",
+  "name": "SaC",
+  "scopeName": "source.sac",
+  "description": [
+    "Syntax highlighting for SaC (Single Assignment C)",
+    "We reuse the C syntax highlighting for most of the code, and add some additional keywords specific to SaC.",
+    "Schema was fetched with: curl -L -o sac.tmLanguage.schema.json https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json"
+  ],
+  "patterns": [
+    {
+      "include": "#sac-module-imports"
+    },
+    {
+      "include": "#sac-types"
+    },
+    {
+      "include": "#sac-keywords"
+    },
+    {
+      "include": "#sac-pragmas"
+    },
+    {
+      "include": "#sac-type-patterns"
+    },
+    {
+      "include": "#sac-stdlib-functions"
+    },
+    {
+      "include": "#sac-shape-guards"
+    },
+    {
+      "include": "#sac-functions"
+    },
+    {
+      "include": "source.c"
+    }
+  ],
+  "injections": {
+    "L:meta.parens.c - comment - string": {
+      "patterns": [
+        {
+          "include": "#sac-types"
+        },
+        {
+          "include": "#sac-shapes-in-calls"
+        }
+      ]
+    },
+    "L:meta.function.definition.parameters.c - comment - string": {
+      "patterns": [
+        {
+          "include": "#sac-types"
+        },
+        {
+          "include": "#sac-shapes-in-calls"
+        }
+      ]
+    },
+    "L:meta.function.parameters.c - comment - string": {
+      "patterns": [
+        {
+          "include": "#sac-types"
+        },
+        {
+          "include": "#sac-shapes-in-calls"
+        }
+      ]
+    },
+    "L:source.sac - comment - string": {
+      "patterns": [
+        {
+          "include": "#sac-module-imports"
+        },
+        {
+          "include": "#sac-types"
+        },
+        {
+          "include": "#sac-keywords"
+        },
+        {
+          "include": "#sac-pragmas"
+        },
+        {
+          "include": "#sac-type-patterns"
+        },
+        {
+          "include": "#sac-stdlib-functions"
+        },
+        {
+          "include": "#sac-shape-guards"
+        },
+        {
+          "include": "#sac-functions"
+        },
+        {
+          "include": "#sac-shape-function-calls"
+        }
+      ]
+    }
+  },
+  "repository": {
+    "sac-module-imports": {
+      "patterns": [
+        {
+          "begin": "\\b(use|import)\\b",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.control.import.sac"
+            }
+          },
+          "end": ";",
+          "patterns": [
+            {
+              "name": "keyword.control.import.all.sac",
+              "match": "\\ball\\b"
+            },
+            {
+              "name": "keyword.control.import.except.sac",
+              "match": "\\bexcept\\b"
+            },
+            {
+              "name": "entity.name.module.sac",
+              "match": "[a-zA-Z_]\\w*(?:::[a-zA-Z_]\\w*)?"
+            },
+            {
+              "name": "keyword.operator.set.sac",
+              "match": "[{}:]"
+            }
+          ]
+        }
+      ]
+    },
+    "sac-stdlib-functions": {
+      "patterns": [
+        {
+          "name": "support.function.builtin.sac",
+          "match": "\\b(_[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*_)\\b(?=\\s*\\()"
+        },
+        {
+          "name": "support.function.stdlib.sac",
+          "match": "\\b(shape|reshape|sel|take|drop|cat|dim|size|all|min|max|print|transpose|zero|toi|tof|toc|tob|tos|toui|toul|toull|toub|tous|genarray|modarray|fold|foldfix|propagate)\\b(?=\\s*\\()"
+        }
+      ]
+    },
+    "sac-types": {
+      "patterns": [
+        {
+          "match": "\\b(int|bool|char|float|double)\\b",
+          "name": "storage.type.sac"
+        }
+      ]
+    },
+    "sac-type-patterns": {
+      "patterns": [
+        {
+          "begin": "(int|bool|char|float|double)\\s*\\[",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.begin.sac"
+            },
+            "1": {
+              "name": "storage.type.sac"
+            }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.end.sac"
+            }
+          },
+          "patterns": [
+            {
+              "name": "variable.parameter.shape.sac",
+              "match": "[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?"
+            },
+            {
+              "name": "keyword.operator.shape.separator.sac",
+              "match": "[:,]"
+            }
+          ]
+        }
+      ]
+    },
+    "sac-shapes-anywhere": {
+      "patterns": [
+        {
+          "begin": "\\[",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.begin.sac"
+            }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.end.sac"
+            }
+          },
+          "patterns": [
+            {
+              "name": "variable.parameter.shape.sac",
+              "match": "(?:\\.|[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?)"
+            },
+            {
+              "name": "keyword.operator.shape.separator.sac",
+              "match": "[:,]"
+            }
+          ]
+        }
+      ]
+    },
+    "sac-keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.sac",
+          "match": "\\b(if|else|while|do|for|return|typedef|classtype|class|objdef|external|struct|step|width)\\b"
+        }
+      ]
+    },
+    "sac-pragmas": {
+      "patterns": [
+        {
+          "name": "keyword.control.directive.pragma.sac",
+          "match": "#\\s*pragma\\s+(linkobj|linksign|header|linkname|sacarg|effect|ctype|gpumem)\\b"
+        }
+      ]
+    },
+    "sac-functions": {
+      "patterns": [
+        {
+          "begin": "\\b(int|bool|char|float|double)\\b",
+          "beginCaptures": {
+            "1": {
+              "name": "storage.type.sac"
+            }
+          },
+          "end": "(?=\\{)",
+          "patterns": [
+            {
+              "begin": "\\[",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.section.brackets.begin.sac"
+                }
+              },
+              "end": "\\]",
+              "endCaptures": {
+                "0": {
+                  "name": "punctuation.section.brackets.end.sac"
+                }
+              },
+              "patterns": [
+                {
+                  "name": "variable.parameter.shape.sac",
+                  "match": "[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?"
+                },
+                {
+                  "name": "keyword.operator.shape.separator.sac",
+                  "match": "[:,]"
+                }
+              ]
+            },
+            {
+              "name": "entity.name.function.sac",
+              "match": "[a-zA-Z_]\\w*(?=\\s*\\()"
+            }
+          ]
+        },
+        {
+          "begin": "\\b[A-Za-z_]\\w*(?:\\s*\\[[^\\]]*\\])*\\s+([A-Za-z_]\\w*)(?=\\s*\\()",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.function.sac"
+            }
+          },
+          "end": "(?=\\{)"
+        }
+      ]
+    },
+    "sac-shape-guards": {
+      "patterns": [
+        {
+          "name": "keyword.operator.guard.sac",
+          "match": "\\|"
+        }
+      ]
+    },
+    "sac-shapes-in-calls": {
+      "patterns": [
+        {
+          "begin": "\\[",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.begin.sac"
+            }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.end.sac"
+            }
+          },
+          "patterns": [
+            {
+              "name": "variable.parameter.shape.sac",
+              "match": "(?:\\.|[*+]|[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?)"
+            },
+            {
+              "name": "keyword.operator.shape.separator.sac",
+              "match": "[,:]"
+            },
+            {
+              "name": "constant.numeric",
+              "match": "\\d+"
+            }
+          ]
+        }
+      ]
+    },
+    "sac-shapes-in-blocks": {
+      "patterns": [
+        {
+          "begin": "\\[",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.begin.sac"
+            }
+          },
+          "end": "\\]",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.section.brackets.end.sac"
+            }
+          },
+          "patterns": [
+            {
+              "name": "variable.parameter.shape.sac",
+              "match": "(?:\\.|[a-zA-Z_]\\w*(?::[a-zA-Z_]\\w*)?)"
+            },
+            {
+              "name": "keyword.operator.shape.separator.sac",
+              "match": "[:,]"
+            }
+          ]
+        }
+      ]
+    },
+    "sac-shape-function-calls": {
+      "patterns": [
+        {
+          "begin": "\\b(genarray|modarray|sel|reshape|shape)\\s*\\(",
+          "beginCaptures": {
+            "1": {
+              "name": "support.function.stdlib.sac"
+            }
+          },
+          "end": "\\)",
+          "patterns": [
+            {
+              "include": "#sac-shapes-in-calls"
+            }
+          ]
+        }
+      ]
+    }
+  }
 }

@@ -34,9 +34,7 @@ const STDLIB_FUNCTION_NAMES = [
   "propagate",
 ] as const;
 
-const STDLIB_TARGETS = new Map<string, HoverTarget>(
-  STDLIB_FUNCTION_NAMES.map((name) => [name, createHoverTarget(name, "stdlib")]),
-);
+const STDLIB_TARGETS = new Map<string, HoverTarget>(STDLIB_FUNCTION_NAMES.map((name) => [name, createHoverTarget(name, "stdlib")]));
 
 function createHoverTarget(name: string, kind: HoverTarget["kind"]): HoverTarget {
   if (kind === "builtin") {
@@ -146,11 +144,5 @@ export function lookupHoverTarget(lineText: string, column: number): HoverMatch 
  * Formats a hover target as markdown content.
  */
 export function formatHoverMarkdown(target: HoverTarget): string {
-  return [
-    `### \`${target.name}\``,
-    "",
-    target.summary,
-    "",
-    `Call form: \`${target.callForm}\``,
-  ].join("\n");
+  return [`### \`${target.name}\``, "", target.summary, "", `Call form: \`${target.callForm}\``].join("\n");
 }

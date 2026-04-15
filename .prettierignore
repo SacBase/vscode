@@ -1,0 +1,5 @@
+node_modules
+out
+vendor
+src/copilot/mcp/sac2c-mcp.js
+*.vsix

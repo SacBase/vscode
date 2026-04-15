@@ -23,10 +23,10 @@ export interface SacInvocation {
 export function isLikelyMessagingFlagFailure(stderrText: string): boolean {
   const text = (stderrText || "").toLowerCase();
   return (
-    text.includes("unknown option")
-    || text.includes("unknown argument")
-    || text.includes("invalid option")
-    || text.includes("unrecognized option")
+    text.includes("unknown option") ||
+    text.includes("unknown argument") ||
+    text.includes("invalid option") ||
+    text.includes("unrecognized option")
   );
 }
 
@@ -156,10 +156,7 @@ export function createInvocation(
 /**
  * Resolves runtime config for navigation/hover compiler adapters.
  */
-export function getCompilerNavigationRuntime(
-  settings: SacSettings,
-  workspaceRoot: string,
-): CompilerNavigationRuntimeConfig {
+export function getCompilerNavigationRuntime(settings: SacSettings, workspaceRoot: string): CompilerNavigationRuntimeConfig {
   if (settings.executionBackend !== "local") {
     return {
       executable: null,

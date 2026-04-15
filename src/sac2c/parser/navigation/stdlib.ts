@@ -2,11 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { pathToFileURL } from "url";
 
-import {
-  FUNCTION_CALL_PATTERN,
-  FUNCTION_DEFINITION_CAPTURE_PATTERN,
-  MODULE_DECLARATION_CAPTURE_PATTERN,
-} from "$constants/regex";
+import { FUNCTION_CALL_PATTERN, FUNCTION_DEFINITION_CAPTURE_PATTERN, MODULE_DECLARATION_CAPTURE_PATTERN } from "$constants/regex";
 import { collectSacFiles } from "$util/documentUtils";
 import { cloneRegex } from "$util/regex";
 import { offsetToLineAndCharacter } from "$util/sourceFile";

@@ -20,9 +20,7 @@ export interface ProvideDefinitionContext {
 /**
  * Provides a baseline go-to-definition implementation.
  */
-export async function provideDefinition(
-  context: ProvideDefinitionContext,
-): Promise<Definition | null> {
+export async function provideDefinition(context: ProvideDefinitionContext): Promise<Definition | null> {
   const symbol = getSymbolAtPosition(context.document, context.position);
   if (!symbol) {
     return null;

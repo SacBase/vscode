@@ -155,9 +155,7 @@ async function handleToolsCall(params: ToolCallParams): Promise<unknown> {
     }
 
     const executable = resolveExecutable(args.executable);
-    const cwd = typeof args.cwd === "string" && args.cwd.trim().length > 0
-      ? path.resolve(args.cwd)
-      : process.cwd();
+    const cwd = typeof args.cwd === "string" && args.cwd.trim().length > 0 ? path.resolve(args.cwd) : process.cwd();
     const filePath = path.isAbsolute(args.file) ? args.file : path.resolve(cwd, args.file);
     const defaultArgs = parseDefaultArgs();
     const userArgs = asArrayOfStrings(args.args);

@@ -1,16 +1,7 @@
-import {
-  SAC_CONFIG_SECTION,
-  SAC_FILE_GLOB,
-  SAC_LANGUAGE_ID,
-  SAC_URI_FILE_SCHEME,
-} from "$constants/language";
+import { SAC_CONFIG_SECTION, SAC_FILE_GLOB, SAC_LANGUAGE_ID, SAC_URI_FILE_SCHEME } from "$constants/language";
 import * as path from "path";
 import * as vscode from "vscode";
-import {
-  LanguageClient,
-  Trace,
-  TransportKind,
-} from "vscode-languageclient/node";
+import { LanguageClient, Trace, TransportKind } from "vscode-languageclient/node";
 
 interface FeatureLifecycle {
   /**
@@ -42,7 +33,7 @@ function toClientTraceLevel(value: string): Trace {
 export class LanguageClientFeature implements FeatureLifecycle {
   private client: LanguageClient | undefined;
 
-  constructor(private readonly context: vscode.ExtensionContext) { }
+  constructor(private readonly context: vscode.ExtensionContext) {}
 
   /**
    * Starts SaC language client when feature is enabled.
@@ -80,12 +71,7 @@ export class LanguageClientFeature implements FeatureLifecycle {
       },
     };
 
-    this.client = new LanguageClient(
-      "sacLanguageServer",
-      "SaC Language Server",
-      serverOptions,
-      clientOptions,
-    );
+    this.client = new LanguageClient("sacLanguageServer", "SaC Language Server", serverOptions, clientOptions);
 
     try {
       await this.client.start();

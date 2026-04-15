@@ -10,12 +10,7 @@ import {
   parseSacCompilerOutput,
   renderCoreDiagnostics,
 } from "$sac2c/diagnostics";
-import {
-  DiagnosticGroup,
-  DiagnosticsPresentationSettings,
-  ParsedDiagnostic,
-  RenderedDiagnostic,
-} from "$server/diagnostics/types";
+import { DiagnosticGroup, DiagnosticsPresentationSettings, ParsedDiagnostic, RenderedDiagnostic } from "$server/diagnostics/types";
 
 function toLspSeverity(severity: CoreDiagnosticSeverity): DiagnosticSeverity {
   if (severity === "warning") {
@@ -127,12 +122,7 @@ export function presentDiagnostics(
     maxStackFrames: settings.maxStackFrames,
   };
 
-  const rendered = renderCoreDiagnostics(
-    parsed.map(toCoreParsedDiagnostic),
-    toCoreGroups(groups),
-    requestedFilePath,
-    coreSettings,
-  );
+  const rendered = renderCoreDiagnostics(parsed.map(toCoreParsedDiagnostic), toCoreGroups(groups), requestedFilePath, coreSettings);
 
   const serverRendered = fromCoreRendered(rendered);
   if (!settings.includeRelatedInformation) {
