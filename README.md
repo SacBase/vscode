@@ -110,6 +110,7 @@ If you are on Windows and do not have a native `sac2c` binary, recommended optio
 
 - Diagnostics pipeline: `docs/diagnostics-pipeline.md`
 - Editor-agnostic diagnostics notes: `docs/editor-agnostic-diagnostics.md`
+- Copilot plugin and AI extension integration: `docs/copilot-plugin.md`
 - Support: `SUPPORT.md`
 - Contributing: `CONTRIBUTING.md`
 

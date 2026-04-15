@@ -35,15 +35,19 @@
     "Themes"
   ],
   "main": "./out/extension.js",
+  "activationEvents": [
+    "onChatParticipant:sac-language-support.sac"
+  ],
   "engines": {
     "vscode": "^1.115.0"
   },
   "scripts": {
     "vscode:prepublish": "npm run bundle",
     "clean:out": "node -e \"require('fs').rmSync('out', { recursive: true, force: true })\"",
+    "build:copilot:mcp": "esbuild src/copilot/mcp/sac2c-mcp.ts --bundle --platform=node --target=node20 --format=cjs --outfile=src/copilot/mcp/sac2c-mcp.js",
     "bundle": "npm run clean:out && esbuild src/extension.ts src/server/server.ts --bundle --platform=node --target=node20 --format=cjs --outdir=out --outbase=src --sourcemap --external:vscode --tsconfig=tsconfig.json",
-    "compile": "tsc -p ./ && tsc-alias -p tsconfig.json",
-    "watch": "concurrently -k \"tsc -watch -p ./\" \"tsc-alias -p tsconfig.json -w\"",
+    "compile": "tsc -p ./ && tsc-alias -p tsconfig.json && npm run build:copilot:mcp",
+    "watch": "concurrently -k \"tsc -watch -p ./\" \"tsc-alias -p tsconfig.json -w\" \"esbuild src/copilot/mcp/sac2c-mcp.ts --bundle --platform=node --target=node20 --format=cjs --outfile=src/copilot/mcp/sac2c-mcp.js --watch\"",
     "package": "vsce package"
   },
   "devDependencies": {
@@ -127,6 +131,80 @@
         "label": "SaC Vibrant",
         "uiTheme": "vs-dark",
         "path": "./themes/sac-color-theme-vibrant.json"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "sac-language-support.sac",
+        "name": "sac",
+        "fullName": "SaC Assistant",
+        "description": "Ask for SaC diagnostics, formatting, and overloading guidance",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "sac-diagnose",
+            "description": "Explain SaC compiler diagnostics and next fixes"
+          },
+          {
+            "name": "sac-format",
+            "description": "Apply SaC formatting conventions"
+          },
+          {
+            "name": "sac-overload",
+            "description": "Design or review SaC overload changes"
+          }
+        ]
+      }
+    ],
+    "chatInstructions": [
+      {
+        "path": "./src/copilot/instructions/sac-formatting.instructions.md"
+      }
+    ],
+    "chatPromptFiles": [
+      {
+        "path": "./src/copilot/prompts/sac.prompt.md"
+      }
+    ],
+    "chatSkills": [
+      {
+        "path": "./src/copilot/skills/sac2c-build-assistant/SKILL.md"
+      },
+      {
+        "path": "./src/copilot/skills/sac-style-guide/SKILL.md"
+      },
+      {
+        "path": "./src/copilot/skills/sac-overloading-guide/SKILL.md"
+      },
+      {
+        "path": "./src/copilot/skills/sac-diagnostics-playbook/SKILL.md"
+      }
+    ],
+    "chatAgents": [
+      {
+        "path": "./src/copilot/agents/sac-compiler/AGENT.md"
+      }
+    ],
+    "languageModelChatProviders": [
+      {
+        "id": "sac-language-support.sac2c-local",
+        "displayName": "SaC Compiler (Local)",
+        "vendor": "SacBase",
+        "description": "Local sac2c compiler invocation via MCP",
+        "features": [
+          "sac-language-support.sac"
+        ]
+      }
+    ],
+    "mcpServers": [
+      {
+        "id": "sac2c-local",
+        "displayName": "SaC Compiler MCP",
+        "command": "node",
+        "args": [
+          "./src/copilot/mcp/sac2c-mcp.js"
+        ],
+        "description": "MCP server for local sac2c compiler invocation"
       }
     ],
     "configuration": {
