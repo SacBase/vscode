@@ -134,8 +134,8 @@
       "",
       "provide all;",
       "",
-      "import Array : all;",
-      "import StdIO : all;",
+      "use Array : all;",
+      "use StdIO : all;",
       "",
       "${0}"
     ],
@@ -150,20 +150,5 @@
       "${0}"
     ],
     "description": "Declaration for calling external C functions."
-  },
-  "SaC Class Template": {
-    "prefix": "sac_class",
-    "body": [
-      "class ${1:ClassName};",
-      "",
-      "classtype ${2:int};",
-      "",
-      "export all;",
-      "",
-      "objdef ${1:ClassName} ${3:instance} = ${4:constructor}();",
-      "",
-      "${0}"
-    ],
-    "description": "Template for SaC classes and global objects."
   }
 }
