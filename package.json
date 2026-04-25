@@ -147,6 +147,26 @@
         "path": "./themes/sac-color-theme-vibrant.json"
       }
     ],
+    "commands": [
+      {
+        "command": "sac.runActiveFile",
+        "title": "SaC: Run Active File (sac2c)",
+        "category": "SaC"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "sac.runActiveFile",
+        "key": "f5",
+        "when": "editorTextFocus && editorLangId == sac"
+      },
+      {
+        "command": "sac.runActiveFile",
+        "key": "ctrl+f5",
+        "mac": "cmd+f5",
+        "when": "editorTextFocus && editorLangId == sac"
+      }
+    ],
     "chatParticipants": [
       {
         "id": "sac-language-support.sac",
@@ -248,6 +268,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable local Outline symbol provider for SaC files."
+        },
+        "sac.features.commands.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable SaC command feature module registration."
         },
         "sac.format.enable": {
           "type": "boolean",

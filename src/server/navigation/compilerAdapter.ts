@@ -1,13 +1,13 @@
 import { fileURLToPath, pathToFileURL } from "url";
 
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { Location, Position } from "vscode-languageserver/node";
+import type { TextDocument } from "vscode-languageserver-textdocument";
+import type { Location, Position } from "vscode-languageserver/node";
 
 import { parseNavigationIndex } from "$sac2c/parser/navigation/parser";
 import { resolveDefinitionFromIndex, resolveHoverFromIndex } from "$sac2c/parser/navigation/query";
 
 import { buildNavArgs, runCompilerCommand } from "$server/navigation/compilerCommand";
-import { CompilerNavigationRuntimeConfig, HoverDebugLogger, SacDefinitionQueryResult, SacHoverQueryResult } from "$server/navigation/types";
+import type { CompilerNavigationRuntimeConfig, HoverDebugLogger, SacDefinitionQueryResult, SacHoverQueryResult } from "$server/navigation/types";
 
 const NAV_DEBUG_ENABLED = process.env.SAC_NAV_DEBUG === "1";
 

@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
 
-import { Position } from "vscode-languageserver/node";
+import type { Position } from "vscode-languageserver/node";
 
 /**
  * Executes compiler command safely and returns captured stdout.

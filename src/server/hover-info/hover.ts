@@ -1,10 +1,11 @@
 import { fileURLToPath } from "url";
 
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { Hover, MarkupContent, MarkupKind, Position, Range } from "vscode-languageserver/node";
+import { type TextDocument } from "vscode-languageserver-textdocument";
+import { type Hover, type MarkupContent, MarkupKind, type Position, type Range } from "vscode-languageserver/node";
 
-import { formatHoverMarkdown, lookupHoverTarget } from "$sac2c/parser/hover";
-import { HoverTarget } from "$sac2c/parser/hover/types";
+import { BUILTIN_SYMBOL_NAME_PATTERN, IDENTIFIER_NAME_PATTERN } from "$constants/regex";
+import { formatHoverMarkdown, lookupHoverTarget } from "$sac2c/parser/hover-info";
+import type { HoverTarget } from "$sac2c/parser/hover-info/types";
 import {
   extractDefinitionSignatureFromText,
   findFunctionCallAtPosition,
@@ -13,10 +14,9 @@ import {
   readDefinitionDocComment,
   readDefinitionSignature,
 } from "$sac2c/parser/navigation/sourceDocs";
-import { BUILTIN_SYMBOL_NAME_PATTERN, IDENTIFIER_NAME_PATTERN } from "$constants/regex";
-import { queryCompilerHover } from "$server/navigation/compilerAdapter";
-import { CompilerNavigationRuntimeConfig, HoverDebugLogger } from "$server/navigation/types";
 import { formatHoverDocumentationMarkdown, resolveHoverDocumentation } from "$server/hover-info/hoverDocs";
+import { queryCompilerHover } from "$server/navigation/compilerAdapter";
+import type { CompilerNavigationRuntimeConfig, HoverDebugLogger } from "$server/navigation/types";
 
 const HOVER_DEBUG_ENABLED = process.env.SAC_NAV_DEBUG === "1";
 

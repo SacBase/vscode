@@ -1,22 +1,25 @@
 import { TextDocument } from "vscode-languageserver-textdocument";
-import {
-  createConnection,
+import type {
   Definition,
   DefinitionParams,
   Hover,
   HoverParams,
+  TextDocumentPositionParams
+} from "vscode-languageserver/node";
+import {
+  createConnection,
   ProposedFeatures,
-  TextDocumentPositionParams,
   TextDocuments,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
 
-import { uriToFsPath } from "$util/documentUtils";
 import { getCompilerNavigationRuntime } from "$server/compilerRuntime";
 import { createDiagnosticsWorkflow } from "$server/diagnosticsWorkflow";
 import { provideHover } from "$server/hover-info/hover";
 import { provideDefinition } from "$server/navigation/provider";
-import { getDefaultSettings, SacSettings, updateSettings } from "$server/settings";
+import type { SacSettings } from "$server/settings";
+import { getDefaultSettings, updateSettings } from "$server/settings";
+import { uriToFsPath } from "$util/documentUtils";
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);

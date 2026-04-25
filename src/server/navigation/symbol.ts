@@ -1,8 +1,8 @@
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { Position } from "vscode-languageserver/node";
 import { SYMBOL_CHAR_PATTERN, SYMBOL_START_CHAR_PATTERN } from "$constants/regex";
+import type { TextDocument } from "vscode-languageserver-textdocument";
+import type { Position } from "vscode-languageserver/node";
 
-import { SacSymbolOccurrence } from "$server/navigation/types";
+import type { SacSymbolOccurrence } from "$server/navigation/types";
 
 function getLineText(document: TextDocument, line: number): string | null {
   const lines = document.getText().split(/\r?\n/);

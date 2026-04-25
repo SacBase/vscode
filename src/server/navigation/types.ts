@@ -1,4 +1,4 @@
-import { Location } from "vscode-languageserver/node";
+import type { Location } from "vscode-languageserver/node";
 
 export interface SacSymbolOccurrence {
   name: string;

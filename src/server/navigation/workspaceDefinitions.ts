@@ -5,10 +5,10 @@ import { offsetToLineAndCharacter } from "$util/sourceFile";
 import * as fs from "fs";
 import * as path from "path";
 import { pathToFileURL } from "url";
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { Location } from "vscode-languageserver/node";
+import type { TextDocument } from "vscode-languageserver-textdocument";
+import type { Location } from "vscode-languageserver/node";
 
-import { SacDefinitionEntry } from "$server/navigation/types";
+import type { SacDefinitionEntry } from "$server/navigation/types";
 
 function getTextByUri(openDocuments: TextDocument[]): Map<string, string> {
   const result = new Map<string, string>();

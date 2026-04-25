@@ -1,15 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { Connection, Diagnostic, TextDocuments } from "vscode-languageserver/node";
+import type { TextDocument } from "vscode-languageserver-textdocument";
+import type { Connection, Diagnostic, TextDocuments } from "vscode-languageserver/node";
 
-import { collectSacFiles, createDocumentFromFile, isFileDocument, normalizePathForCompare, uriToFsPath } from "$util/documentUtils";
-import { createInvocation, isLikelyMessagingFlagFailure, runSac2c, SacCompilerRunResult } from "$server/compilerRuntime";
+import { createInvocation, isLikelyMessagingFlagFailure, runSac2c, type SacCompilerRunResult } from "$server/compilerRuntime";
 import { groupDiagnostics, parseCompilerOutput, presentDiagnostics } from "$server/diagnostics/adapter";
 import { buildDiagnosticWithRange } from "$server/diagnostics/range";
 import { buildRelatedInformation } from "$server/diagnostics/relatedInfo";
-import { SacSettings } from "$server/settings";
+import type { SacSettings } from "$server/settings";
+import { collectSacFiles, createDocumentFromFile, isFileDocument, normalizePathForCompare, uriToFsPath } from "$util/documentUtils";
 
 interface DiagnosticsWorkflowDeps {
   connection: Connection;

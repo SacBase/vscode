@@ -1,6 +1,7 @@
 import type * as vscode from "vscode";
 
 import { ChatParticipantFeature } from "$extension/features/chatParticipantFeature";
+import { CommandFeature } from "$extension/features/commandFeature";
 import { FormattingFeature } from "$extension/features/formattingFeature";
 import { type FeatureLifecycle, LanguageClientFeature } from "$extension/features/languageClientFeature";
 import { OutlineFeature } from "$extension/features/outlineFeature";
@@ -14,6 +15,7 @@ export interface ExtensionFeatureController {
  */
 export async function registerExtensionFeatures(context: vscode.ExtensionContext): Promise<ExtensionFeatureController> {
   const features: FeatureLifecycle[] = [
+    new CommandFeature(),
     new ChatParticipantFeature(),
     new FormattingFeature(),
     new OutlineFeature(),
