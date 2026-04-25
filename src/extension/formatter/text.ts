@@ -146,6 +146,7 @@ export function splitTopLevel(text: string, delimiter: string): string[] {
     const char = text[index];
     const next = index + 1 < text.length ? text[index + 1] : "";
 
+    // Handle escaped characters inside strings (e.g., \" or \\).
     if (char === "\\" && inString) {
       buffer += char;
       if (next.length > 0) {
@@ -155,12 +156,14 @@ export function splitTopLevel(text: string, delimiter: string): string[] {
       continue;
     }
 
+    // Toggle string state on unescaped quote.
     if (char === '"') {
       inString = !inString;
       buffer += char;
       continue;
     }
 
+    // Track nesting depth of brackets, parens, and braces (only when outside strings).
     if (!inString) {
       if (char === "(") {
         parenDepth += 1;
@@ -176,6 +179,7 @@ export function splitTopLevel(text: string, delimiter: string): string[] {
         braceDepth = Math.max(0, braceDepth - 1);
       }
 
+      // Found a top-level delimiter: record it as a split point.
       if (char === delimiter && parenDepth === 0 && bracketDepth === 0 && braceDepth === 0) {
         parts.push(buffer.trim());
         buffer = "";
@@ -206,16 +210,19 @@ export function findTopLevelToken(text: string, token: string): number {
   for (let index = 0; index <= text.length - token.length; index += 1) {
     const char = text[index];
 
+    // Skip escaped chars in strings.
     if (char === "\\" && inString) {
       index += 1;
       continue;
     }
 
+    // Toggle string state.
     if (char === '"') {
       inString = !inString;
       continue;
     }
 
+    // Track nesting depth (only outside strings).
     if (!inString) {
       if (char === "(") {
         parenDepth += 1;
@@ -231,6 +238,7 @@ export function findTopLevelToken(text: string, token: string): number {
         braceDepth = Math.max(0, braceDepth - 1);
       }
 
+      // Match token only at top level (all depths zero).
       if (parenDepth === 0 && bracketDepth === 0 && braceDepth === 0 && text.slice(index, index + token.length) === token) {
         return index;
       }
@@ -258,11 +266,13 @@ export function findTopLevelGuardPipe(text: string, startIndex: number): number 
     const prev = index > 0 ? text[index - 1] : "";
     const next = index + 1 < text.length ? text[index + 1] : "";
 
+    // Skip escaped chars and string content.
     if (char === "\\" && inString) {
       index += 1;
       continue;
     }
 
+    // Toggle string state.
     if (char === '"') {
       inString = !inString;
       continue;
@@ -272,6 +282,7 @@ export function findTopLevelGuardPipe(text: string, startIndex: number): number 
       continue;
     }
 
+    // Track nesting depth for (), [], and {}.
     if (char === "(") {
       parenDepth += 1;
       continue;
@@ -297,6 +308,7 @@ export function findTopLevelGuardPipe(text: string, startIndex: number): number 
       continue;
     }
 
+    // Found single `|` at top level (not `||`).
     if (char === "|" && parenDepth === 0 && bracketDepth === 0 && braceDepth === 0 && prev !== "|" && next !== "|") {
       return index;
     }

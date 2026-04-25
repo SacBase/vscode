@@ -6,7 +6,7 @@ import { FUNCTION_CALL_PATTERN, FUNCTION_DEFINITION_CAPTURE_PATTERN, MODULE_DECL
 import { collectSacFiles } from "$util/documentUtils";
 import { cloneRegex } from "$util/regex";
 import { offsetToLineAndCharacter } from "$util/sourceFile";
-import { Location } from "vscode-languageserver/node";
+import type { Location } from "vscode-languageserver/node";
 
 function extractDefinitionsFromText(uri: string, sourceText: string): Location[] {
   const locations: Location[] = [];

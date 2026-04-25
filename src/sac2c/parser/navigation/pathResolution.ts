@@ -1,7 +1,7 @@
 import * as path from "path";
 import { fileURLToPath } from "url";
 
-import { NavigationBinding, NavigationIndex, NavigationRange, NavigationSymbol, NavigationToken } from "$sac2c/parser/navigation/types";
+import type { NavigationBinding, NavigationIndex, NavigationRange, NavigationSymbol, NavigationToken } from "$sac2c/parser/navigation/types";
 
 export function normalizeComparePath(filePath: string): string {
   const normalized = path.normalize(filePath);

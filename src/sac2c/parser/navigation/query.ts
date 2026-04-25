@@ -8,7 +8,7 @@ import {
   normalizeComparePath,
 } from "$sac2c/parser/navigation/pathResolution";
 import { formatSignature } from "$sac2c/parser/navigation/signatureFormatting";
-import { NavigationDefinitionHit, NavigationHoverHit, NavigationIndex } from "$sac2c/parser/navigation/types";
+import type { NavigationDefinitionHit, NavigationHoverHit, NavigationIndex } from "$sac2c/parser/navigation/types";
 
 /**
  * Resolves goto-definition target from navjson index for cursor position.

@@ -1,13 +1,13 @@
-import { splitTopLevel } from "$util/textSplit";
 import { ASSIGNMENT_PATTERN, IDENTIFIER_CHARS } from "$constants/regex";
 import { extractCallExpressionSource } from "$sac2c/parser/navigation/callExpression";
 import {
   getCandidateParameterShapes,
   getCandidateReturnShape,
   scoreShapeCompatibility,
-  ValueShape,
+  type ValueShape,
 } from "$sac2c/parser/navigation/shapeScoring";
-import { NavigationIndex, NavigationSymbol, NavigationToken } from "$sac2c/parser/navigation/types";
+import type { NavigationIndex, NavigationSymbol, NavigationToken } from "$sac2c/parser/navigation/types";
+import { splitTopLevel } from "$util/textSplit";
 
 function inferExpressionShape(
   expressionText: string,

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import { SAC_CONFIG_SECTION, SAC_LANGUAGE_ID, SAC_URI_FILE_SCHEME } from "$constants/language";
-import { FeatureLifecycle } from "$extension/features/languageClientFeature";
+import type { FeatureLifecycle } from "$extension/features/languageClientFeature";
 import { SacDocumentSymbolProvider } from "$extension/outline/documentSymbolProvider";
 
 /**

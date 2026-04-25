@@ -10,7 +10,7 @@ import {
   SAC_URI_FILE_SCHEME,
 } from "$constants/language";
 import { TRAILING_SINGLE_NEWLINE_PATTERN } from "$constants/regex";
-import { FeatureLifecycle } from "$extension/features/languageClientFeature";
+import type { FeatureLifecycle } from "$extension/features/languageClientFeature";
 import { formatSacSource } from "$extension/formatter/sacFormatter";
 import { preserveTrailingNewlines, splitNormalizedLines } from "$util/newlines";
 

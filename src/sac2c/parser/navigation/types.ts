@@ -19,6 +19,13 @@ export interface NavigationToken {
   range: NavigationRange;
   role: string;
   spelling?: string;
+  scopeId?: string;
+  stableKey?: string;
+  type?: {
+    typeShape?: {
+      typeRepr?: string;
+    };
+  };
   enclosingSymbolId?: string;
 }
 
@@ -27,12 +34,24 @@ export interface NavigationSymbol {
   kind: string;
   name: string;
   qualifiedName: string;
+  parentSymbolId?: string;
+  scopeId?: string;
   definitionTokenId: string;
   declarationTokenId?: string;
   moduleId: string;
   signatureIds?: string[];
   provenance: string;
   visibility?: string;
+  completionKind?: string;
+  score?: number;
+  canRename?: boolean;
+  immutable?: boolean;
+  type?: {
+    typeShape?: {
+      typeRepr?: string;
+    };
+  };
+  stableKey?: string;
 }
 
 export interface NavigationBinding {
@@ -41,6 +60,25 @@ export interface NavigationBinding {
   candidateSymbolIds: string[];
   selectedSymbolId?: string;
   reason?: string;
+}
+
+export interface NavigationReference {
+  symbolId: string;
+  tokenId: string;
+  role?: "read" | "write" | "call" | "import" | "type";
+  isDefinition?: boolean;
+  score?: number;
+}
+
+export interface NavigationSyntaxNode {
+  id: string;
+  fileId: string;
+  kind: string;
+  range: NavigationRange;
+  scopeId?: string;
+  symbolId?: string;
+  stableKey?: string;
+  parentId?: string;
 }
 
 export interface NavigationSignatureParameter {
@@ -70,6 +108,8 @@ export interface NavigationIndex {
   tokens: NavigationToken[];
   symbols: NavigationSymbol[];
   bindings: NavigationBinding[];
+  references?: NavigationReference[];
+  syntaxNodes?: NavigationSyntaxNode[];
   signatures?: NavigationSignatureEntry[];
 }
 

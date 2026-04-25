@@ -1,4 +1,4 @@
-import { NavigationSignatureEntry } from "$sac2c/parser/navigation/types";
+import type { NavigationSignatureEntry } from "$sac2c/parser/navigation/types";
 
 /**
  * Formats signature from structured signature payload.

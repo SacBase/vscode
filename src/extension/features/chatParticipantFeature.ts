@@ -1,12 +1,8 @@
 import * as vscode from "vscode";
 
-import { FeatureLifecycle } from "$extension/features/languageClientFeature";
+import type { FeatureLifecycle } from "$extension/features/languageClientFeature";
 
 const PARTICIPANT_ID = "sac-language-support.sac";
-
-type SacChatMetadata = {
-  command: string;
-};
 
 /**
  * Builds chat result metadata used by follow-up provider.

@@ -1,6 +1,7 @@
+import { BUILTIN_FUNCTION_CALL_PATTERN } from "$constants/regex";
+import type { HoverMatch, HoverTarget } from "$sac2c/parser/hover-info/types";
 import { escapeRegExp } from "$util/regex";
-import { BUILTIN_FUNCTION_CALL_PATTERN, FUNCTION_CALL_PATTERN } from "$constants/regex";
-import { HoverMatch, HoverTarget } from "$sac2c/hover/types";
+
 // This is an initial set of StdLib wrappers. Prefer maintaining full details via docs markdown files.
 const STDLIB_FUNCTION_NAMES = [
   "shape",
@@ -76,27 +77,6 @@ function lookupStdlib(lineText: string, column: number): HoverMatch | null {
 
       return { target, start, end };
     }
-  }
-
-  return null;
-}
-
-function lookupAnyCallIdentifier(lineText: string, column: number): HoverMatch | null {
-  const pattern = new RegExp(FUNCTION_CALL_PATTERN.source, FUNCTION_CALL_PATTERN.flags);
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(lineText)) !== null) {
-    const token = match[1];
-    const start = match.index;
-    const end = start + token.length;
-    if (!isColumnInsideMatch(column, start, end)) {
-      continue;
-    }
-
-    return {
-      target: createHoverTarget(token, "stdlib"),
-      start,
-      end,
-    };
   }
 
   return null;

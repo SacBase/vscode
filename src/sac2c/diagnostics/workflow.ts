@@ -1,16 +1,17 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { Connection, Diagnostic, TextDocuments } from "vscode-languageserver/node";
+import type { TextDocument } from "vscode-languageserver-textdocument";
+import type { Connection, Diagnostic, TextDocuments } from "vscode-languageserver/node";
 
-import { SacSettings } from "$extension/settings/settings";
-import { collectSacFiles, createDocumentFromFile, isFileDocument, normalizePathForCompare, uriToFsPath } from "$util/documentUtils";
+import type { SacSettings } from "$extension/settings/settings";
+import { createInvocation, isLikelyMessagingFlagFailure, runSac2c, type SacCompilerRunResult } from "$sac2c/runtime/compilerRuntime";
 import { groupDiagnostics, parseCompilerOutput, presentDiagnostics } from "$server/diagnostics/adapter";
 import { buildDiagnosticWithRange } from "$server/diagnostics/range";
 import { buildRelatedInformation } from "$server/diagnostics/relatedInfo";
-import { createInvocation, isLikelyMessagingFlagFailure, runSac2c, SacCompilerRunResult } from "$sac2c/runtime/compilerRuntime";
+import { collectSacFiles, createDocumentFromFile, isFileDocument, normalizePathForCompare, uriToFsPath } from "$util/documentUtils";
 
+// Dependencies injected by server for isolation and testability.
 interface DiagnosticsWorkflowDeps {
   connection: Connection;
   documents: TextDocuments<TextDocument>;
@@ -21,6 +22,7 @@ interface DiagnosticsWorkflowDeps {
   runSafely: (work: Promise<void>, context: string) => void;
 }
 
+// Public API: all methods exported by diagnostics workflow factory.
 export interface DiagnosticsWorkflow {
   clearDocumentDiagnostics: (uri: string) => void;
   validateDocument: (document: TextDocument) => Promise<void>;
@@ -29,6 +31,8 @@ export interface DiagnosticsWorkflow {
   handleDocumentClose: (uri: string) => void;
 }
 
+// Checks if compiler diagnostic (from parsed output) applies to requested file.
+// Match by full path first, fallback to basename comparison (handle relative paths).
 function diagnosticAppliesToDocument(parsedPath: string, requestedFilePath: string): boolean {
   const normalizedParsedPath = normalizePathForCompare(parsedPath);
   if (normalizedParsedPath === requestedFilePath) {
@@ -40,7 +44,9 @@ function diagnosticAppliesToDocument(parsedPath: string, requestedFilePath: stri
   return parsedBase.length > 0 && parsedBase === requestedBase;
 }
 
+// Factory creates workflow instance with injected deps.
 export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): DiagnosticsWorkflow {
+  // Send empty diagnostics array to clear all issues for doc.
   const clearDocumentDiagnostics = (uri: string): void => {
     try {
       deps.connection.sendDiagnostics({ uri, diagnostics: [] });
@@ -50,10 +56,12 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
     }
   };
 
+  // Parse compiler output, normalize paths, render formatted diagnostics.
   const gatherDiagnosticsForDocument = (document: TextDocument, stdout: string, stderr: string): Diagnostic[] => {
     const settings = deps.getSettings();
     const requestedFilePath = normalizePathForCompare(uriToFsPath(document.uri));
     const parsedDiagnostics = parseCompilerOutput(stdout, stderr);
+    // Normalize all file paths for consistent comparison.
     const normalizedParsedDiagnostics = parsedDiagnostics.map((entry: any) => ({
       ...entry,
       file: normalizePathForCompare(entry.file),
@@ -61,6 +69,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
     const groups = groupDiagnostics(normalizedParsedDiagnostics);
     const lines = document.getText().split(/\r?\n/);
 
+    // Format diagnostics respecting user settings (stack frames, related info, etc).
     const rendered = presentDiagnostics(normalizedParsedDiagnostics, groups, requestedFilePath, {
       presentation: settings.diagnosticsPresentation,
       includeRelatedInformation: settings.diagnosticsIncludeRelatedInformation,
@@ -68,6 +77,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
       maxStackFrames: settings.diagnosticsMaxStackFrames,
     });
 
+    // Filter to requested doc only, build VS Code Diagnostic objects.
     return rendered
       .filter((entry: any) => diagnosticAppliesToDocument(entry.anchor.file, requestedFilePath))
       .map((entry: any) => {
@@ -75,6 +85,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
         const diagnostic = buildDiagnosticWithRange(entry.anchor, lineText);
         diagnostic.message = entry.message;
 
+        // Attach related info if enabled and available.
         if (settings.diagnosticsIncludeRelatedInformation && entry.related.length > 0) {
           diagnostic.relatedInformation = buildRelatedInformation(entry.related);
         }
@@ -83,7 +94,9 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
       });
   };
 
+  // Compile single doc and collect diagnostics.
   const validateDocument = async (document: TextDocument): Promise<void> => {
+    // Skip if not file-backed (e.g., unsaved, temp docs).
     if (!isFileDocument(document)) {
       return;
     }
@@ -92,11 +105,13 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
     const workspaceRoot = deps.getWorkspaceRoot();
     const fsPath = uriToFsPath(document.uri);
 
+    // File must exist on disk.
     if (!fs.existsSync(fsPath)) {
       clearDocumentDiagnostics(document.uri);
       return;
     }
 
+    // Build invocation with messaging flags enabled.
     const invocationWithMessaging = createInvocation(settings, workspaceRoot, fsPath, true, (message) =>
       deps.connection.window.showWarningMessage(message),
     );
@@ -115,6 +130,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
       return;
     }
 
+    // If messaging failed, retry without messaging flags.
     if (settings.messagingEnabled && isLikelyMessagingFlagFailure(runResult.stderr) && settings.messagingArgs.length > 0) {
       const invocationWithoutMessaging = createInvocation(settings, workspaceRoot, fsPath, false, (message) =>
         deps.connection.window.showWarningMessage(message),
@@ -134,6 +150,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
       }
     }
 
+    // Extract and format diagnostics from compiler output.
     const diagnostics = gatherDiagnosticsForDocument(document, runResult.stdout, runResult.stderr);
 
     try {
@@ -147,6 +164,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
     }
   };
 
+  // Scan workspace and validate all .sac files (skip if manual mode or disabled).
   const validateAllWorkspaceSacFiles = async (): Promise<void> => {
     const settings = deps.getSettings();
     if (settings.diagnosticsMode === "manual" || !settings.workspaceScanEnabled) {
@@ -155,6 +173,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
 
     const excludedDirNames = new Set(settings.workspaceScanExcludeDirectories);
 
+    // Index open docs by normalized path for quick lookup.
     const openByPath = new Map<string, TextDocument>();
     for (const openDocument of deps.documents.all()) {
       if (!isFileDocument(openDocument)) {
@@ -163,6 +182,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
       openByPath.set(normalizePathForCompare(uriToFsPath(openDocument.uri)), openDocument);
     }
 
+    // Collect all .sac files from workspace roots (skip duplicates).
     const seenPaths = new Set<string>();
     for (const root of deps.getWorkspaceRoots()) {
       for (const fsPath of collectSacFiles(root, excludedDirNames)) {
@@ -172,6 +192,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
         }
         seenPaths.add(normalizedPath);
 
+        // If doc is open, use it; otherwise create ephemeral doc from disk.
         const openDocument = openByPath.get(normalizedPath);
         if (openDocument) {
           try {
@@ -196,6 +217,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
     }
   };
 
+  // Schedule doc validation with debounce (cancel prev timer if exists).
   const scheduleOnTypeValidation = (document: TextDocument): void => {
     const existingTimer = deps.pendingTimers.get(document.uri);
     if (existingTimer) {
@@ -210,6 +232,7 @@ export function createDiagnosticsWorkflow(deps: DiagnosticsWorkflowDeps): Diagno
     deps.pendingTimers.set(document.uri, timer);
   };
 
+  // Clean up pending timer and clear diagnostics on doc close.
   const handleDocumentClose = (uri: string): void => {
     const existingTimer = deps.pendingTimers.get(uri);
     if (existingTimer) {

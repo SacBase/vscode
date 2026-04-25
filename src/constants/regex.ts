@@ -75,3 +75,8 @@ export const PIPE_LOGICAL_CONTINUATION_PATTERN = /^\|\s*\|/;
 export const PIPE_LOGICAL_PREFIX_PATTERN = /^\|\s*\|\s*/;
 export const COMMA_SPACING_PATTERN = /\s*,\s*/g;
 export const DOC_BLOCK_ASTERISK_PREFIX_PATTERN = /^\*+\s?/;
+
+// Hover doc formatting patterns.
+export const BUILTIN_SHAPE_CLASS_LEGEND_PATTERN = /^###\s+Shape-Class\s+Legend\b/im;
+export const STDLIB_TYPE_VARIABLE_MARKER_PATTERN = /<a>/i;
+export const STDLIB_TYPE_VARIABLE_NOTE_PATTERN = /^###\s+Type\s+Variable\s+Note\b/im;

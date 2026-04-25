@@ -1,11 +1,17 @@
 import {
+  BUILTIN_SHAPE_CLASS_LEGEND_PATTERN,
+  STDLIB_TYPE_VARIABLE_MARKER_PATTERN,
+  STDLIB_TYPE_VARIABLE_NOTE_PATTERN,
+} from "$constants/regex";
+import {
   extractSignatureLine,
   findSignatureSection,
   normalizeHeadingLabel,
   parseDocSections,
   trimBlankEdges,
-} from "$sac2c/parser/hover/hoverDocSectionParser";
+} from "$sac2c/parser/hover-info/hoverDocSectionParser";
 
+// Markdown block appended to builtin hover docs explaining shape-class notation.
 const BUILTIN_SHAPE_CLASS_LEGEND_MARKDOWN = [
   "### Shape-Class Legend",
   "- `S` = scalar",
@@ -14,6 +20,7 @@ const BUILTIN_SHAPE_CLASS_LEGEND_MARKDOWN = [
   "- In signatures like `SxV`, `x` separates argument shape classes.",
 ].join("\n");
 
+// Markdown block appended to stdlib hover docs explaining type variables.
 const STDLIB_TYPE_VARIABLE_NOTE_MARKDOWN = [
   "### Type Variable Note",
   "- `<a>` denotes a generic type variable.",
@@ -25,8 +32,10 @@ export interface HoverFormattingOptions {
   signature?: string | null;
 }
 
+// Order to present structured sections in hover markdown (e.g., Description, Parameters, Returns, Examples).
 const STRUCTURED_SECTION_ORDER = ["description", "parameters", "returns", "return", "example", "examples"] as const;
 
+// Append section block if it has content (skip empty sections).
 function addSectionBlock(blocks: string[], title: string, bodyLines: string[]): void {
   const trimmed = trimBlankEdges(bodyLines);
   if (trimmed.length === 0) {
@@ -36,6 +45,7 @@ function addSectionBlock(blocks: string[], title: string, bodyLines: string[]): 
   blocks.push(`**${title}**\n${trimmed.join("\n")}`);
 }
 
+// Format hover markdown: extract signature, parse sections, render in canonical layout.
 export function formatHoverDocumentationMarkdown(markdown: string, options: HoverFormattingOptions = {}): string {
   const { sections, headingCount, preamble } = parseDocSections(markdown);
 
@@ -62,6 +72,7 @@ export function formatHoverDocumentationMarkdown(markdown: string, options: Hove
   }
 
   const consumedSections = new Set<string>();
+  // Track consumed sections to avoid duplicates or reordering.
   if (descriptionSection) {
     consumedSections.add("description");
   }
@@ -69,6 +80,7 @@ export function formatHoverDocumentationMarkdown(markdown: string, options: Hove
     consumedSections.add(normalizeHeadingLabel(signatureSection.heading));
   }
 
+  // Add structured sections in preferred order.
   for (const key of STRUCTURED_SECTION_ORDER) {
     if (consumedSections.has(key)) {
       continue;
@@ -83,11 +95,13 @@ export function formatHoverDocumentationMarkdown(markdown: string, options: Hove
     consumedSections.add(key);
   }
 
+  // Add remaining sections (not in preferred order).
   for (const [key, section] of sections.entries()) {
     if (consumedSections.has(key)) {
       continue;
     }
 
+    // Skip signature-related sections (already extracted).
     if (key === "signature" || key === "common signatures" || key === "signatures") {
       continue;
     }
@@ -103,20 +117,22 @@ export function formatHoverDocumentationMarkdown(markdown: string, options: Hove
   return `${compactBlocks.join("\n\n---\n\n").trimEnd()}\n`;
 }
 
+// Append shape-class legend to builtin docs (skip if already present).
 export function appendBuiltinLegend(markdown: string): string {
-  if (/^###\s+Shape-Class\s+Legend\b/im.test(markdown)) {
+  if (BUILTIN_SHAPE_CLASS_LEGEND_PATTERN.test(markdown)) {
     return markdown;
   }
 
   return `${markdown.trimEnd()}\n\n${BUILTIN_SHAPE_CLASS_LEGEND_MARKDOWN}`;
 }
 
+// Append type-variable note to stdlib docs if <a> found (skip if already present).
 export function appendStdlibTypeVariableNote(markdown: string): string {
-  if (!/<a>/i.test(markdown)) {
+  if (!STDLIB_TYPE_VARIABLE_MARKER_PATTERN.test(markdown)) {
     return markdown;
   }
 
-  if (/^###\s+Type\s+Variable\s+Note\b/im.test(markdown)) {
+  if (STDLIB_TYPE_VARIABLE_NOTE_PATTERN.test(markdown)) {
     return markdown;
   }
 

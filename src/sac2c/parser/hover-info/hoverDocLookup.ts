@@ -3,7 +3,7 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 
 import { SAFE_DOC_NAME_PATTERN } from "$constants/regex";
-import { HoverTarget } from "$sac2c/hover/types";
+import type { HoverTarget } from "$sac2c/parser/hover-info/types";
 
 const DOCS_FOLDER_BY_KIND: Record<HoverTarget["kind"], string> = {
   stdlib: "stdlib",

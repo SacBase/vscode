@@ -16,6 +16,7 @@ export function maskNonCodeText(source: string): string {
     const current = chars[index];
     const next = index + 1 < chars.length ? chars[index + 1] : "";
 
+    // Inside line comment: mask until newline.
     if (inLineComment) {
       if (current === "\n") {
         inLineComment = false;
@@ -25,6 +26,7 @@ export function maskNonCodeText(source: string): string {
       continue;
     }
 
+    // Inside block comment: mask chars except newlines, watch for `*/`.
     if (inBlockComment) {
       if (current !== "\n") {
         chars[index] = MASK_CHAR;
@@ -38,9 +40,11 @@ export function maskNonCodeText(source: string): string {
       continue;
     }
 
+    // Inside string: mask chars except newlines, handle escapes and closing quote.
     if (inString) {
       if (current === "\\") {
         chars[index] = MASK_CHAR;
+        // Mask the escaped char as well.
         if (index + 1 < chars.length && chars[index + 1] !== "\n") {
           chars[index + 1] = MASK_CHAR;
         }
@@ -52,6 +56,7 @@ export function maskNonCodeText(source: string): string {
         chars[index] = MASK_CHAR;
       }
 
+      // Check for closing quote.
       if (current === stringQuote) {
         inString = false;
         stringQuote = "";
@@ -59,6 +64,7 @@ export function maskNonCodeText(source: string): string {
       continue;
     }
 
+    // Outside string: check for comment starts.
     if (current === "/" && next === "/") {
       chars[index] = MASK_CHAR;
       chars[index + 1] = MASK_CHAR;
@@ -75,6 +81,7 @@ export function maskNonCodeText(source: string): string {
       continue;
     }
 
+    // Check for string start.
     if (current === '"' || current === "'") {
       chars[index] = MASK_CHAR;
       inString = true;
@@ -94,6 +101,7 @@ export function findMatchingBrace(source: string, openOffset: number, maskedSour
   const scan = maskedSource ?? maskNonCodeText(source);
   let depth = 1;
 
+  // Scan forward from opening brace, tracking nesting depth.
   for (let index = openOffset + 1; index < scan.length; index += 1) {
     const current = scan[index];
     if (current === "{") {
@@ -102,12 +110,14 @@ export function findMatchingBrace(source: string, openOffset: number, maskedSour
     }
     if (current === "}") {
       depth -= 1;
+      // Found matching closing brace when depth reaches zero.
       if (depth === 0) {
         return index;
       }
     }
   }
 
+  // No match found: return end of source.
   return Math.max(openOffset, source.length - 1);
 }
 

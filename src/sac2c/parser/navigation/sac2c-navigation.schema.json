@@ -2,14 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://sac-home.org/schema/sac2c-navigation.schema.json",
   "title": "SaC navjson payload",
-  "description": "Compiler navigation index consumed by hover and goto-definition logic.",
+  "description": "Compiler navigation index consumed by hover, goto-definition, references and refactor-aware editor logic.",
   "type": "object",
   "additionalProperties": true,
   "required": ["schemaVersion", "files", "tokens", "symbols", "bindings"],
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "minimum": 1
+      "minimum": 2
     },
     "indexKind": {
       "type": "string",
@@ -43,6 +43,18 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/binding"
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "syntaxNodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/syntaxNode"
       }
     },
     "modules": {
@@ -168,6 +180,9 @@
         "sha256": {
           "type": "string"
         },
+        "fileVersion": {
+          "type": ["string", "integer"]
+        },
         "isGenerated": {
           "type": "boolean"
         }
@@ -193,6 +208,15 @@
         "spelling": {
           "type": "string"
         },
+        "scopeId": {
+          "type": "string"
+        },
+        "stableKey": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/symbolType"
+        },
         "enclosingSymbolId": {
           "type": "string"
         }
@@ -214,6 +238,12 @@
           "minLength": 1
         },
         "qualifiedName": {
+          "type": "string"
+        },
+        "parentSymbolId": {
+          "type": "string"
+        },
+        "scopeId": {
           "type": "string"
         },
         "definitionTokenId": {
@@ -239,6 +269,51 @@
           "enum": ["user", "stdlib", "builtin", "external"]
         },
         "visibility": {
+          "type": "string"
+        },
+        "completionKind": {
+          "type": "string",
+          "enum": [
+            "Text",
+            "Method",
+            "Function",
+            "Constructor",
+            "Field",
+            "Variable",
+            "Class",
+            "Interface",
+            "Module",
+            "Property",
+            "Unit",
+            "Value",
+            "Enum",
+            "Keyword",
+            "Snippet",
+            "Color",
+            "File",
+            "Reference",
+            "Folder",
+            "EnumMember",
+            "Constant",
+            "Struct",
+            "Event",
+            "Operator",
+            "TypeParameter"
+          ]
+        },
+        "score": {
+          "type": "number"
+        },
+        "canRename": {
+          "type": "boolean"
+        },
+        "immutable": {
+          "type": "boolean"
+        },
+        "type": {
+          "$ref": "#/$defs/symbolType"
+        },
+        "stableKey": {
           "type": "string"
         },
         "tags": {
@@ -272,6 +347,87 @@
         },
         "reason": {
           "type": "string"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "required": ["symbolId", "tokenId"],
+      "additionalProperties": true,
+      "properties": {
+        "symbolId": {
+          "$ref": "#/$defs/id"
+        },
+        "tokenId": {
+          "$ref": "#/$defs/id"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["read", "write", "call", "import", "type"]
+        },
+        "isDefinition": {
+          "type": "boolean"
+        },
+        "score": {
+          "type": "number"
+        }
+      }
+    },
+    "syntaxNode": {
+      "type": "object",
+      "required": ["id", "fileId", "kind", "range"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "fileId": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "moduleDecl",
+            "functionDecl",
+            "paramDecl",
+            "varDecl",
+            "assignStmt",
+            "letExpr",
+            "callExpr",
+            "identifierRef",
+            "identifierListRef",
+            "importDecl",
+            "returnStmt",
+            "ifStmt",
+            "loopStmt",
+            "typeUse",
+            "unknown"
+          ]
+        },
+        "range": {
+          "$ref": "#/$defs/range"
+        },
+        "scopeId": {
+          "$ref": "#/$defs/id"
+        },
+        "symbolId": {
+          "$ref": "#/$defs/id"
+        },
+        "stableKey": {
+          "type": "string"
+        },
+        "parentId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "symbolType": {
+      "type": "object",
+      "required": ["typeShape"],
+      "additionalProperties": true,
+      "properties": {
+        "typeShape": {
+          "$ref": "#/$defs/typeShape"
         }
       }
     },
@@ -514,8 +670,31 @@
         "level": {
           "type": "string"
         },
+        "severity": {
+          "type": "string",
+          "enum": ["error", "warning", "info", "hint"]
+        },
         "code": {
           "type": "string"
+        },
+        "related": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["range", "message"],
+            "additionalProperties": true,
+            "properties": {
+              "fileId": {
+                "$ref": "#/$defs/id"
+              },
+              "range": {
+                "$ref": "#/$defs/range"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
         },
         "message": {
           "type": "string"

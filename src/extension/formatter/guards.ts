@@ -1,31 +1,39 @@
 import { SAC_NON_FUNCTION_HEADER_KEYWORDS } from "$constants/language";
 import {
   CONTROL_FLOW_KEYWORD_PATTERN,
+  CONTROL_OR_RETURN_HEADER_PATTERN,
+  FUNCTION_HEADER_CANDIDATE_PATTERN,
   FUNCTION_SIGNATURE_TRAILING_PAREN_PATTERN,
   INLINE_GUARD_SPLIT_PATTERN,
   PIPE_LOGICAL_CONTINUATION_PATTERN,
   PIPE_LOGICAL_PREFIX_PATTERN,
+  RETURN_STATEMENT_START_PATTERN,
 } from "$constants/regex";
 import { delimiterBalance, splitTopLevel } from "$extension/formatter/text";
 
+// Helper: checks if text is exactly the keyword or starts with "keyword ".
 function startsWithKeyword(trimmed: string, keyword: string): boolean {
   return trimmed === keyword || trimmed.startsWith(`${keyword} `);
 }
 
+// Helper: detects if line looks like a function signature (not a control flow statement).
 function isLikelyFunctionHeader(text: string): boolean {
   const trimmed = text.trim();
   if (trimmed.length === 0) {
     return false;
   }
 
+  // Exclude return/if/while/for keywords.
   if (SAC_NON_FUNCTION_HEADER_KEYWORDS.some((keyword) => startsWithKeyword(trimmed, keyword))) {
     return false;
   }
 
+  // Exclude lines that contain body markers or ternary operators.
   if (trimmed.includes("{") || trimmed.includes(";") || trimmed.includes("?")) {
     return false;
   }
 
+  // Check if line has trailing paren (function signature pattern).
   return FUNCTION_SIGNATURE_TRAILING_PAREN_PATTERN.test(trimmed);
 }
 
@@ -102,20 +110,24 @@ export function mergeGuardLogicalContinuations(lines: string[]): string[] {
   for (const line of lines) {
     const trimmed = line.trim();
     const isPipeContinuation = PIPE_LOGICAL_CONTINUATION_PATTERN.test(trimmed);
+    // Check if line starts with `||`, `&&`, or a pipe-based logical operator.
     const isLogicalContinuation = trimmed.startsWith("||") || trimmed.startsWith("&&") || isPipeContinuation;
 
+    // If not a continuation line or no previous line to merge into, keep as-is.
     if (!isLogicalContinuation || merged.length === 0) {
       merged.push(line);
       continue;
     }
 
     const previous = merged[merged.length - 1].trim();
+    // Only merge if previous line is also a guard line (starts with guard marker).
     const previousIsGuard = previous.startsWith("|") || previous.startsWith(",") || previous.startsWith("||") || previous.startsWith("&&");
     if (!previousIsGuard) {
       merged.push(line);
       continue;
     }
 
+    // Append logical continuation to previous guard line.
     const continuation = isPipeContinuation ? `|| ${trimmed.replace(PIPE_LOGICAL_PREFIX_PATTERN, "")}` : trimmed;
     merged[merged.length - 1] = `${previous} ${continuation}`;
   }
@@ -134,27 +146,70 @@ export function mergeGuardExpressionContinuations(lines: string[]): string[] {
 
   for (const line of lines) {
     const trimmed = line.trim();
+    // Check if line is a comma continuation (starts with `,`).
     const isCommaLine = trimmed.startsWith(", ") || trimmed === ",";
 
+    // If not a continuation or no previous line, keep as-is.
     if (!isCommaLine || merged.length === 0) {
       merged.push(line);
       continue;
     }
 
     const previous = merged[merged.length - 1].trim();
+    // Only merge if previous line is a guard line.
     const previousIsGuard = previous.startsWith("|") || previous.startsWith(",") || previous.startsWith("||") || previous.startsWith("&&");
     if (!previousIsGuard) {
       merged.push(line);
       continue;
     }
 
+    // If previous guard has open delimiters (unclosed parens/brackets/braces), merge the comma line.
     if (delimiterBalance(previous) > 0) {
       merged[merged.length - 1] = `${previous}${trimmed}`;
       continue;
     }
 
+    // Otherwise keep comma line separate.
     merged.push(line);
   }
 
   return merged;
+}
+
+/**
+ * Resolves indentation for guard lines (`|`, `,`) using current hint.
+ *
+ * @param content Current line content.
+ * @param effectiveIndent Effective non-closer indent level.
+ * @param guardIndentHint Active guard hint.
+ * @returns Base indent level for current line.
+ */
+export function resolveGuardBaseIndent(content: string, effectiveIndent: number, guardIndentHint: number | null): number {
+  if (content.startsWith("|") || content.startsWith(",")) {
+    return guardIndentHint ?? Math.max(1, effectiveIndent + 1);
+  }
+
+  return effectiveIndent;
+}
+
+/**
+ * Updates guard indent hint based on current line shape.
+ *
+ * @param content Current line content.
+ * @param baseIndent Computed base indent for line.
+ * @param currentHint Existing hint.
+ * @returns Next guard indent hint.
+ */
+export function nextGuardIndentHint(content: string, baseIndent: number, currentHint: number | null): number | null {
+  if (FUNCTION_HEADER_CANDIDATE_PATTERN.test(content) && !CONTROL_OR_RETURN_HEADER_PATTERN.test(content)) {
+    return baseIndent + 1;
+  }
+
+  if (!(content.startsWith("|") || content.startsWith(","))) {
+    if (content.startsWith("{") || content.endsWith(";") || RETURN_STATEMENT_START_PATTERN.test(content)) {
+      return null;
+    }
+  }
+
+  return currentHint;
 }

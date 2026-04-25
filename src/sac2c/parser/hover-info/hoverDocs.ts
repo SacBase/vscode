@@ -1,11 +1,11 @@
-import { HoverTarget } from "$sac2c/hover/types";
 import {
   appendBuiltinLegend,
   appendStdlibTypeVariableNote,
   formatHoverDocumentationMarkdown,
-} from "$sac2c/parser/hover/hoverDocFormatting";
-import { lookupHoverDocumentation } from "$sac2c/parser/hover/hoverDocLookup";
-export { formatHoverDocumentationMarkdown, HoverFormattingOptions } from "$sac2c/parser/hover/hoverDocFormatting";
+} from "$sac2c/parser/hover-info/hoverDocFormatting";
+import { lookupHoverDocumentation } from "$sac2c/parser/hover-info/hoverDocLookup";
+import type { HoverTarget } from "$sac2c/parser/hover-info/types";
+export { formatHoverDocumentationMarkdown, HoverFormattingOptions } from "$sac2c/parser/hover-info/hoverDocFormatting";
 
 /**
  * Resolves markdown hover content from docs/<kind>/<symbol>.md when available.

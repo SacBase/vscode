@@ -1,4 +1,4 @@
-import { DiagnosticsPresentationMode } from "$sac2c/diagnostics/types";
+import type { DiagnosticsPresentationMode } from "$sac2c/diagnostics/types";
 import type { CompilerResolutionSettings } from "$server/sac2cResolver";
 
 export interface SacSettings extends CompilerResolutionSettings {

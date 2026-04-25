@@ -1,4 +1,4 @@
-import { HoverTarget } from "$sac2c/hover/types";
+import { HoverTarget } from "$sac2c/parser/hover/types";
 import { appendBuiltinLegend, appendStdlibTypeVariableNote, formatHoverDocumentationMarkdown } from "$server/hover-info/hoverDocFormatting";
 import { lookupHoverDocumentation } from "$server/hover-info/hoverDocLookup";
 export { formatHoverDocumentationMarkdown, HoverFormattingOptions } from "$server/hover-info/hoverDocFormatting";

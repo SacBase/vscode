@@ -4,7 +4,7 @@ import {
   NOISY_COMPILATION_FAILED_PATTERN,
   PATH_BACKSLASH_PATTERN,
 } from "$constants/regex";
-import { CoreDiagnosticSeverity, CoreParsedDiagnostic } from "$sac2c/diagnostics/core/types";
+import type { CoreDiagnosticSeverity, CoreParsedDiagnostic } from "$sac2c/diagnostics/core/types";
 
 const NOISY_MESSAGE_PATTERNS: RegExp[] = [NOISY_COMPILATION_FAILED_PATTERN, NOISY_ABORT_PATTERN];
 

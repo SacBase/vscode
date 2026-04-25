@@ -1,8 +1,8 @@
-import * as vscode from "vscode";
+import type * as vscode from "vscode";
 
 import { ChatParticipantFeature } from "$extension/features/chatParticipantFeature";
 import { FormattingFeature } from "$extension/features/formattingFeature";
-import { FeatureLifecycle, LanguageClientFeature } from "$extension/features/languageClientFeature";
+import { type FeatureLifecycle, LanguageClientFeature } from "$extension/features/languageClientFeature";
 import { OutlineFeature } from "$extension/features/outlineFeature";
 
 export interface ExtensionFeatureController {

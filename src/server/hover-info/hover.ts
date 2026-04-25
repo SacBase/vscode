@@ -3,8 +3,8 @@ import { fileURLToPath } from "url";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Hover, MarkupContent, MarkupKind, Position, Range } from "vscode-languageserver/node";
 
-import { formatHoverMarkdown, lookupHoverTarget } from "$sac2c/hover";
-import { HoverTarget } from "$sac2c/hover/types";
+import { formatHoverMarkdown, lookupHoverTarget } from "$sac2c/parser/hover";
+import { HoverTarget } from "$sac2c/parser/hover/types";
 import {
   extractDefinitionSignatureFromText,
   findFunctionCallAtPosition,

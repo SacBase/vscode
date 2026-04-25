@@ -1,5 +1,5 @@
+import { type ExtensionFeatureController, registerExtensionFeatures } from "$extension/features";
 import * as vscode from "vscode";
-import { ExtensionFeatureController, registerExtensionFeatures } from "$extension/features";
 
 let controller: ExtensionFeatureController | undefined;
 
@@ -7,7 +7,7 @@ let controller: ExtensionFeatureController | undefined;
  * Activates the extension and starts the SaC language client.
  *
  * !IMPORTANT: The server module is loaded from compiled output under out/server.
- * ?TODO: Add a startup self-check command that validates configured backend availability
+ * TODO: Add a startup self-check command that validates configured backend availability
  *        (local, WSL, Docker) and reports actionable guidance to users.
  *
  * @param context VS Code extension activation context.

@@ -1,4 +1,4 @@
-import { CoreDiagnosticsReportV1, CoreRenderedDiagnostic } from "$sac2c/diagnostics/core/types";
+import type { CoreDiagnosticsReportV1, CoreRenderedDiagnostic } from "$sac2c/diagnostics/core/types";
 
 interface SarifRegion {
   startLine: number;
@@ -86,9 +86,9 @@ export function toSarifLog(report: CoreDiagnosticsReportV1): SarifLog {
           relatedLocations:
             entry.related.length > 0
               ? entry.related.map((related) => ({
-                  ...toSarifLocation(related.location.filePath, related.location.line, related.location.column),
-                  message: { text: related.message },
-                }))
+                ...toSarifLocation(related.location.filePath, related.location.line, related.location.column),
+                message: { text: related.message },
+              }))
               : undefined,
         })),
       },
