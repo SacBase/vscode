@@ -1,0 +1,31 @@
+{
+  "$schema": "./sac.tmLanguage.schema.json",
+  "name": "SaC Format Config",
+  "scopeName": "source.sac-format",
+  "description": "Syntax highlighting for .sac-format configuration files.",
+  "patterns": [
+    {
+      "name": "comment.line.double-slash.sac-format",
+      "match": "//.*$"
+    },
+    {
+      "name": "comment.line.double-dash.sac-format",
+      "match": "#.*$"
+    },
+    {
+      "name": "meta.key-value.sac-format",
+      "match": "^\\s*([A-Za-z][A-Za-z0-9]*)\\s*(:)\\s*(.*)$",
+      "captures": {
+        "1": {
+          "name": "variable.other.property.sac-format"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.sac-format"
+        },
+        "3": {
+          "name": "string.unquoted.value.sac-format"
+        }
+      }
+    }
+  ]
+}

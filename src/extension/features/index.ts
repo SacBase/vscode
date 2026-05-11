@@ -5,6 +5,7 @@ import { CommandFeature } from "$extension/features/commandFeature";
 import { FormattingFeature } from "$extension/features/formattingFeature";
 import { type FeatureLifecycle, LanguageClientFeature } from "$extension/features/languageClientFeature";
 import { OutlineFeature } from "$extension/features/outlineFeature";
+import { SacFormatFeature } from "$extension/features/sacFormatFeature";
 
 export interface ExtensionFeatureController {
   dispose(): Promise<void>;
@@ -19,6 +20,7 @@ export async function registerExtensionFeatures(context: vscode.ExtensionContext
     new ChatParticipantFeature(),
     new FormattingFeature(),
     new OutlineFeature(),
+    new SacFormatFeature(),
     new LanguageClientFeature(context),
   ];
 

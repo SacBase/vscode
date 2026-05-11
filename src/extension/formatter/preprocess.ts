@@ -41,8 +41,10 @@ export function preExpandSacLines(input: string, options: SacFormattingOptions):
       chunks = chunks.flatMap((chunk) => expandInlineComprehension(chunk));
     }
 
-    chunks = chunks.flatMap((chunk) => splitFunctionInlineGuards(chunk));
-    chunks = chunks.flatMap((chunk) => splitGuardChain(chunk));
+    if (options.splitInlineGuards) {
+      chunks = chunks.flatMap((chunk) => splitFunctionInlineGuards(chunk));
+      chunks = chunks.flatMap((chunk) => splitGuardChain(chunk));
+    }
 
     expanded.push(...chunks);
   }

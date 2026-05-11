@@ -21,7 +21,13 @@ type RuntimeFormatConfig = {
   normalizeGuards: boolean;
   expandInlineWithLoops: boolean;
   expandInlineComprehensions: boolean;
+  splitInlineGuards: boolean;
 };
+
+interface CachedSacFormatConfig {
+  mtimeMs: number;
+  overrides: Partial<RuntimeFormatConfig>;
+}
 
 /**
  * Computes full editable range for document replacement.
@@ -121,9 +127,41 @@ function parseSacFormatFile(content: string): Partial<RuntimeFormatConfig> {
       }
       continue;
     }
+
+    if (key === "splitinlineguards") {
+      const parsed = parseBoolean(value);
+      if (typeof parsed === "boolean") {
+        overrides.splitInlineGuards = parsed;
+      }
+    }
   }
 
   return overrides;
+}
+
+/**
+ * Reads `.sac-format` overrides and refreshes cache when file changes.
+ *
+ * @param filePath Absolute `.sac-format` path.
+ * @param cache Parsed config cache.
+ * @returns Parsed overrides or empty object when file cannot be read.
+ */
+function readSacFormatOverrides(filePath: string, cache: Map<string, CachedSacFormatConfig>): Partial<RuntimeFormatConfig> {
+  try {
+    const stat = fs.statSync(filePath);
+    const cached = cache.get(filePath);
+    if (cached && cached.mtimeMs === stat.mtimeMs) {
+      return cached.overrides;
+    }
+
+    const content = fs.readFileSync(filePath, "utf8");
+    const overrides = parseSacFormatFile(content);
+    cache.set(filePath, { mtimeMs: stat.mtimeMs, overrides });
+    return overrides;
+  } catch {
+    cache.delete(filePath);
+    return {};
+  }
 }
 
 /**
@@ -162,7 +200,10 @@ function findNearestSacFormat(document: vscode.TextDocument): string | null {
  * @param document Active text document.
  * @returns Fully resolved runtime formatter config.
  */
-function readFormatConfig(document: vscode.TextDocument): RuntimeFormatConfig {
+function readFormatConfig(document: vscode.TextDocument, cache: Map<string, CachedSacFormatConfig>): RuntimeFormatConfig {
+  const formatFilePath = findNearestSacFormat(document);
+  const fileOverrides = formatFilePath ? readSacFormatOverrides(formatFilePath, cache) : {};
+
   const config = vscode.workspace.getConfiguration(SAC_FORMAT_CONFIG_SECTION);
   const resolved: RuntimeFormatConfig = {
     enabled: config.get<boolean>("enable", true),
@@ -171,22 +212,13 @@ function readFormatConfig(document: vscode.TextDocument): RuntimeFormatConfig {
     normalizeGuards: config.get<boolean>("normalizeGuards", true),
     expandInlineWithLoops: config.get<boolean>("expandInlineWithLoops", true),
     expandInlineComprehensions: config.get<boolean>("expandInlineComprehensions", true),
+    splitInlineGuards: config.get<boolean>("splitInlineGuards", config.get<boolean>("assertions", true)),
   };
 
-  const formatFilePath = findNearestSacFormat(document);
-  if (!formatFilePath) {
-    return resolved;
-  }
-
-  try {
-    const content = fs.readFileSync(formatFilePath, "utf8");
-    return {
-      ...resolved,
-      ...parseSacFormatFile(content),
-    };
-  } catch {
-    return resolved;
-  }
+  return {
+    ...resolved,
+    ...fileOverrides,
+  };
 }
 
 /**
@@ -195,8 +227,8 @@ function readFormatConfig(document: vscode.TextDocument): RuntimeFormatConfig {
  * @param document Active text document.
  * @returns Runtime formatter config.
  */
-function readOnSaveConfig(document: vscode.TextDocument): RuntimeFormatConfig {
-  const resolved = readFormatConfig(document);
+function readOnSaveConfig(document: vscode.TextDocument, cache: Map<string, CachedSacFormatConfig>): RuntimeFormatConfig {
+  const resolved = readFormatConfig(document, cache);
   return {
     ...resolved,
     // Formatter intentionally spaces-only for SaC/C style consistency.
@@ -206,6 +238,7 @@ function readOnSaveConfig(document: vscode.TextDocument): RuntimeFormatConfig {
 
 export class FormattingFeature implements FeatureLifecycle {
   private disposables: vscode.Disposable[] = [];
+  private readonly sacFormatConfigCache = new Map<string, CachedSacFormatConfig>();
 
   /**
    * Activates document/range formatter + optional format-on-save hook.
@@ -217,10 +250,11 @@ export class FormattingFeature implements FeatureLifecycle {
     }
 
     const selector: vscode.DocumentSelector = [{ language: SAC_LANGUAGE_ID, scheme: SAC_URI_FILE_SCHEME }];
+    const formatConfigCache = this.sacFormatConfigCache;
 
     const provider: vscode.DocumentFormattingEditProvider & vscode.DocumentRangeFormattingEditProvider = {
       provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
-        const config = readFormatConfig(document);
+        const config = readFormatConfig(document, formatConfigCache);
         if (!config.enabled) {
           return [];
         }
@@ -235,7 +269,7 @@ export class FormattingFeature implements FeatureLifecycle {
       },
 
       provideDocumentRangeFormattingEdits(document: vscode.TextDocument, range: vscode.Range): vscode.TextEdit[] {
-        const config = readFormatConfig(document);
+        const config = readFormatConfig(document, formatConfigCache);
         if (!config.enabled) {
           return [];
         }
@@ -263,7 +297,7 @@ export class FormattingFeature implements FeatureLifecycle {
           return;
         }
 
-        const config = readOnSaveConfig(event.document);
+        const config = readOnSaveConfig(event.document, formatConfigCache);
         if (!config.enabled || !config.onSave) {
           return;
         }
@@ -278,6 +312,26 @@ export class FormattingFeature implements FeatureLifecycle {
         );
       }),
     );
+
+    void this.primeWorkspaceSacFormatCache();
+  }
+
+  /**
+   * Best-effort cache warmup for workspace `.sac-format` files.
+   */
+  private async primeWorkspaceSacFormatCache(): Promise<void> {
+    try {
+      const files = await vscode.workspace.findFiles(
+        "**/.sac-format",
+        "{**/.git/**,**/node_modules/**,**/out/**,**/.vscode-test/**}",
+      );
+
+      for (const file of files) {
+        readSacFormatOverrides(file.fsPath, this.sacFormatConfigCache);
+      }
+    } catch {
+      // Cache warmup is best-effort only.
+    }
   }
 
   /**

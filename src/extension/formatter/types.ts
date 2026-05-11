@@ -6,6 +6,7 @@ export interface SacFormattingOptions {
   normalizeGuards: boolean;
   expandInlineWithLoops: boolean;
   expandInlineComprehensions: boolean;
+  splitInlineGuards: boolean;
 }
 
 export const DEFAULT_OPTIONS: SacFormattingOptions = {
@@ -13,4 +14,5 @@ export const DEFAULT_OPTIONS: SacFormattingOptions = {
   normalizeGuards: true,
   expandInlineWithLoops: true,
   expandInlineComprehensions: true,
+  splitInlineGuards: true,
 };

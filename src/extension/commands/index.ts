@@ -1,9 +1,10 @@
 import type * as vscode from "vscode";
 
+import { generateFormatConfigCommand } from "$extension/commands/generateFormatConfigCommand";
 import { runSac2cCommand } from "$extension/commands/runSac2cCommand";
 import type { ExtensionCommand } from "$extension/commands/types";
 
-const COMMANDS: ExtensionCommand[] = [runSac2cCommand];
+const COMMANDS: ExtensionCommand[] = [runSac2cCommand, generateFormatConfigCommand];
 
 /**
  * Registers all extension commands and returns disposables.

@@ -38,6 +38,20 @@ Choose how diagnostics are displayed:
 
 ![Diagnostic Styles](marketplace/diagnostic-presentation.gif)
 
+### 4. Formatter and Local Rules
+
+SaC formatter supports document/range formatting, optional format-on-save, and workspace-local `.sac-format` files with syntax highlighting and hover tooltips.
+
+Formatting precedence is:
+
+1. VS Code settings under `sac.format.*`
+2. nearest `.sac-format`
+3. built-in defaults
+
+Use the command **"SaC: Generate Default .sac-format File"** to scaffold a `.sac-format` in your workspace root.
+
+See [docs/formatting.md](docs/formatting.md) for supported keys and configuration.
+
 ## Requirements
 
 Syntax highlighting works without external tools.
@@ -59,6 +73,11 @@ Supported execution backends:
 Common settings:
 
 - `sac.languageServer.enable`
+- `sac.features.languageServer.enable`
+- `sac.features.formatter.enable`
+- `sac.features.outline.enable`
+- `sac.features.commands.enable`
+- `sac.features.chatParticipant.enable`
 - `sac.diagnostics.mode` (`onSave`, `onType`, `manual`)
 - `sac.diagnostics.presentation` (`expanded`, `smart`, `hybrid`)
 - `sac.diagnostics.includeRelatedInformation`
@@ -69,6 +88,17 @@ Common settings:
 - `sac.compiler.path`
 - `sac.compiler.executionBackend` (`local`, `wsl`, `docker`)
 - `sac.compiler.extraArgs`
+- `sac.format.enable`
+- `sac.format.onSave`
+- `sac.format.indentSize`
+- `sac.format.normalizeGuards`
+- `sac.format.expandInlineWithLoops`
+- `sac.format.expandInlineComprehensions`
+- `sac.format.splitInlineGuards`
+
+Workspace formatter file:
+
+- `.sac-format` with `IndentSize`, `TabWidth`, `NormalizeGuards`, `ExpandInlineWithLoops`, `ExpandInlineComprehensions`, `SplitInlineGuards`
 
 Default structured messaging args:
 

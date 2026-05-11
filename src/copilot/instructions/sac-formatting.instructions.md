@@ -11,6 +11,29 @@ applyTo: "**/*.sac"
 - For first guard line, write exactly 4 spaces then `| ` before the guard expression.
 - For subsequent guard lines, write 4 spaces then `, ` before each guard expression.
 
+Use workspace `.sac-format` as shared defaults, but let VS Code `sac.format.*` settings win when both define same behavior.
+
+Supported formatter controls:
+
+- `sac.format.enable`
+- `sac.format.onSave`
+- `sac.format.indentSize`
+- `sac.format.normalizeGuards`
+- `sac.format.expandInlineWithLoops`
+- `sac.format.expandInlineComprehensions`
+- `sac.format.splitInlineGuards`
+- `sac.format.assertions` (deprecated alias)
+
+`.sac-format` keys:
+
+- `IndentSize`
+- `TabWidth`
+- `NormalizeGuards`
+- `ExpandInlineWithLoops`
+- `ExpandInlineComprehensions`
+- `SplitInlineGuards`
+- `Assertions` (deprecated alias)
+
 Example:
 
 ```sac

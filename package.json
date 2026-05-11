@@ -89,6 +89,16 @@
           ".sac"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "sac-format",
+        "aliases": [
+          "SaC Format",
+          "sac-format"
+        ],
+        "filenames": [
+          ".sac-format"
+        ]
       }
     ],
     "grammars": [
@@ -103,6 +113,11 @@
         "injectTo": [
           "source.c"
         ]
+      },
+      {
+        "language": "sac-format",
+        "scopeName": "source.sac-format",
+        "path": "./syntaxes/sac-format.tmLanguage.json"
       }
     ],
     "fileIcons": [
@@ -152,6 +167,11 @@
       {
         "command": "sac.runActiveFile",
         "title": "SaC: Run Active File (sac2c)",
+        "category": "SaC"
+      },
+      {
+        "command": "sac.generateFormatConfig",
+        "title": "SaC: Generate Default .sac-format File",
         "category": "SaC"
       }
     ],
@@ -305,6 +325,17 @@
           "type": "boolean",
           "default": true,
           "description": "Expand inline tensor comprehensions to multiline style when formatting."
+        },
+        "sac.format.splitInlineGuards": {
+          "type": "boolean",
+          "default": true,
+          "description": "Split inline function guards/conditions onto separate lines when formatting."
+        },
+        "sac.format.assertions": {
+          "type": "boolean",
+          "default": true,
+          "deprecationMessage": "Use sac.format.splitInlineGuards instead.",
+          "description": "Deprecated alias for sac.format.splitInlineGuards."
         },
         "sac.diagnostics.mode": {
           "type": "string",

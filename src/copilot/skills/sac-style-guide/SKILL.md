@@ -108,3 +108,7 @@ When present, align behavior with these keys:
 - `NormalizeGuards`
 - `ExpandInlineWithLoops`
 - `ExpandInlineComprehensions`
+- `SplitInlineGuards`
+- `Assertions` (deprecated alias)
+
+VS Code `sac.format.*` settings override `.sac-format` values when both exist.
