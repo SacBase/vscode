@@ -146,7 +146,7 @@
     "sac-types": {
       "patterns": [
         {
-          "match": "\\b(int|bool|char|float|double)\\b",
+          "match": "\\b(int|bool|char|float|double|void)\\b",
           "name": "storage.type.sac"
         }
       ]
@@ -154,7 +154,7 @@
     "sac-type-patterns": {
       "patterns": [
         {
-          "begin": "(int|bool|char|float|double)\\s*\\[",
+          "begin": "(int|bool|char|float|double|void)\\s*\\[",
           "beginCaptures": {
             "0": {
               "name": "punctuation.section.brackets.begin.sac"
@@ -229,7 +229,7 @@
     "sac-functions": {
       "patterns": [
         {
-          "begin": "\\b(int|bool|char|float|double)\\b",
+          "begin": "\\b(int|bool|char|float|double|void)\\b",
           "beginCaptures": {
             "1": {
               "name": "storage.type.sac"
