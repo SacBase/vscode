@@ -1,9 +1,9 @@
 import { spawn } from "child_process";
 import * as path from "path";
 
-import type { SacSettings } from "$extension/settings/settings";
-import type { CompilerNavigationRuntimeConfig } from "$server/navigation/types";
-import { resolveSac2cPath } from "$server/sac2cResolver";
+import type { SacSettings } from "$extension/settings";
+import type { CompilerNavigationRuntimeConfig } from "$lsp-server/navigation/types";
+import { resolveSac2cPath } from "$sac2c/runtime/resolver";
 
 export interface SacCompilerRunResult {
   code: number | null;

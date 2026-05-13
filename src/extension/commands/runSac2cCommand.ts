@@ -1,11 +1,12 @@
 import * as vscode from "vscode";
 
 import { SAC_CONFIG_SECTION, SAC_LANGUAGE_ID, SAC_URI_FILE_SCHEME } from "$constants/language";
-import type { SacSettings } from "$extension/settings/settings";
-import { getDefaultSettings } from "$extension/settings/settings";
+import type { SacSettings } from "$extension/settings";
+import { getDefaultSettings } from "$extension/settings";
 import { createInvocation, isLikelyMessagingFlagFailure, runSac2c } from "$sac2c/runtime/compilerRuntime";
 
 import type { ExtensionCommand } from "$extension/commands/types";
+import { Logger } from "$util/logging";
 
 const RUN_ACTIVE_FILE_COMMAND_ID = "sac.runActiveFile";
 const SAC_OUTPUT_CHANNEL_NAME = "SaC Compiler";
@@ -122,17 +123,21 @@ async function runWithOptionalMessagingRetry(
 }
 
 async function runSac2cForResource(resource?: unknown): Promise<void> {
+  Logger.info("[command] sac.runActiveFile invoked");
   const document = resolveTargetDocument(resource);
   if (!document) {
+    Logger.warn("[command] No active document found.");
     vscode.window.showWarningMessage("No active document to run with sac2c.");
     return;
   }
 
   if (!ensureRunnableSacDocument(document)) {
+    Logger.warn("[command] Document is not a valid .sac file.");
     return;
   }
 
   if (!(await ensureSavedDocument(document))) {
+    Logger.warn("[command] Document not saved, aborting.");
     return;
   }
 
@@ -144,6 +149,8 @@ async function runSac2cForResource(resource?: unknown): Promise<void> {
   const workspaceRoot = resolveWorkspaceRoot(document.uri);
   const fsPath = document.uri.fsPath;
 
+  Logger.info(`[command] Running sac2c on ${fsPath}`);
+  Logger.info(`[command] Compiler channel: ${settings.compilerChannel}`);
   output.appendLine(`Running sac2c for ${fsPath}`);
   output.appendLine("");
 

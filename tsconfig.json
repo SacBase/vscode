@@ -3,11 +3,12 @@
     "module": "Node16",
     "target": "ES2020",
     "paths": {
+      "$settings": ["./src/extension/settings.ts"],
       "$sac2c/*": ["./src/sac2c/*"],
       "$util/*": ["./src/util/*"],
       "$extension/*": ["./src/extension/*"],
       "$constants/*": ["./src/constants/*"],
-      "$server/*": ["./src/server/*"],
+      "$lsp-server/*": ["./src/lsp-server/*"],
       "$copilot/*": ["./src/copilot/*"]
     },
     "lib": ["ES2020"],

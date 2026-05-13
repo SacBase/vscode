@@ -50,7 +50,7 @@
     "vscode:prepublish": "npm run bundle",
     "clean:out": "node -e \"require('fs').rmSync('out', { recursive: true, force: true })\"",
     "build:copilot:mcp": "esbuild src/copilot/mcp/sac2c-mcp.ts --bundle --platform=node --target=node20 --format=cjs --outfile=src/copilot/mcp/sac2c-mcp.js",
-    "bundle": "npm run clean:out && esbuild src/extension.ts src/server/server.ts --bundle --platform=node --target=node20 --format=cjs --outdir=out --outbase=src --sourcemap --external:vscode --tsconfig=tsconfig.json",
+    "bundle": "npm run clean:out && esbuild src/extension.ts src/lsp-server/server.ts --bundle --platform=node --target=node20 --format=cjs --outdir=out --outbase=src --sourcemap --external:vscode --tsconfig=tsconfig.json",
     "compile": "tsc -p ./ && tsc-alias -p tsconfig.json && npm run build:copilot:mcp",
     "watch": "concurrently -k \"tsc -watch -p ./\" \"tsc-alias -p tsconfig.json -w\" \"esbuild src/copilot/mcp/sac2c-mcp.ts --bundle --platform=node --target=node20 --format=cjs --outfile=src/copilot/mcp/sac2c-mcp.js --watch\"",
     "package": "vsce package",
@@ -275,10 +275,24 @@
           "default": true,
           "description": "Enable language server feature module. Overrides sac.languageServer.enable when set."
         },
+        "sac.navigation.backend": {
+          "type": "string",
+          "enum": [
+            "navjson",
+            "symbols"
+          ],
+          "default": "symbols",
+          "description": "Select compiler navigation backend. navjson uses cursor-targeted JSON queries; symbols uses -symbols dump output."
+        },
         "sac.features.formatter.enable": {
           "type": "boolean",
           "default": true,
           "description": "Enable formatter feature module registration."
+        },
+        "sac.features.fallback.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable local fallback hover and navigation providers when language server does not return a result."
         },
         "sac.features.chatParticipant.enable": {
           "type": "boolean",

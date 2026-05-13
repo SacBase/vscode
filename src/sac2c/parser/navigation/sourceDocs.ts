@@ -1,7 +1,5 @@
 import * as fs from "fs";
 
-import { escapeRegExp } from "$util/regex";
-import { splitTopLevel } from "$util/textSplit";
 import {
   CONTROL_FLOW_KEYWORD_PATTERN,
   DOC_TAG_EXAMPLE_PATTERN,
@@ -11,6 +9,8 @@ import {
   FUNCTION_DEFINITION_HEADER_PATTERN,
   RETURN_KEYWORD_PATTERN,
 } from "$constants/regex";
+import { escapeRegExp } from "$util/regex";
+import { splitTopLevel } from "$util/textSplit";
 
 function normalizeSimpleHtmlToMarkdown(text: string): string {
   return text
@@ -349,7 +349,7 @@ export function extractDefinitionSignatureFromText(sourceText: string, definitio
   }
 
   const signatureStem = header.slice(0, closeParenIndex + 1).trim();
-  if (!/\b[A-Za-z_][A-Za-z0-9_]*\s*\(/.test(signatureStem)) {
+  if (!/(?:\b|(?=[+\-*/=<>&|!%^~]))([A-Za-z_][A-Za-z0-9_]*|[+\-*/=<>&|!%^~]+)\s*\(/.test(signatureStem)) {
     return null;
   }
 
@@ -421,7 +421,7 @@ export function findFunctionCallAtPosition(
 export function findFunctionDefinitionLineByName(sourceText: string, functionName: string): number | null {
   const lines = sourceText.split(/\r?\n/);
   const escapedName = escapeRegExp(functionName);
-  const pattern = new RegExp(`^\\s*(?:inline\\s+)?(?:[A-Za-z0-9_\\[\\].,:<>*\\s]+)?\\b${escapedName}\\s*\\(`);
+  const pattern = new RegExp(`^\\s*(?:inline\\s+)?(?:[A-Za-z0-9_\\[\\].,:<>*\\s]+)?(?:\\b|(?=[+\\-*/=<>&|!%^~]))${escapedName}\\s*\\(`);
 
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
     const lineText = lines[lineIndex];

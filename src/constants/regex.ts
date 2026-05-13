@@ -1,10 +1,12 @@
 // Shared regexes used across navigation, formatter, and helper parsing code.
 
 export const IDENTIFIER_CHARS = "[A-Za-z_][A-Za-z0-9_]*";
+export const OPERATOR_CHARS = "[+\\-*/=<>&|!%^~]+";
+export const FUNCTION_NAME_CHARS = `(?:${IDENTIFIER_CHARS}|${OPERATOR_CHARS})`;
 
 export const IDENTIFIER_PATTERN = new RegExp(IDENTIFIER_CHARS);
 
-export const FUNCTION_DEFINITION_HEADER_PATTERN = /^(\s*)(?:inline\s+)?(?:[A-Za-z0-9_\[\].,:<>\*\s]+)?\b([A-Za-z_][A-Za-z0-9_]*)\s*\(/;
+export const FUNCTION_DEFINITION_HEADER_PATTERN = /^(\s*)(?:inline\s+)?(?:[A-Za-z0-9_\[\].,:<>\*\s]+)?(?:\b|(?=[+\-*/=<>&|!%^~]))([A-Za-z_][A-Za-z0-9_]*|[+\-*/=<>&|!%^~]+)\s*\(/;
 
 export const FUNCTION_CALL_PATTERN = /\b([A-Za-z_][A-Za-z0-9_]*)\b(?=\s*\()/g;
 export const BUILTIN_FUNCTION_CALL_PATTERN = /(^|[^A-Za-z0-9_])(_[A-Za-z0-9]+(?:_[A-Za-z0-9]+)*_)(?=\s*\()/g;
@@ -18,7 +20,7 @@ export const TOP_LEVEL_HEADING_PATTERN = /^#\s+/;
 export const DOC_SECTION_HEADING_PATTERN = /^##+\s+(.+)$/;
 export const SIGNATURE_CODE_BLOCK_PATTERN = /```(?:sac)?\s*\n([\s\S]*?)```/gi;
 
-export const FUNCTION_DEFINITION_CAPTURE_PATTERN = /\b([A-Za-z_][A-Za-z0-9_]*)\s*\([^;{}]*\)\s*\{/g;
+export const FUNCTION_DEFINITION_CAPTURE_PATTERN = /(?:\b|(?=[+\-*/=<>&|!%^~]))([A-Za-z_][A-Za-z0-9_]*|[+\-*/=<>&|!%^~]+)\s*\([^;{}]*\)\s*\{/g;
 export const MODULE_DECLARATION_CAPTURE_PATTERN = /^\s*module\s+([A-Za-z_][A-Za-z0-9_]*)\s*;/m;
 export const FUNCTION_SIGNATURE_TRAILING_PAREN_PATTERN = /\([^;{}]*\)\s*$/;
 export const FUNCTION_HEADER_CANDIDATE_PATTERN = /^[A-Za-z_][\w\[\]\s,:*<>]*\([^;{}]*\)\s*$/;
