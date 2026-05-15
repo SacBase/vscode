@@ -1,10 +1,16 @@
 {
   "iconDefinitions": {
     "_file_sac": {
-      "iconPath": "./logo.png"
+      "iconPath": "./logo-outline.png"
+    },
+    "_file_sac_format": {
+      "iconPath": "./logo-blue.png"
     }
   },
   "fileExtensions": {
     "sac": "_file_sac"
+  },
+  "fileNames": {
+    ".sac-format": "_file_sac_format"
   }
 }

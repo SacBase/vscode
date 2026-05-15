@@ -39,6 +39,8 @@
   ],
   "main": "./out/extension.js",
   "activationEvents": [
+    "onLanguage:sac",
+    "onLanguage:sac-format",
     "onChatParticipant:sac-language-support.sac"
   ],
   "engines": {
@@ -83,7 +85,8 @@
         "id": "sac",
         "aliases": [
           "SaC",
-          "sac"
+          "sac",
+          "Single-assignment C"
         ],
         "extensions": [
           ".sac"
@@ -94,7 +97,8 @@
         "id": "sac-format",
         "aliases": [
           "SaC Format",
-          "sac-format"
+          "sac-format",
+          "Single-assignment C Format Config"
         ],
         "filenames": [
           ".sac-format"
@@ -118,14 +122,6 @@
         "language": "sac-format",
         "scopeName": "source.sac-format",
         "path": "./syntaxes/sac-format.tmLanguage.json"
-      }
-    ],
-    "fileIcons": [
-      {
-        "extensions": [
-          "sac"
-        ],
-        "icon": "./icons/logo.png"
       }
     ],
     "snippets": [

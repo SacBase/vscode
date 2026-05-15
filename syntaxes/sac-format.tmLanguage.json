@@ -13,6 +13,21 @@
       "match": "#.*$"
     },
     {
+      "name": "meta.key-value.valid.sac-format",
+      "match": "^\\s*(IndentSize|NormalizeGuards|ExpandInlineWithLoops|ExpandInlineComprehensions|SplitInlineGuards)\\s*(:)\\s*(.*)$",
+      "captures": {
+        "1": {
+          "name": "variable.parameter.sac-format"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.sac-format"
+        },
+        "3": {
+          "name": "string.unquoted.value.sac-format"
+        }
+      }
+    },
+    {
       "name": "meta.key-value.sac-format",
       "match": "^\\s*([A-Za-z][A-Za-z0-9]*)\\s*(:)\\s*(.*)$",
       "captures": {

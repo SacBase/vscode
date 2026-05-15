@@ -10,31 +10,46 @@
       }
     },
     {
-      "scope": ["comment", "punctuation.definition.comment"],
+      "scope": [
+        "comment",
+        "punctuation.definition.comment"
+      ],
       "settings": {
         "foreground": "#57A64A"
       }
     },
     {
-      "scope": ["string", "punctuation.definition.string"],
+      "scope": [
+        "string",
+        "punctuation.definition.string"
+      ],
       "settings": {
         "foreground": "#CE9178"
       }
     },
     {
-      "scope": ["constant.numeric", "constant.language"],
+      "scope": [
+        "constant.numeric",
+        "constant.language"
+      ],
       "settings": {
         "foreground": "#B5CEA8"
       }
     },
     {
-      "scope": ["keyword", "storage"],
+      "scope": [
+        "keyword",
+        "storage"
+      ],
       "settings": {
         "foreground": "#D8A0DF"
       }
     },
     {
-      "scope": ["entity.name.function", "support.function"],
+      "scope": [
+        "entity.name.function",
+        "support.function"
+      ],
       "settings": {
         "foreground": "#DCDCAA"
       }
@@ -53,7 +68,10 @@
       }
     },
     {
-      "scope": ["entity.name.type", "support.type"],
+      "scope": [
+        "entity.name.type",
+        "support.type"
+      ],
       "settings": {
         "foreground": "#569CD6"
       }
@@ -140,6 +158,19 @@
       }
     },
     {
+      "scope": "variable.parameter.sac-format",
+      "settings": {
+        "foreground": "#569CD6",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "variable.other.property.sac-format",
+      "settings": {
+        "foreground": "#9A9A9A"
+      }
+    },
+    {
       "scope": "variable.parameter.rank.sac",
       "settings": {
         "foreground": "#DADADA"
@@ -165,7 +196,11 @@
       }
     },
     {
-      "scope": ["punctuation.section.brackets.begin.sac", "punctuation.section.brackets.end.sac", "punctuation.separator.comma.sac"],
+      "scope": [
+        "punctuation.section.brackets.begin.sac",
+        "punctuation.section.brackets.end.sac",
+        "punctuation.separator.comma.sac"
+      ],
       "settings": {
         "foreground": "#DADADA"
       }

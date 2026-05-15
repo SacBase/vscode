@@ -10,31 +10,46 @@
       }
     },
     {
-      "scope": ["comment", "punctuation.definition.comment"],
+      "scope": [
+        "comment",
+        "punctuation.definition.comment"
+      ],
       "settings": {
         "foreground": "#4B5563"
       }
     },
     {
-      "scope": ["string", "punctuation.definition.string"],
+      "scope": [
+        "string",
+        "punctuation.definition.string"
+      ],
       "settings": {
         "foreground": "#93E9F0"
       }
     },
     {
-      "scope": ["constant.numeric", "constant.language"],
+      "scope": [
+        "constant.numeric",
+        "constant.language"
+      ],
       "settings": {
         "foreground": "#A5E3FF"
       }
     },
     {
-      "scope": ["keyword", "storage"],
+      "scope": [
+        "keyword",
+        "storage"
+      ],
       "settings": {
         "foreground": "#60A5FF"
       }
     },
     {
-      "scope": ["entity.name.function", "support.function"],
+      "scope": [
+        "entity.name.function",
+        "support.function"
+      ],
       "settings": {
         "foreground": "#BFE4FF"
       }
@@ -53,7 +68,10 @@
       }
     },
     {
-      "scope": ["entity.name.type", "support.type"],
+      "scope": [
+        "entity.name.type",
+        "support.type"
+      ],
       "settings": {
         "foreground": "#7DD3FC"
       }
@@ -165,9 +183,26 @@
       }
     },
     {
-      "scope": ["punctuation.section.brackets.begin.sac", "punctuation.section.brackets.end.sac", "punctuation.separator.comma.sac"],
+      "scope": [
+        "punctuation.section.brackets.begin.sac",
+        "punctuation.section.brackets.end.sac",
+        "punctuation.separator.comma.sac"
+      ],
       "settings": {
         "foreground": "#93C5FF"
+      }
+    },
+    {
+      "scope": "variable.parameter.sac-format",
+      "settings": {
+        "foreground": "#7DD3FC",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": "variable.other.property.sac-format",
+      "settings": {
+        "foreground": "#9A9A9A"
       }
     }
   ]
