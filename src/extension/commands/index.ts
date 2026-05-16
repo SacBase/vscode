@@ -1,11 +1,20 @@
 import type * as vscode from "vscode";
 
+import { compileSelectedFileCommand } from "$extension/commands/compileSelectedFileCommand";
 import { generateFormatConfigCommand } from "$extension/commands/generateFormatConfigCommand";
 import { runSac2cCommand } from "$extension/commands/runSac2cCommand";
+import { runSelectedFileCommand } from "$extension/commands/runSelectedFileCommand";
+import { runSelectedFileInTerminalCommand } from "$extension/commands/runSelectedFileInTerminalCommand";
 import type { ExtensionCommand } from "$extension/commands/types";
 import { Logger } from "$util/logging";
 
-const COMMANDS: ExtensionCommand[] = [runSac2cCommand, generateFormatConfigCommand];
+const COMMANDS: ExtensionCommand[] = [
+  runSac2cCommand,
+  generateFormatConfigCommand,
+  runSelectedFileCommand,
+  runSelectedFileInTerminalCommand,
+  compileSelectedFileCommand,
+];
 
 /**
  * Registers all extension commands and returns disposables.

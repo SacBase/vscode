@@ -169,6 +169,21 @@
         "command": "sac.generateFormatConfig",
         "title": "SaC: Generate Default .sac-format File",
         "category": "SaC"
+      },
+      {
+        "command": "sac.runSelectedFile",
+        "title": "Run Selected File(s)",
+        "category": "SaC"
+      },
+      {
+        "command": "sac.runSelectedFileInTerminal",
+        "title": "Run Selected File(s) in New Terminal",
+        "category": "SaC"
+      },
+      {
+        "command": "sac.compileSelectedFile",
+        "title": "Compile Selected File(s)",
+        "category": "SaC"
       }
     ],
     "keybindings": [
@@ -182,6 +197,48 @@
         "key": "ctrl+f5",
         "mac": "cmd+f5",
         "when": "editorTextFocus && editorLangId == sac"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "submenu": "sac/explorer/context",
+          "group": "1_modification",
+          "when": "resourceLangId == sac"
+        },
+        {
+          "submenu": "sac/explorer/context",
+          "group": "9_zzz_open",
+          "when": "resourceIsFolder || !resource"
+        }
+      ],
+      "sac/explorer/context": [
+        {
+          "command": "sac.generateFormatConfig",
+          "group": "sac@0",
+          "when": "resourceIsFolder || !resource"
+        },
+        {
+          "command": "sac.runSelectedFile",
+          "group": "sac@1",
+          "when": "resourceLangId == sac"
+        },
+        {
+          "command": "sac.runSelectedFileInTerminal",
+          "group": "sac@2",
+          "when": "resourceLangId == sac"
+        },
+        {
+          "command": "sac.compileSelectedFile",
+          "group": "sac@3",
+          "when": "resourceLangId == sac"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "sac/explorer/context",
+        "label": "SaC"
       }
     ],
     "chatParticipants": [
