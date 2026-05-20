@@ -1,6 +1,14 @@
 import * as vscode from "vscode";
 
-import { isSacFile, readRuntimeCompilerSettings, resolveWorkspaceRoot, runSac2cWithRetry } from "$extension/commands/contextMenuHelpers";
+import {
+    cleanupGeneratedArtifacts,
+    getGeneratedArtifactPaths,
+    isSacFile,
+    readRuntimeCompilerSettings,
+    resolveWorkspaceRoot,
+    runCompiledFileInTerminal,
+    runSac2cWithRetry,
+} from "$extension/commands/contextMenuHelpers";
 import type { ExtensionCommand } from "$extension/commands/types";
 import { Logger } from "$util/logging";
 
@@ -15,7 +23,6 @@ async function runSelectedSacFiles(fileUris: vscode.Uri[]): Promise<void> {
     return;
   }
 
-  const settings = readRuntimeCompilerSettings();
   const output = vscode.window.createOutputChannel("SaC Compiler - Context Menu");
   output.clear();
   output.show(true);
@@ -29,10 +36,11 @@ async function runSelectedSacFiles(fileUris: vscode.Uri[]): Promise<void> {
   for (const fileUri of fileUris) {
     const fsPath = fileUri.fsPath;
     const workspaceRoot = resolveWorkspaceRoot(fileUri);
+    const settings = readRuntimeCompilerSettings("sac", fsPath);
 
     try {
       output.appendLine(`--- ${fsPath} ---`);
-      const result = await runSac2cWithRetry(settings, workspaceRoot, fsPath, true);
+      const result = await runSac2cWithRetry(settings, workspaceRoot, fsPath, true, true);
 
       if (result.stdout.trim().length > 0) {
         output.appendLine(result.stdout);
@@ -43,9 +51,14 @@ async function runSelectedSacFiles(fileUris: vscode.Uri[]): Promise<void> {
       }
 
       if (result.code === 0) {
-        output.appendLine(`✓ Completed with exit code 0`);
+        output.appendLine(`✓ Compiled successfully`);
+        const cleanupPaths = getGeneratedArtifactPaths(settings, fsPath);
+        const activeTerminal = vscode.window.activeTerminal ?? vscode.window.createTerminal({ name: "SaC Compiler" });
+        runCompiledFileInTerminal(activeTerminal, settings, fsPath);
+        output.appendLine(`  launched ${cleanupPaths[0]}`);
         successCount++;
       } else {
+        await cleanupGeneratedArtifacts(settings, fsPath);
         output.appendLine(`✗ Exited with code ${result.code === null ? "unknown" : String(result.code)}`);
         failureCount++;
       }
@@ -53,13 +66,12 @@ async function runSelectedSacFiles(fileUris: vscode.Uri[]): Promise<void> {
       output.appendLine("");
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
+      await cleanupGeneratedArtifacts(settings, fsPath);
       output.appendLine(`✗ Error: ${message}`);
       output.appendLine("");
       failureCount++;
     }
   }
-
-  output.appendLine(`Summary: ${successCount} succeeded, ${failureCount} failed.`);
 
   if (failureCount === 0) {
     vscode.window.showInformationMessage(`SaC: sac2c run completed for ${successCount} file(s).`);

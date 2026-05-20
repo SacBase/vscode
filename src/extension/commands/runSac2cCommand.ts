@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 
-import { SAC_CONFIG_SECTION, SAC_LANGUAGE_ID, SAC_URI_FILE_SCHEME } from "$constants/language";
+import { SAC_LANGUAGE_ID, SAC_URI_FILE_SCHEME } from "$constants/language";
 import type { SacSettings } from "$extension/settings";
-import { getDefaultSettings } from "$extension/settings";
-import { createInvocation, isLikelyMessagingFlagFailure, runSac2c } from "$sac2c/runtime/compilerRuntime";
+import { readRuntimeCompilerSettings } from "$extension/settings";
+import { createInvocation, isLikelyMessagingFlagFailure, runSac2c } from "$sac2c/invoke";
 
 import type { ExtensionCommand } from "$extension/commands/types";
 import { Logger } from "$util/logging";
@@ -18,36 +18,6 @@ function getOutputChannel(): vscode.OutputChannel {
   }
 
   return outputChannel;
-}
-
-function normalizeStringArgs(value: unknown, fallback: string[]): string[] {
-  if (!Array.isArray(value)) {
-    return fallback;
-  }
-
-  return value.filter((entry): entry is string => typeof entry === "string");
-}
-
-function readRuntimeCompilerSettings(): SacSettings {
-  const defaults = getDefaultSettings();
-  const config = vscode.workspace.getConfiguration(SAC_CONFIG_SECTION);
-
-  const compilerChannel = config.get<string>("compiler.channel", defaults.compilerChannel);
-  const executionBackend = config.get<string>("compiler.executionBackend", defaults.executionBackend);
-
-  return {
-    ...defaults,
-    compilerChannel: compilerChannel === "stable" || compilerChannel === "develop" || compilerChannel === "system" ? compilerChannel : defaults.compilerChannel,
-    compilerPath: config.get<string>("compiler.path", defaults.compilerPath),
-    fallbackToSystem: config.get<boolean>("compiler.fallbackToSystem", defaults.fallbackToSystem),
-    executionBackend: executionBackend === "local" || executionBackend === "wsl" || executionBackend === "docker" ? executionBackend : defaults.executionBackend,
-    wslDistribution: config.get<string>("compiler.wsl.distribution", defaults.wslDistribution),
-    dockerImage: config.get<string>("compiler.docker.image", defaults.dockerImage),
-    dockerRunArgs: normalizeStringArgs(config.get<unknown>("compiler.docker.runArgs"), defaults.dockerRunArgs),
-    messagingEnabled: config.get<boolean>("compiler.messaging.enabled", defaults.messagingEnabled),
-    messagingArgs: normalizeStringArgs(config.get<unknown>("compiler.messaging.args"), defaults.messagingArgs),
-    compilerExtraArgs: normalizeStringArgs(config.get<unknown>("compiler.extraArgs"), defaults.compilerExtraArgs),
-  };
 }
 
 function resolveWorkspaceRoot(uri: vscode.Uri): string {
@@ -145,9 +115,9 @@ async function runSac2cForResource(resource?: unknown): Promise<void> {
   output.clear();
   output.show(true);
 
-  const settings = readRuntimeCompilerSettings();
   const workspaceRoot = resolveWorkspaceRoot(document.uri);
   const fsPath = document.uri.fsPath;
+  const settings = readRuntimeCompilerSettings("sac", fsPath);
 
   Logger.info(`[command] Running sac2c on ${fsPath}`);
   Logger.info(`[command] Compiler channel: ${settings.compilerChannel}`);

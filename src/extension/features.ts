@@ -2,11 +2,12 @@ import type * as vscode from "vscode";
 
 import { ChatParticipantFeature } from "$copilot/chatParticipantFeature";
 import { CommandFeature } from "$extension/commands/feature";
+import { SacConfigFeature } from "$extension/config/feature";
 import {
-  FormattingFeature,
-  OutlineFeature,
-  ReferencesFallbackFeature,
-  SacFormatFeature,
+    FormattingFeature,
+    OutlineFeature,
+    ReferencesFallbackFeature,
+    SacFormatFeature,
 } from "$extension/fallback";
 import { createLspClientFeatures, type FeatureLifecycle } from "$extension/lsp-client/client";
 import { Logger } from "$util/logging";
@@ -25,6 +26,7 @@ export async function registerExtensionFeatures(context: vscode.ExtensionContext
     new ReferencesFallbackFeature(),
     new OutlineFeature(),
     new SacFormatFeature(),
+    new SacConfigFeature(),
     new ChatParticipantFeature(),
     ...createLspClientFeatures(context),
   ];

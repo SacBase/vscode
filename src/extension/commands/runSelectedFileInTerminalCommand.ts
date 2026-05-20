@@ -1,8 +1,14 @@
 import * as vscode from "vscode";
 
-import { isSacFile, readRuntimeCompilerSettings, resolveWorkspaceRoot } from "$extension/commands/contextMenuHelpers";
+import {
+    cleanupGeneratedArtifacts,
+    isSacFile,
+    readRuntimeCompilerSettings,
+    resolveWorkspaceRoot,
+    runCompiledFileInTerminal,
+    runSac2cWithRetry,
+} from "$extension/commands/contextMenuHelpers";
 import type { ExtensionCommand } from "$extension/commands/types";
-import { createInvocation } from "$sac2c/runtime/compilerRuntime";
 import { Logger } from "$util/logging";
 
 const COMMAND_ID = "sac.runSelectedFileInTerminal";
@@ -16,32 +22,31 @@ async function runSelectedSacFilesInTerminal(fileUris: vscode.Uri[]): Promise<vo
     return;
   }
 
-  const settings = readRuntimeCompilerSettings();
-  const firstUri = fileUris[0];
-  const workspaceRoot = resolveWorkspaceRoot(firstUri);
-  const workspaceFolder = vscode.workspace.getWorkspaceFolder(firstUri);
+  for (const fileUri of fileUris) {
+    const workspaceRoot = resolveWorkspaceRoot(fileUri);
+    const settings = readRuntimeCompilerSettings("sac", fileUri.fsPath);
 
-  const terminal = vscode.window.createTerminal({
-    name: "SaC Compiler",
-    cwd: workspaceFolder?.uri.fsPath || workspaceRoot,
-  });
+    try {
+      const result = await runSac2cWithRetry(settings, workspaceRoot, fileUri.fsPath, true, true);
+      if (result.code !== 0) {
+        await cleanupGeneratedArtifacts(settings, fileUri.fsPath);
+        vscode.window.showErrorMessage(`sac2c exited with code ${result.code === null ? "unknown" : String(result.code)} for ${fileUri.fsPath}.`);
+        continue;
+      }
 
-  // Build command for all selected files
-  const filePaths = fileUris.map((uri) => `"${uri.fsPath}"`).join(" ");
-  const invocation = createInvocation(settings, workspaceRoot, fileUris[0].fsPath, true, (message) => vscode.window.showWarningMessage(message));
+      const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+      const terminal = vscode.window.createTerminal({
+        name: "SaC Compiler",
+        cwd: workspaceFolder?.uri.fsPath || workspaceRoot,
+      });
 
-  if (!invocation) {
-    vscode.window.showErrorMessage("Unable to build sac2c invocation from current settings.");
-    terminal.dispose();
-    return;
+      runCompiledFileInTerminal(terminal, settings, fileUri.fsPath);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      await cleanupGeneratedArtifacts(settings, fileUri.fsPath);
+      vscode.window.showErrorMessage(`Failed to run ${fileUri.fsPath}: ${message}`);
+    }
   }
-
-  // Replace the file path in the invocation args with all selected files
-  const args = invocation.args.map((arg) => (arg === fileUris[0].fsPath ? filePaths : arg)).join(" ");
-  const command = `${invocation.command} ${args}`;
-
-  terminal.sendText(command);
-  terminal.show();
 }
 
 /**

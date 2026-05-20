@@ -41,6 +41,7 @@
   "activationEvents": [
     "onLanguage:sac",
     "onLanguage:sac-format",
+    "onLanguage:sac-config",
     "onChatParticipant:sac-language-support.sac"
   ],
   "engines": {
@@ -103,6 +104,17 @@
         "filenames": [
           ".sac-format"
         ]
+      },
+      {
+        "id": "sac-config",
+        "aliases": [
+          "SaC Config",
+          "sac-config",
+          "SaC Project Config"
+        ],
+        "filenames": [
+          ".sac-config"
+        ]
       }
     ],
     "grammars": [
@@ -122,6 +134,11 @@
         "language": "sac-format",
         "scopeName": "source.sac-format",
         "path": "./syntaxes/sac-format.tmLanguage.json"
+      },
+      {
+        "language": "sac-config",
+        "scopeName": "source.sac-config",
+        "path": "./syntaxes/sac-config.tmLanguage.json"
       }
     ],
     "snippets": [
@@ -168,6 +185,11 @@
       {
         "command": "sac.generateFormatConfig",
         "title": "SaC: Generate Default .sac-format File",
+        "category": "SaC"
+      },
+      {
+        "command": "sac.generateCompilerConfig",
+        "title": "SaC: Generate Default .sac-config File",
         "category": "SaC"
       },
       {
@@ -524,6 +546,15 @@
             "type": "string"
           },
           "description": "Additional command-line arguments passed to sac2c when running diagnostics."
+        },
+        "sac.compiler.outputBase": {
+          "type": "string",
+          "enum": [
+            "file-name",
+            "a"
+          ],
+          "default": "file-name",
+          "description": "Base name used for sac2c output files. file-name uses the source filename without extension; a keeps the classic a.out style."
         },
         "sac.compiler.messaging.enabled": {
           "type": "boolean",

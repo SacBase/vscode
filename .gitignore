@@ -5,3 +5,4 @@ out
 .ignored
 docs/private/*
 .ignored
+.archive

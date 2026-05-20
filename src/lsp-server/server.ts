@@ -1,23 +1,23 @@
 import { TextDocument } from "vscode-languageserver-textdocument";
 import type {
-	Definition,
-	DefinitionParams,
-	Hover,
-	HoverParams,
-	TextDocumentPositionParams,
+    Definition,
+    DefinitionParams,
+    Hover,
+    HoverParams,
+    TextDocumentPositionParams,
 } from "vscode-languageserver/node";
 import {
-	createConnection,
-	ProposedFeatures,
-	TextDocuments,
-	TextDocumentSyncKind,
+    createConnection,
+    ProposedFeatures,
+    TextDocuments,
+    TextDocumentSyncKind,
 } from "vscode-languageserver/node";
 
 import { getDefaultSettings, type SacSettings, updateSettings } from "$extension/settings";
-import { createDiagnosticsWorkflow } from "$lsp-server/diagnostics/workflow";
-import { provideHover } from "$lsp-server/hover-info/hover";
-import { provideDefinition } from "$lsp-server/navigation/provider";
-import { getCompilerNavigationRuntime } from "$sac2c/runtime/compilerRuntime";
+import { createDiagnosticsWorkflow } from "$lsp-server/methods/textDocument/diagnostics/workflow";
+import { provideHover } from "$lsp-server/methods/textDocument/hover/hover";
+import { provideDefinition } from "$lsp-server/methods/textDocument/navigation/provider";
+import { getCompilerNavigationRuntime } from "$sac2c/invoke";
 import { uriToFsPath } from "$util/documentUtils";
 
 const connection = createConnection(ProposedFeatures.all);
@@ -101,7 +101,6 @@ connection.onHover(async (params: HoverParams & TextDocumentPositionParams): Pro
 			params.position,
 			workspaceRoot,
 			extensionInstallRoot,
-			settings.navigationBackend,
 			getCompilerNavigationRuntime(settings, workspaceRoot),
 			createHoverDebugLogger(settings.compilerTrace !== "off", "hover"),
 		);
@@ -127,7 +126,6 @@ connection.onDefinition(async (params: DefinitionParams): Promise<Definition | n
 		workspaceRoots,
 		openDocuments: documents.all(),
 		excludedDirNames: new Set(settings.workspaceScanExcludeDirectories),
-		navigationBackend: settings.navigationBackend,
 		runtime: getCompilerNavigationRuntime(settings, workspaceRoot),
 	});
 
@@ -140,7 +138,7 @@ connection.onInitialized(() => {
 			console.error("[server] Initialized, loading configuration...");
 			const sacConfig = await connection.workspace.getConfiguration("sac");
 			settings = updateSettings({ sac: sacConfig as unknown });
-			console.error(`[server] Configuration loaded. Navigation backend: ${settings.navigationBackend}, Diagnostics mode: ${settings.diagnosticsMode}`);
+			console.error(`[server] Configuration loaded. Diagnostics mode: ${settings.diagnosticsMode}`);
 			if (settings.workspaceScanOnInitialize) {
 				console.error("[server] Initiating workspace scan on startup...");
 				await diagnosticsWorkflow.validateAllWorkspaceSacFiles();

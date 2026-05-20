@@ -1,44 +1,11 @@
+import * as path from "path";
 import * as vscode from "vscode";
 
 import type { SacSettings } from "$extension/settings";
-import { getDefaultSettings } from "$extension/settings";
-import { createInvocation, isLikelyMessagingFlagFailure, runSac2c } from "$sac2c/runtime/compilerRuntime";
+import { createInvocation, isLikelyMessagingFlagFailure, runSac2c } from "$sac2c/invoke";
+import { getCompilerOutputArtifactPaths, resolveCompilerOutputBaseName } from "$sac2c/invoke/compiler";
 
-/**
- * Normalizes string array from config values.
- */
-export function normalizeStringArgs(value: unknown, fallback: string[]): string[] {
-  if (!Array.isArray(value)) {
-    return fallback;
-  }
-
-  return value.filter((entry): entry is string => typeof entry === "string");
-}
-
-/**
- * Reads SaC compiler settings from workspace configuration.
- */
-export function readRuntimeCompilerSettings(): SacSettings {
-  const defaults = getDefaultSettings();
-  const config = vscode.workspace.getConfiguration("sac");
-
-  const compilerChannel = config.get<string>("compiler.channel", defaults.compilerChannel);
-  const executionBackend = config.get<string>("compiler.executionBackend", defaults.executionBackend);
-
-  return {
-    ...defaults,
-    compilerChannel: compilerChannel === "stable" || compilerChannel === "develop" || compilerChannel === "system" ? compilerChannel : defaults.compilerChannel,
-    compilerPath: config.get<string>("compiler.path", defaults.compilerPath),
-    fallbackToSystem: config.get<boolean>("compiler.fallbackToSystem", defaults.fallbackToSystem),
-    executionBackend: executionBackend === "local" || executionBackend === "wsl" || executionBackend === "docker" ? executionBackend : defaults.executionBackend,
-    wslDistribution: config.get<string>("compiler.wsl.distribution", defaults.wslDistribution),
-    dockerImage: config.get<string>("compiler.docker.image", defaults.dockerImage),
-    dockerRunArgs: normalizeStringArgs(config.get<unknown>("compiler.docker.runArgs"), defaults.dockerRunArgs),
-    messagingEnabled: config.get<boolean>("compiler.messaging.enabled", defaults.messagingEnabled),
-    messagingArgs: normalizeStringArgs(config.get<unknown>("compiler.messaging.args"), defaults.messagingArgs),
-    compilerExtraArgs: normalizeStringArgs(config.get<unknown>("compiler.extraArgs"), defaults.compilerExtraArgs),
-  };
-}
+export { readRuntimeCompilerSettings } from "$extension/settings";
 
 /**
  * Resolves workspace root from a given URI.
@@ -58,6 +25,55 @@ export function resolveWorkspaceRoot(uri: vscode.Uri): string {
  */
 export function isSacFile(uri: vscode.Uri): boolean {
   return uri.fsPath.endsWith(".sac");
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, `'"'"'`)}'`;
+}
+
+function getExecutablePath(settings: SacSettings, fsPath: string): string {
+  const outputBase = resolveCompilerOutputBaseName(settings, fsPath);
+  return path.join(path.dirname(fsPath), outputBase);
+}
+
+export function getGeneratedArtifactPaths(settings: SacSettings, fsPath: string): string[] {
+  return getCompilerOutputArtifactPaths(settings, fsPath);
+}
+
+export async function cleanupGeneratedArtifacts(settings: SacSettings, fsPath: string): Promise<void> {
+  const paths = getGeneratedArtifactPaths(settings, fsPath);
+  await Promise.all(
+    paths.map(async (artifactPath) => {
+      try {
+        await vscode.workspace.fs.delete(vscode.Uri.file(artifactPath));
+      } catch {
+        // Ignore missing files and cleanup races.
+      }
+    }),
+  );
+}
+
+export function buildTerminalRunScript(executablePath: string, cleanupPaths: string[]): string {
+  const cleanupCommand = cleanupPaths.length > 0 ? `rm -f ${cleanupPaths.map(shellQuote).join(" ")}` : "";
+  const lines: string[] = [];
+
+  if (cleanupCommand.length > 0) {
+    lines.push(`trap ${shellQuote(cleanupCommand)} EXIT`);
+  }
+
+  lines.push(shellQuote(executablePath));
+  return lines.join("\n");
+}
+
+export function runCompiledFileInTerminal(
+  terminal: vscode.Terminal,
+  settings: SacSettings,
+  fsPath: string,
+): void {
+  const executablePath = getExecutablePath(settings, fsPath);
+  const cleanupPaths = getGeneratedArtifactPaths(settings, fsPath);
+  terminal.sendText(buildTerminalRunScript(executablePath, cleanupPaths));
+  terminal.show(true);
 }
 
 /**
@@ -110,8 +126,16 @@ export async function runSac2cWithRetry(
   workspaceRoot: string,
   fsPath: string,
   enableMessaging: boolean,
+  emitOutputs = true,
 ): Promise<{ code: number | null; stdout: string; stderr: string }> {
-  const invocation = createInvocation(settings, workspaceRoot, fsPath, enableMessaging, (message) => vscode.window.showWarningMessage(message));
+  const invocation = createInvocation(
+    settings,
+    workspaceRoot,
+    fsPath,
+    enableMessaging,
+    (message) => vscode.window.showWarningMessage(message),
+    emitOutputs,
+  );
   if (!invocation) {
     throw new Error("Unable to build sac2c invocation from current settings.");
   }
@@ -123,7 +147,14 @@ export async function runSac2cWithRetry(
   }
 
   // Retry without messaging flags
-  const retryInvocation = createInvocation(settings, workspaceRoot, fsPath, false, (message) => vscode.window.showWarningMessage(message));
+  const retryInvocation = createInvocation(
+    settings,
+    workspaceRoot,
+    fsPath,
+    false,
+    (message) => vscode.window.showWarningMessage(message),
+    emitOutputs,
+  );
   if (!retryInvocation) {
     throw new Error("Unable to build fallback sac2c invocation.");
   }

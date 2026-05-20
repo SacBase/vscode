@@ -6,6 +6,8 @@ export const SAC_FILE_GLOB = "**/*.sac";
 export const SAC_CONFIG_SECTION = "sac";
 export const SAC_FORMAT_CONFIG_SECTION = "sac.format";
 export const SAC_FORMAT_FILENAME = ".sac-format";
+export const SAC_CONFIG_LANGUAGE_ID = "sac-config";
+export const SAC_CONFIG_FILENAME = ".sac-config";
 
 export const SAC_KEYWORD_RETURN = "return";
 export const SAC_CONTROL_FLOW_KEYWORDS = ["if", "for", "while", "switch"] as const;

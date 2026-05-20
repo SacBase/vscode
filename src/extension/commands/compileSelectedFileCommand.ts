@@ -15,7 +15,6 @@ async function compileSelectedSacFiles(fileUris: vscode.Uri[]): Promise<void> {
     return;
   }
 
-  const settings = readRuntimeCompilerSettings();
   const output = vscode.window.createOutputChannel("SaC Compiler - Compile");
   output.clear();
   output.show(true);
@@ -29,6 +28,7 @@ async function compileSelectedSacFiles(fileUris: vscode.Uri[]): Promise<void> {
   for (const fileUri of fileUris) {
     const fsPath = fileUri.fsPath;
     const workspaceRoot = resolveWorkspaceRoot(fileUri);
+    const settings = readRuntimeCompilerSettings("sac", fsPath);
 
     try {
       output.appendLine(`--- ${fsPath} ---`);

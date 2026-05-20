@@ -1,17 +1,17 @@
 import { SAC_CONFIG_SECTION, SAC_LANGUAGE_ID, SAC_URI_FILE_SCHEME } from "$constants/language";
 import { BUILTIN_SYMBOL_NAME_PATTERN, IDENTIFIER_NAME_PATTERN } from "$constants/regex";
-import { getSymbolAtPosition } from "$extension/fallback/navigation/symbol";
-import type { FeatureLifecycle } from "$extension/lsp-client/languageClientFeature";
-import { formatHoverDocumentationMarkdown, resolveHoverDocumentation } from "$lsp-server/hover-info/hoverDocs";
-import { formatHoverMarkdown, lookupHoverTarget } from "$sac2c/parser/hover-info";
-import type { HoverTarget } from "$sac2c/parser/hover-info/types";
+import type { HoverTarget } from "$extension/fallback/hover-info/lookup";
+import { formatHoverMarkdown, lookupHoverTarget } from "$extension/fallback/hover-info/lookup";
 import {
-  findFunctionCallAtPosition,
-  findFunctionDefinitionAtPosition,
-  findFunctionDefinitionLineByName,
-  readDefinitionDocComment,
-  readDefinitionSignature,
-} from "$sac2c/parser/navigation/sourceDocs";
+    findFunctionCallAtPosition,
+    findFunctionDefinitionAtPosition,
+    findFunctionDefinitionLineByName,
+    readDefinitionDocComment,
+    readDefinitionSignature,
+} from "$extension/fallback/navigation/sourceDocs";
+import { getSymbolAtPosition } from "$extension/fallback/navigation/symbol";
+import { formatHoverDocumentationMarkdown, resolveHoverDocumentation } from "$extension/fallback/parser/hover-info";
+import type { FeatureLifecycle } from "$extension/lsp-client/languageClientFeature";
 import * as vscode from "vscode";
 
 export async function provideHoverFallback(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Hover | undefined> {

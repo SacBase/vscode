@@ -1,15 +1,39 @@
-# sac2c Domain Modules
+# sac2c Module: Typed Compiler Invocation & Output
 
-This folder contains compiler-domain logic used by extension/server layers.
+Invoke sac2c compiler + parse raw output. Core module - no LSP/IDE deps.
 
-## Modules
+## Structure
 
-- `diagnostics/`: compiler output parsing/grouping/presentation contracts plus workflow wiring.
-- `hover/`: token-level hover target detection/types.
-- `parser/navigation/`: navjson parser, symbol resolution, stdlib lookup, source-doc extraction.
-- `runtime/`: compiler invocation/runtime helpers shared by diagnostics/navigation.
+```
+sac2c/
+├── invoke/          # Run compiler
+│   ├── types.ts    # CompilerOptions, SacInvocation, CompilerResolution
+│   ├── compiler.ts # runSac2c(), createInvocation(), buildCompilerArgs()
+│   ├── resolver.ts # resolveSac2cPath()
+│   ├── options.ts  # Messaging flags, validators
+│   └── index.ts    # Barrel
+│
+├── interpret/       # Parse compiler output
+│   └── index.ts    # CompilerDiagnostic, SymbolInfo, ParsedCompilerOutput types
+│
+└── index.ts        # invoke + interpret exports
+```
 
-## Contract docs
+## sac2c responsibility
 
-- Navigation schema: `src/sac2c/parser/navigation/sac2c-navigation.schema.json`
-- Design notes: `docs/private/navigation-schema-design.md`
+- ✅ Run compiler (local/wsl/docker)
+- ✅ Type compiler options
+- ✅ Parse raw compiler output (diagnostics, -symbols JSON)
+
+## LSP's responsibility
+
+Feature-specific interpretation (hover, nav, definition lookup) → `lsp-server/`
+
+## API
+
+```typescript
+import { runSac2c, createInvocation, type CompilerOptions, type CompilerDiagnostic } from "$sac2c";
+
+const result = await runSac2c("sac2c", ["-symbols", "file.sac"], ".");
+```
+

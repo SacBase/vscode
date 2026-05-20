@@ -1,0 +1,49 @@
+{
+  "$schema": "./sac.tmLanguage.schema.json",
+  "name": "SaC Config",
+  "scopeName": "source.sac-config",
+  "description": [
+    "Syntax highlighting for SaC project config files.",
+    "The format is line-oriented key/value pairs using YAML-like colon syntax."
+  ],
+  "patterns": [
+    {
+      "name": "comment.line.number-sign.sac-config",
+      "match": "#.*$"
+    },
+    {
+      "name": "comment.line.double-slash.sac-config",
+      "match": "//.*$"
+    },
+    {
+      "name": "meta.key-value.valid.sac-config",
+      "match": "^\\s*(outputBase|compiler\\.outputBase)\\s*(:)\\s*(.*)$",
+      "captures": {
+        "1": {
+          "name": "variable.parameter.sac-config"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.sac-config"
+        },
+        "3": {
+          "name": "string.unquoted.value.sac-config"
+        }
+      }
+    },
+    {
+      "name": "meta.key-value.sac-config",
+      "match": "^\\s*([A-Za-z][A-Za-z0-9_.-]*)\\s*(:)\\s*(.*)$",
+      "captures": {
+        "1": {
+          "name": "variable.other.property.sac-config"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.sac-config"
+        },
+        "3": {
+          "name": "string.unquoted.value.sac-config"
+        }
+      }
+    }
+  ]
+}

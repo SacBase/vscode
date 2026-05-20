@@ -1,9 +1,9 @@
 import { SAC_CONFIG_SECTION, SAC_LANGUAGE_ID, SAC_URI_FILE_SCHEME } from "$constants/language";
 import { getSymbolAtPosition } from "$extension/fallback/navigation/symbol";
 import { queryWorkspaceDefinitions } from "$extension/fallback/navigation/workspaceDefinitions";
+import { queryStdlibDefinitions } from "$extension/fallback/parser/navigation";
 import type { FeatureLifecycle } from "$extension/lsp-client/languageClientFeature";
 import { DEFAULT_WORKSPACE_SCAN_EXCLUDE_DIRS } from "$extension/settings";
-import { queryStdlibDefinitions } from "$sac2c/parser/navigation/stdlib";
 import * as vscode from "vscode";
 import { TextDocument } from "vscode-languageserver-textdocument";
 

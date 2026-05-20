@@ -8,7 +8,7 @@ import { pathToFileURL } from "url";
 import type { TextDocument } from "vscode-languageserver-textdocument";
 import type { Location } from "vscode-languageserver/node";
 
-import type { SacDefinitionEntry } from "$lsp-server/navigation/types";
+import type { SacDefinitionEntry } from "$extension/fallback/parser/navigation/types";
 
 function getTextByUri(openDocuments: TextDocument[]): Map<string, string> {
   const result = new Map<string, string>();

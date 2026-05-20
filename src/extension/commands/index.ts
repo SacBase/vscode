@@ -7,10 +7,12 @@ import { runSelectedFileCommand } from "$extension/commands/runSelectedFileComma
 import { runSelectedFileInTerminalCommand } from "$extension/commands/runSelectedFileInTerminalCommand";
 import type { ExtensionCommand } from "$extension/commands/types";
 import { Logger } from "$util/logging";
+import { generateCompilerConfigCommand } from "./generateCompilerConfigCommand";
 
 const COMMANDS: ExtensionCommand[] = [
   runSac2cCommand,
   generateFormatConfigCommand,
+  generateCompilerConfigCommand,
   runSelectedFileCommand,
   runSelectedFileInTerminalCommand,
   compileSelectedFileCommand,
