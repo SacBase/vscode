@@ -141,14 +141,52 @@
     ],
     "description": "Boilerplate for a new SaC module."
   },
-  "FFI External Function": {
-    "prefix": "sac_external",
+  "Pragma: Basic External C Link": {
+    "prefix": "sac_pragma_basic",
     "body": [
-      "external ${1:void} ${2:c_func_name} (${3:args});",
-      "#pragma linkname \"${2:c_func_name}\"",
-      "#pragma linkobj \"${4:source.o}\"",
+      "external ${1:double} ${2:c_func} (${3:double x, double y});",
+      "#pragma linkobj \"${4:simple.o}\"",
+      "#pragma header \"${5:simple.h}\"",
       "${0}"
     ],
-    "description": "Declaration for calling external C functions."
+    "description": "Links an external C function with its object file and header for type safety."
+  },
+  "Pragma: Rename and Signature Mapping": {
+    "prefix": "sac_pragma_link",
+    "body": [
+      "external ${1:int} ${2:sac_func_name} (${3:int x, int y});",
+      "#pragma linkname \"${4:actual_c_name}\"",
+      "#pragma linksign [${5:1, 1, 2}]",
+      "${0}"
+    ],
+    "description": "Maps a SaC identifier to a different C name and defines how return values/arguments map to C pointers."
+  },
+  "Pragma: GPU Memory Integration": {
+    "prefix": "sac_pragma_gpu",
+    "body": [
+      "external ${1:int[.]} ${2:gpu_add} (${3:int n, int[.] x, int[.] y});",
+      "#pragma gpumem [${4:0, 1, 2}]",
+      "${0}"
+    ],
+    "description": "Indicates that an external function (e.g., CUDA) expects pointers to GPU device memory."
+  },
+  "Pragma: Side-Effect Management": {
+    "prefix": "sac_pragma_effect",
+    "body": [
+      "external ${1:void} ${2:print_internal} (${3:args});",
+      "#pragma effect ${4:World::TheWorld}",
+      "${0}"
+    ],
+    "description": "Declares that an external function has a side-effect on a global object or the program world."
+  },
+  "Pragma: External Type Mapping": {
+    "prefix": "sac_pragma_ctype",
+    "body": [
+      "external typedef ${1:MyType};",
+      "#pragma ctype \"${2:c_struct_name}\"",
+      "#pragma header \"${3:types.h}\"",
+      "${0}"
+    ],
+    "description": "Provides a specific C type for the SaC compiler to use when representing an external SaC type."
   }
 }

@@ -31,7 +31,6 @@ VS Code provides syntax highlighting and hover tooltips for `.sac-format` keys, 
 - `sac.format.expandInlineWithLoops`
 - `sac.format.expandInlineComprehensions`
 - `sac.format.splitInlineGuards`
-- `sac.format.assertions` (deprecated alias)
 
 ## Supported `.sac-format` keys
 
