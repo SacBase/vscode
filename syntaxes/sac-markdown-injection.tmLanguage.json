@@ -1,0 +1,24 @@
+{
+  "scopeName": "markdown.fenced_code.block.sac",
+  "injectionSelector": "L:text.html.markdown",
+  "patterns": [
+    {
+      "begin": "(^|\\G)\\s*(```|~~~)\\s*(sac)\\s*$",
+      "beginCaptures": {
+        "2": {
+          "name": "punctuation.definition.markdown"
+        },
+        "3": {
+          "name": "fenced_code.block.language.markdown"
+        }
+      },
+      "end": "(^|\\G)\\s*\\2\\s*$",
+      "contentName": "meta.embedded.block.sac",
+      "patterns": [
+        {
+          "include": "source.sac"
+        }
+      ]
+    }
+  ]
+}

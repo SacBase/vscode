@@ -139,6 +139,16 @@
         "language": "sac-config",
         "scopeName": "source.sac-config",
         "path": "./syntaxes/sac-config.tmLanguage.json"
+      },
+      {
+        "scopeName": "markdown.fenced_code.block.sac",
+        "path": "./syntaxes/sac-markdown-injection.tmLanguage.json",
+        "injectTo": [
+          "text.html.markdown"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.sac": "sac"
+        }
       }
     ],
     "snippets": [

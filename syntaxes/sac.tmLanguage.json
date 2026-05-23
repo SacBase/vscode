@@ -103,7 +103,7 @@
     "sac-module-imports": {
       "patterns": [
         {
-          "begin": "\\b(use|import)\\b",
+          "begin": "\\b(use|import|export|provide)\\b",
           "beginCaptures": {
             "1": {
               "name": "keyword.control.import.sac"
